@@ -15,6 +15,19 @@ let quillInstances = {};
 let isEditMode = false;
 let editId = null;
 
+// Fungsi untuk membaca format tanggal dari Spreadsheet (DD/MM/YYYY) menjadi format Kalender HTML (YYYY-MM-DD)
+function parseDate(dateStr) {
+    if (!dateStr) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // Sudah format YYYY-MM-DD
+    const parts = dateStr.split(/[\/\-]/);
+    if (parts.length === 3) {
+        if (parts[2].length === 4) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`; // DD/MM/YYYY ke YYYY-MM-DD
+        }
+    }
+    return dateStr; 
+}
+
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     const id = `${idPrefix}_${index}`;
     const lowerHeader = headerText.toLowerCase().trim();
@@ -27,11 +40,23 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 <div id="${id}_quill" style="height: 150px; background: white;"></div>
                 <input type="hidden" id="${id}">
             </div>`;
-    } else if (lowerHeader.includes('tgl') || lowerHeader.includes('tanggal')) {
+    } else if (lowerHeader === 'status sengketa') {
+        return `
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">${headerText}</label>
+                <select class="form-select" id="${id}" required>
+                    <option value="" disabled selected>-- Pilih Status --</option>
+                    <option value="Dalam Proses">Dalam Proses</option>
+                    <option value="Selesai">Selesai</option>
+                </select>
+                ${hint}
+            </div>`;
+    } else if (lowerHeader.includes('tgl') || lowerHeader.includes('tanggal') || lowerHeader === 'sidang terakhir') {
         return `
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">${headerText}</label>
                 <input type="date" class="form-control" id="${id}" required>
+                ${hint}
             </div>`;
     } else {
         return `
@@ -62,6 +87,40 @@ function initQuill(headers, idPrefix) {
     });
 }
 
+// Fungsi Khusus Mengunci Link Putusan
+function attachStatusLogic() {
+    let statusId = null, linkId = null;
+    
+    // Cari elemen di kedua sheet
+    sheetHeadersPerkara.forEach((h, i) => {
+        if(h.toLowerCase().trim() === 'status sengketa') statusId = `inputPerkara_${i}`;
+        if(h.toLowerCase().trim() === 'link putusan') linkId = `inputPerkara_${i}`;
+    });
+    sheetHeadersDetail.forEach((h, i) => {
+        if(h.toLowerCase().trim() === 'status sengketa') statusId = `inputDetail_${i}`;
+        if(h.toLowerCase().trim() === 'link putusan') linkId = `inputDetail_${i}`;
+    });
+
+    if(statusId && linkId) {
+        const statusEl = document.getElementById(statusId);
+        const linkEl = document.getElementById(linkId);
+        
+        window.applyStatusLogic = () => {
+            if(statusEl.value === 'Dalam Proses') {
+                linkEl.value = '-';
+                linkEl.setAttribute('readonly', true);
+                linkEl.removeAttribute('required');
+            } else if (statusEl.value === 'Selesai') {
+                if(linkEl.value === '-') linkEl.value = '';
+                linkEl.removeAttribute('readonly');
+                linkEl.setAttribute('required', true);
+            }
+        };
+        
+        statusEl.addEventListener('change', window.applyStatusLogic);
+    }
+}
+
 async function loadData() {
     const thead = document.getElementById('tableHeader');
     const tbody = document.getElementById('dataTable');
@@ -75,7 +134,7 @@ async function loadData() {
         thead.innerHTML = ''; tbody.innerHTML = ''; formContainer.innerHTML = '';
 
         if (!data.perkara || data.perkara.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Spreadsheet DataPerkara kosong.</td></tr>'; 
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Spreadsheet kosong.</td></tr>'; 
             return;
         }
 
@@ -85,6 +144,7 @@ async function loadData() {
         detailData = data.detail.slice(1) || [];
         quillInstances = {}; 
 
+        // Menyembunyikan kolom "detail" yang berupa teks kosong
         const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
         sheetHeadersPerkara.forEach((h, i) => { 
             if(i !== skipIdx) { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); }
@@ -100,6 +160,7 @@ async function loadData() {
 
         initQuill(sheetHeadersPerkara, 'inputPerkara');
         initQuill(sheetHeadersDetail, 'inputDetail');
+        attachStatusLogic(); // Pasang logika Status vs Link
 
         if(document.getElementById('inputPerkara_0')) {
             document.getElementById('inputPerkara_0').addEventListener('input', (e) => {
@@ -162,6 +223,10 @@ function bukaModalTambah() {
     document.getElementById('formTambahData').reset();
     Object.values(quillInstances).forEach(q => q.setContents([]));
     document.getElementById('inputDetail_0').removeAttribute('readonly'); 
+    
+    // Jalankan Status Logic
+    if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -170,19 +235,39 @@ function bukaModalEdit(id) {
     const rowP = perkaraData.find(r => r[0] === id) || [];
     const rowD = detailData.find(r => r[0] === id) || [];
 
+    // Pengisian Form Utama + Fitur Tanggal & Select
     sheetHeadersPerkara.forEach((h, i) => {
         const inputId = `inputPerkara_${i}`;
-        if(quillInstances[inputId]) quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowP[i] || '');
-        document.getElementById(inputId).value = rowP[i] || '';
+        const val = rowP[i] || '';
+        const el = document.getElementById(inputId);
+        if(quillInstances[inputId]) {
+            quillInstances[inputId].clipboard.dangerouslyPasteHTML(val);
+            document.getElementById(inputId).value = val;
+        } else if (el) {
+            if (el.type === 'date') el.value = parseDate(val);
+            else el.value = val;
+        }
     });
 
+    // Pengisian Form Detail + Fitur Tanggal & Select
     sheetHeadersDetail.forEach((h, i) => {
         const inputId = `inputDetail_${i}`;
-        if(quillInstances[inputId]) quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowD[i] || '');
-        document.getElementById(inputId).value = rowD[i] || '';
+        const val = rowD[i] || '';
+        const el = document.getElementById(inputId);
+        if(quillInstances[inputId]) {
+            quillInstances[inputId].clipboard.dangerouslyPasteHTML(val);
+            document.getElementById(inputId).value = val;
+        } else if (el) {
+            if (el.type === 'date') el.value = parseDate(val);
+            else el.value = val;
+        }
     });
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
+    
+    // Aktifkan logika disable Link Putusan jika Status = Dalam Proses
+    if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -213,7 +298,7 @@ function lihatDetail(id) {
             return;
         }
 
-        const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "link putusan"];
+        const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
 
@@ -222,7 +307,6 @@ function lihatDetail(id) {
             if(idx !== -1) {
                 let fieldVal = row ? (row[idx] || '-') : '-';
                 
-                // Menjadikan "Link Putusan" sebagai Tautan
                 if (f === 'link putusan' && fieldVal !== '-') {
                     let linkUrl = fieldVal;
                     if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
