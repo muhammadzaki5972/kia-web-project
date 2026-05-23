@@ -16,7 +16,6 @@ let quillInstances = {};
 let isEditMode = false;
 let editId = null;
 
-// Fungsi Render Input Dinamis
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     const id = `${idPrefix}_${index}`;
     const lowerHeader = headerText.toLowerCase();
@@ -45,7 +44,6 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     }
 }
 
-// Inisialisasi Text Editor
 function initQuill(headers, idPrefix) {
     headers.forEach((header, index) => {
         if (header.toLowerCase() === 'rincian permohonan') {
@@ -80,12 +78,19 @@ async function loadData() {
         perkaraData = data.perkara.slice(1);
         detailData = data.detail.slice(1) || [];
         quillInstances = {}; 
+
+        // Cari index kolom 'detail' untuk disembunyikan dari tabel
+        const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
         
-        // --- BUAT HEADER ---
-        sheetHeadersPerkara.forEach((h) => { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); });
+        // --- BUAT HEADER (Kecuali kolom detail) ---
+        sheetHeadersPerkara.forEach((h, i) => { 
+            if(i !== skipIdx) {
+                const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); 
+            }
+        });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
-        // --- BUAT FORM INPUT ---
+        // --- BUAT FORM INPUT (Semua kolom tetap di-render agar sinkron dengan sheet) ---
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => formHtml += renderInput(h, 'inputPerkara', i, false));
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
@@ -96,7 +101,6 @@ async function loadData() {
         initQuill(sheetHeadersPerkara, 'inputPerkara');
         initQuill(sheetHeadersDetail, 'inputDetail');
 
-        // Khusus sinkronisasi ID otomatis pada form detail
         document.getElementById('inputPerkara_0').addEventListener('input', (e) => {
             const detailIdInput = document.getElementById('inputDetail_0');
             if(detailIdInput) detailIdInput.value = e.target.value;
@@ -104,18 +108,17 @@ async function loadData() {
 
         // --- BUAT ISI TABEL ---
         if(perkaraData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${sheetHeadersPerkara.length + 2}" class="text-center text-muted">Belum ada data.</td></tr>`; return;
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Belum ada data.</td></tr>`; return;
         }
 
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
-            for (let i = 0; i < sheetHeadersPerkara.length; i++) rowHtml += `<td>${row[i] || '-'}</td>`;
+            for (let i = 0; i < sheetHeadersPerkara.length; i++) {
+                if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`;
+            }
             const rowId = row[0] || '';
             
-            // Perbaikan: Tombol lihat di admin kini aktif dan memanggil fungsi lihatDetail
             rowHtml += `<td><button class="btn btn-info btn-sm text-white py-0 shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
-            
-            // Tombol Edit dan Hapus
             rowHtml += `
                 <td>
                     <button class="btn btn-warning btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${rowId}')">Edit</button>
@@ -126,7 +129,6 @@ async function loadData() {
     } catch (error) { tbody.innerHTML = `<tr><td colspan="8" class="text-danger fw-bold text-center">Error: ${error.message}</td></tr>`; }
 }
 
-// Buka Modal Tambah
 function bukaModalTambah() {
     isEditMode = false; editId = null;
     document.getElementById('formTambahData').reset();
@@ -136,14 +138,11 @@ function bukaModalTambah() {
     document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold";
     document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
-    
-    // Perbaikan: Membuat input detail 0 tidak bisa diketik manual (otomatis ikut form utama)
     document.getElementById('inputDetail_0').setAttribute('readonly', true);
     
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
-// Buka Modal Edit dan Isi Form
 function bukaModalEdit(id) {
     isEditMode = true; editId = id;
     const rowP = perkaraData.find(r => r[0] === id) || [];
@@ -153,7 +152,7 @@ function bukaModalEdit(id) {
         const inputId = `inputPerkara_${i}`;
         if(quillInstances[inputId]) {
             quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowP[i] || '');
-            document.getElementById(inputId).value = rowP[i] || ''; // Trigger hidden input
+            document.getElementById(inputId).value = rowP[i] || ''; 
         } else { document.getElementById(inputId).value = rowP[i] || ''; }
     });
 
@@ -161,7 +160,7 @@ function bukaModalEdit(id) {
         const inputId = `inputDetail_${i}`;
         if(quillInstances[inputId]) {
             quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowD[i] || '');
-            document.getElementById(inputId).value = rowD[i] || ''; // Trigger hidden input
+            document.getElementById(inputId).value = rowD[i] || ''; 
         } else { document.getElementById(inputId).value = rowD[i] || ''; }
     });
 
@@ -174,18 +173,15 @@ function bukaModalEdit(id) {
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
-// Hapus Data
 async function hapusData(id) {
     if(!confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data dengan Register "${id}" secara permanen?`)) return;
     try {
-        // Perbaikan encodeURIComponent agar kebal terhadap slash (/)
         const response = await fetch(`/api/data?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
         if(response.ok) { alert('Data berhasil dihapus!'); loadData(); } 
         else { const err = await response.json(); alert('Gagal menghapus: ' + err.error); }
     } catch (error) { alert('Terjadi kesalahan koneksi.'); }
 }
 
-// Submit Form (Tambah atau Edit)
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit');
@@ -198,7 +194,6 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
     let barisDetail = [];
     for (let i = 0; i < sheetHeadersDetail.length; i++) barisDetail.push(document.getElementById(`inputDetail_${i}`).value);
 
-    // Perbaikan URI Component
     const url = isEditMode ? `/api/data?id=${encodeURIComponent(editId)}` : '/api/data';
     const method = isEditMode ? 'PUT' : 'POST';
 
@@ -218,7 +213,6 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
     finally { btnSubmit.innerText = originalText; btnSubmit.disabled = false; }
 });
 
-// --- FUNGSI MODAL DETAIL (Dikombalikan agar bisa ditutup) ---
 function lihatDetail(id) {
     const modalEl = document.getElementById('detailModal');
     const modal = new bootstrap.Modal(modalEl);
@@ -226,6 +220,19 @@ function lihatDetail(id) {
     
     document.getElementById('detailLoading').style.display = 'flex';
     document.getElementById('detailContent').innerHTML = '';
+
+    // MENGUBAH JUDUL MODAL MENJADI "Pemohon vs Termohon"
+    const pRow = perkaraData.find(r => r[0] === id);
+    const idxPemohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+    const idxTermohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+    
+    if (pRow && idxPemohon !== -1 && idxTermohon !== -1) {
+        const pemohon = pRow[idxPemohon] || 'Pemohon';
+        const termohon = pRow[idxTermohon] || 'Termohon';
+        document.getElementById('detailModalTitle').innerText = `${pemohon} vs ${termohon}`;
+    } else {
+        document.getElementById('detailModalTitle').innerText = `Detail Perkara`;
+    }
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
