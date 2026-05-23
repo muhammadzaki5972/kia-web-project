@@ -17,7 +17,6 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
-// Helper mencari baris berdasarkan ID
 async function findRowIndex(sheetName, id) {
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${sheetName}!A:A` });
     const rows = res.data.values || [];
@@ -25,18 +24,16 @@ async function findRowIndex(sheetName, id) {
     return index !== -1 ? index + 1 : null; 
 }
 
-// --- READ ---
 app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F' }),
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:I' })
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:J' }) // Range J
     ]);
     res.json({ perkara: resPerkara.data.values || [], detail: resDetail.data.values || [] });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- CREATE ---
 app.post('/api/data', async (req, res) => {
   const { barisPerkara, barisDetail } = req.body; 
   try {
@@ -46,7 +43,7 @@ app.post('/api/data', async (req, res) => {
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] },
         }),
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:I',
+            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:J', // Range J
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
         })
     ]);
@@ -54,9 +51,8 @@ app.post('/api/data', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- UPDATE (EDIT) ---
 app.put('/api/data', async (req, res) => {
-    const id = req.query.id; // Diubah menggunakan query untuk mencegah error garis miring
+    const id = req.query.id; 
     const { barisPerkara, barisDetail } = req.body;
     try {
         const idxPerkara = await findRowIndex('DataPerkara', id);
@@ -68,7 +64,7 @@ app.put('/api/data', async (req, res) => {
         });
         
         if(idxDetail) await sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:I${idxDetail}`,
+            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:J${idxDetail}`, // Range J
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
         });
 
@@ -76,13 +72,11 @@ app.put('/api/data', async (req, res) => {
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
-// --- DELETE (HAPUS) ---
 app.delete('/api/data', async (req, res) => {
-    const id = req.query.id; // Diubah menggunakan query
+    const id = req.query.id; 
     try {
         const idxPerkara = await findRowIndex('DataPerkara', id);
         const idxDetail = await findRowIndex('detail', id);
-
         const meta = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
         const sheetIdPerkara = meta.data.sheets.find(s => s.properties.title === 'DataPerkara').properties.sheetId;
         const sheetIdDetail = meta.data.sheets.find(s => s.properties.title === 'detail').properties.sheetId;
@@ -91,9 +85,7 @@ app.delete('/api/data', async (req, res) => {
         if(idxPerkara) requests.push({ deleteDimension: { range: { sheetId: sheetIdPerkara, dimension: 'ROWS', startIndex: idxPerkara - 1, endIndex: idxPerkara } }});
         if(idxDetail) requests.push({ deleteDimension: { range: { sheetId: sheetIdDetail, dimension: 'ROWS', startIndex: idxDetail - 1, endIndex: idxDetail } }});
 
-        if(requests.length > 0) {
-            await sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests } });
-        }
+        if(requests.length > 0) await sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests } });
         res.json({ message: 'Data dihapus' });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
