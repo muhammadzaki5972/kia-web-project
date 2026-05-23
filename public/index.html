@@ -86,7 +86,8 @@
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) {
                         if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`;
                     }
-                    tableHtml += `<td><button class="btn btn-info btn-sm text-white fw-bold shadow-sm py-0" onclick="lihatDetail('${row[0]}')">Lihat</button></td></tr>`;
+                    // Tombol Lihat diubah menjadi btn-warning
+                    tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row[0]}')">Lihat</button></td></tr>`;
                 });
                 tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
@@ -106,18 +107,39 @@
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 
-                const leftFields = ["rincian informasi", "no reg", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
+                // Susunan Tampilan Kiri (Menambahkan "tgl register")
+                const leftFields = ["rincian informasi", "no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
                 leftFields.forEach(f => {
-                    const idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
+                    let idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
+                    let fieldVal = '-';
+                    let labelText = '';
+                    
+                    // Cek di Sheet Detail, jika tidak ada, cek di Sheet Utama (Perkara)
                     if(idx !== -1) {
-                        let fieldVal = row ? (row[idx] || '-') : '-';
-                        let labelText = detailHeaders[idx];
-                        
-                        // Override Label Visual
+                        fieldVal = row ? (row[idx] || '-') : '-';
+                        labelText = detailHeaders[idx];
+                    } else {
+                        idx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === f);
+                        if(idx !== -1) {
+                            fieldVal = pRow ? (pRow[idx] || '-') : '-';
+                            labelText = sheetHeadersPerkara[idx];
+                        }
+                    }
+
+                    if(idx !== -1) {
                         if(labelText.toLowerCase().trim() === 'sidang') labelText = 'Sidang Terakhir';
                         if(labelText.toLowerCase().trim() === 'rincian informasi') labelText = 'No Reg';
+
+                        // Konversi Format Tanggal ke DD/MM/YYYY
+                        const lowerF = f.toLowerCase();
+                        if(lowerF.includes('tgl') || lowerF.includes('tanggal') || lowerF.includes('sidang')) {
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) {
+                                const parts = fieldVal.split('-');
+                                fieldVal = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                            }
+                        }
 
                         if (f === 'link putusan' && fieldVal !== '-') {
                             let linkUrl = fieldVal;
