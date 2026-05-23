@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Publik - Sistem KIA</title>
+    <title>Portal Publik - KIACEH</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-primary shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">Komisi Informasi - Data Perkara</a>
+    <!-- Navbar Responsif dengan Logo -->
+    <nav class="navbar navbar-dark bg-primary shadow-sm py-3">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/National_emblem_of_Indonesia_Garuda_Pancasila.svg/600px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Logo Garuda" class="brand-logo">
+                <div class="d-flex flex-column lh-1">
+                    <span class="fs-4 fw-bold">KIACEH</span>
+                    <span class="fs-6 fw-normal text-white-50">Komisi Informasi Aceh</span>
+                </div>
+            </a>
             <a href="login.html" class="btn btn-outline-light btn-sm">Login Admin</a>
         </div>
     </nav>
 
     <!-- Konten Utama -->
     <div class="container mt-5">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5 px-3">
             <h2 class="fw-bold">Informasi Data Perkara Publik</h2>
             <p class="text-muted">Data di bawah ini diperbarui secara real-time dari sistem administrasi.</p>
         </div>
 
-        <!-- Container untuk Kartu Data -->
         <div class="row" id="publicDataContainer">
             <div class="col-12 text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -32,7 +37,6 @@
         </div>
     </div>
 
-    <!-- Script Khusus Halaman Publik -->
     <script>
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
@@ -48,15 +52,14 @@
                     return;
                 }
 
-                const headers = data[0]; // Baris A1:F1
-                const rows = data.slice(1); // Baris A2 ke bawah
+                const headers = data[0]; 
+                const rows = data.slice(1); 
                 
-                container.innerHTML = ''; // Bersihkan loading
+                container.innerHTML = ''; 
 
-                // Render setiap baris data menjadi kartu (Card) Bootstrap
                 rows.forEach(row => {
                     let cardHtml = `
-                        <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="col-lg-4 col-md-6 col-12 mb-4">
                             <div class="card h-100 shadow-sm border-0">
                                 <div class="card-header bg-primary text-white fw-bold">
                                     ${headers[0]}: ${row[0] || '-'}
@@ -65,7 +68,6 @@
                                     <ul class="list-group list-group-flush">
                     `;
 
-                    // Looping sisa kolom (mulai dari kolom ke-2 sampai ke-6)
                     for (let i = 1; i < headers.length; i++) {
                         cardHtml += `
                             <li class="list-group-item px-0">
