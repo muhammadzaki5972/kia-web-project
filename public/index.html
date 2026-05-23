@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <!-- Navbar Responsif dengan Freeze (sticky-top) -->
     <nav class="navbar navbar-dark bg-primary shadow-sm py-3 sticky-top">
         <div class="container d-flex flex-wrap justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
@@ -22,13 +21,11 @@
         </div>
     </nav>
 
-    <!-- Konten Utama (flex-grow-1 mendorong footer ke bawah) -->
     <main class="container mt-5 flex-grow-1 mb-5">
         <div class="text-center mb-4 px-3">
             <h2 class="fw-bold">Informasi Data Perkara Publik</h2>
-            <p class="text-muted">Data di bawah ini diperbarui secara real-time dari sistem administrasi.</p>
+            <p class="text-muted">Data diperbarui secara real-time dari sistem administrasi.</p>
         </div>
-
         <div id="publicDataContainer">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -37,32 +34,56 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
-        <div class="container">
-            <small>&copy; 2026 Komisi Informasi Aceh (KIACEH). Semua hak dilindungi.</small>
+    <!-- Modal Pop Up Detail Perkara -->
+    <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <!-- Header: Tombol X di Kiri Atas (justify-content-start) -->
+                <div class="modal-header bg-info text-white d-flex justify-content-start align-items-center">
+                    <button type="button" class="btn-close btn-close-white me-3 m-0" onclick="closeDetailModal()"></button>
+                    <h5 class="modal-title fw-bold m-0">Detail Perkara</h5>
+                </div>
+                <div class="modal-body position-relative bg-light">
+                    <!-- Loading Animasi -->
+                    <div id="detailLoading" style="display: none;">
+                        <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+                    </div>
+                    <!-- Isi Detail Gaya Card -->
+                    <div class="row" id="detailContent"></div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container"><small>&copy; 2026 Komisi Informasi Aceh (KIACEH). Semua hak dilindungi.</small></div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let detailHeaders = [];
+        let detailData = [];
+
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
-            
             try {
                 const response = await fetch('/api/data');
                 const data = await response.json();
 
                 if (!response.ok || data.error) throw new Error(data.error || 'Gagal memuat API');
                 
-                if (!data || data.length <= 1) {
-                    container.innerHTML = '<div class="text-center"><p class="text-muted">Belum ada data perkara yang dipublikasikan.</p></div>';
+                if (!data.perkara || data.perkara.length <= 1) {
+                    container.innerHTML = '<div class="text-center"><p class="text-muted">Belum ada data perkara.</p></div>';
                     return;
                 }
 
-                const headers = data[0]; 
-                const rows = data.slice(1); 
+                const headersPerkara = data.perkara[0]; 
+                const rowsPerkara = data.perkara.slice(1); 
                 
-                // Membuat struktur tabel small, hovered, dan responsif
+                // Simpan data detail di variabel global
+                detailHeaders = data.detail[0] || [];
+                detailData = data.detail.slice(1) || [];
+                
                 let tableHtml = `
                     <div class="table-responsive shadow-sm bg-white border">
                         <table class="table table-sm table-hover table-striped mb-0">
@@ -70,37 +91,69 @@
                                 <tr>
                 `;
 
-                // Render Header
-                headers.forEach(header => {
-                    tableHtml += `<th>${header}</th>`;
-                });
+                headersPerkara.forEach(h => { tableHtml += `<th>${h}</th>`; });
+                tableHtml += `<th>Detail</th></tr></thead><tbody>`;
 
-                tableHtml += `
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                // Render Baris Data
-                rows.forEach(row => {
+                rowsPerkara.forEach(row => {
                     tableHtml += `<tr>`;
-                    for (let i = 0; i < headers.length; i++) {
+                    for (let i = 0; i < headersPerkara.length; i++) {
                         tableHtml += `<td>${row[i] || '-'}</td>`;
                     }
+                    // Tombol Lihat (Mengirim ID/Kolom pertama sebagai rujukan)
+                    const rowId = row[0] || '';
+                    tableHtml += `<td><button class="btn btn-info btn-sm text-white fw-bold shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
                     tableHtml += `</tr>`;
                 });
 
-                tableHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
+                tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
 
             } catch (error) {
                 container.innerHTML = `<div class="text-center text-danger fw-bold">Kesalahan: ${error.message}</div>`;
             }
+        }
+
+        function lihatDetail(id) {
+            const modalEl = document.getElementById('detailModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+            
+            document.getElementById('detailLoading').style.display = 'flex';
+            document.getElementById('detailContent').innerHTML = '';
+
+            // Simulasi loading sebentar
+            setTimeout(() => {
+                const row = detailData.find(r => r[0] === id);
+                let html = '';
+                
+                if(row) {
+                    detailHeaders.forEach((header, i) => {
+                        html += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body py-2">
+                                    <small class="text-muted fw-bold d-block">${header}</small>
+                                    <span class="fs-6">${row[i] || '-'}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                } else {
+                    html = '<div class="col-12 text-center text-muted py-5">Data detail belum diinput oleh Admin.</div>';
+                }
+                
+                document.getElementById('detailContent').innerHTML = html;
+                document.getElementById('detailLoading').style.display = 'none';
+            }, 600); 
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailLoading').style.display = 'flex';
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+                if(modal) modal.hide();
+                document.getElementById('detailLoading').style.display = 'none';
+            }, 400); // Animasi loading saat tutup
         }
 
         window.onload = loadPublicData;
