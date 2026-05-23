@@ -15,21 +15,19 @@ let quillInstances = {};
 let isEditMode = false;
 let editId = null;
 
-// Fungsi untuk membaca format tanggal dari Spreadsheet agar tidak kosong saat di-Edit
 function parseDate(dateStr) {
     if (!dateStr || dateStr === '-') return '';
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // Sudah format kalender (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; 
     
     const parts = dateStr.split(/[\/\-]/);
     if (parts.length === 3) {
-        if (parts[2].length === 4) { // Format DD/MM/YYYY
+        if (parts[2].length === 4) { 
             return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        } else if (parts[0].length === 4) { // Format YYYY/MM/DD
+        } else if (parts[0].length === 4) { 
             return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
         }
     }
     
-    // Fallback sistem pembaca waktu otomatis
     const d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
         const yyyy = d.getFullYear();
@@ -41,7 +39,6 @@ function parseDate(dateStr) {
 }
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
-    // Override Nama Visual tanpa mengubah Spreadsheet aslinya
     let label = headerText;
     if (headerText.toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
     if (headerText.toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
@@ -104,7 +101,6 @@ function initQuill(headers, idPrefix) {
     });
 }
 
-// Fungsi Otomatis Mengunci/Membuka Kolom Link Putusan
 function attachStatusLogic() {
     let statusIds = [], linkIds = [];
     
@@ -167,7 +163,6 @@ async function loadData() {
         detailData = data.detail.slice(1) || [];
         quillInstances = {}; 
 
-        // Sembunyikan kolom Detail dari tabel utama
         const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
         
         sheetHeadersPerkara.forEach((h, i) => { 
@@ -199,10 +194,11 @@ async function loadData() {
                 if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`;
             }
             const rowId = row[0] || '';
-            rowHtml += `<td><button type="button" class="btn btn-info btn-sm text-white py-0 shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
+            // Tombol Lihat diubah menjadi btn-warning
+            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
             rowHtml += `
                 <td>
-                    <button type="button" class="btn btn-warning btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${rowId}')">Edit</button>
+                    <button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${rowId}')">Edit</button>
                     <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${rowId}')">Hapus</button>
                 </td></tr>`;
             tbody.innerHTML += rowHtml;
@@ -315,24 +311,41 @@ function lihatDetail(id) {
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
-        if(!row) {
-            document.getElementById('detailContent').innerHTML = '<div class="col-12 text-center text-muted">Data detail tidak ditemukan.</div>';
-            document.getElementById('detailLoading').style.display = 'none';
-            return;
-        }
-
-        const leftFields = ["rincian informasi", "no reg", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
+        
+        // Menambahkan "tgl register" di urutan yang tepat
+        const leftFields = ["rincian informasi", "no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
 
         leftFields.forEach(f => {
-            const idx = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === f);
+            let idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
+            let fieldVal = '-';
+            let labelText = '';
+            
+            // Pencarian Lintas Sheet (Mendukung Jika "Tgl Register" ada di DataPerkara)
             if(idx !== -1) {
-                let fieldVal = row ? (row[idx] || '-') : '-';
-                
-                let labelText = sheetHeadersDetail[idx];
+                fieldVal = row ? (row[idx] || '-') : '-';
+                labelText = detailHeaders[idx];
+            } else {
+                idx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === f);
+                if(idx !== -1) {
+                    fieldVal = pRow ? (pRow[idx] || '-') : '-';
+                    labelText = sheetHeadersPerkara[idx];
+                }
+            }
+
+            if(idx !== -1) {
                 if(labelText.toLowerCase().trim() === 'sidang') labelText = 'Sidang Terakhir';
                 if(labelText.toLowerCase().trim() === 'rincian informasi') labelText = 'No Reg';
+
+                // Format Tanggal ke DD/MM/YYYY
+                const lowerF = f.toLowerCase();
+                if(lowerF.includes('tgl') || lowerF.includes('tanggal') || lowerF.includes('sidang')) {
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) {
+                        const parts = fieldVal.split('-');
+                        fieldVal = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
 
                 if (f === 'link putusan' && fieldVal !== '-') {
                     let linkUrl = fieldVal;
@@ -351,13 +364,13 @@ function lihatDetail(id) {
         });
         leftHtml += '</div>';
 
-        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+        const idxPermohonan = detailHeaders.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `
             <div class="col-md-6">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div>
                     <div class="card-body scrollable-box" style="font-size: 0.85rem;">
-                        <div class="text-dark">${idxPermohonan !== -1 ? (row[idxPermohonan] || '-') : '-'}</div>
+                        <div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div>
                     </div>
                 </div>
             </div>`;
