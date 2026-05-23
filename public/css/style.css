@@ -1,39 +1,29 @@
-/* Kustomisasi Font dan Latar */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9 !important;
+    background-color: #f8f9fa !important;
 }
 
-/* Desain Kartu Dasbor */
 .card {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-/* Modifikasi Tabel */
+/* Efek angkat pada kartu di halaman publik */
+#publicDataContainer .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
 .table thead th {
-    background-color: #0d6efd;
+    background-color: #212529;
     color: white;
     border-bottom: none;
     padding: 12px 15px;
-}
-
-.table tbody tr:hover {
-    background-color: #f8f9fa;
-    transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .table td {
     vertical-align: middle;
     padding: 12px 15px;
-}
-
-/* Panel Kontrol (Pencarian & Filter) */
-.filter-panel {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    white-space: nowrap;
 }
