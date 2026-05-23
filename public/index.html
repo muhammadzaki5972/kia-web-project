@@ -38,9 +38,10 @@
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-info text-white d-flex justify-content-start align-items-center">
-                    <button type="button" class="btn-close btn-close-white me-2 m-0" onclick="closeDetailModal()"></button>
-                    <h5 class="modal-title fw-bold m-0 fs-5" id="detailModalTitle">Detail Perkara</h5>
+                <!-- Header Modal: Judul di tengah, tombol silang (hitam) di kanan -->
+                <div class="modal-header bg-info position-relative">
+                    <h5 class="modal-title fw-bold fs-5 w-100 text-center text-dark" id="detailModalTitle">Detail Perkara</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" onclick="closeDetailModal()"></button>
                 </div>
                 <div class="modal-body position-relative bg-light">
                     <div id="detailLoading" style="display: none;">
@@ -106,15 +107,42 @@
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "link putusan"];
+                
                 let leftHtml = '<div class="col-md-6">';
                 leftFields.forEach(f => {
                     const idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
-                    if(idx !== -1) leftHtml += `<div class="card shadow-sm border-0 mb-3"><div class="card-body py-2"><small class="text-muted fw-bold d-block mb-1">${detailHeaders[idx]}</small><div class="text-dark">${row ? (row[idx] || '-') : '-'}</div></div></div>`;
+                    if(idx !== -1) {
+                        let fieldVal = row ? (row[idx] || '-') : '-';
+                        
+                        // Logika Khusus untuk membuat Link Putusan bisa di-klik
+                        if (f === 'link putusan' && fieldVal !== '-') {
+                            let linkUrl = fieldVal;
+                            if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
+                            fieldVal = `<a href="${linkUrl}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
+                        }
+
+                        // Mengurangi ukuran font untuk pop-up detail (0.75rem dan 0.85rem)
+                        leftHtml += `
+                        <div class="card shadow-sm border-0 mb-2">
+                            <div class="card-body py-1 px-3">
+                                <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${detailHeaders[idx]}</div>
+                                <div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div>
+                            </div>
+                        </div>`;
+                    }
                 });
                 leftHtml += '</div>';
 
                 const idxPermohonan = detailHeaders.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
-                let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold">Isi Permohonan</div><div class="card-body scrollable-box"><div class="text-dark">${row && idxPermohonan !== -1 ? (row[idxPermohonan] || '-') : '-'}</div></div></div></div>`;
+                let rightHtml = `
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div>
+                        <div class="card-body scrollable-box" style="font-size: 0.85rem;">
+                            <div class="text-dark">${row && idxPermohonan !== -1 ? (row[idxPermohonan] || '-') : '-'}</div>
+                        </div>
+                    </div>
+                </div>`;
                 
                 document.getElementById('detailContent').innerHTML = leftHtml + rightHtml;
                 document.getElementById('detailLoading').style.display = 'none';
