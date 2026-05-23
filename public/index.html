@@ -23,32 +23,24 @@
 
     <main class="container mt-5 flex-grow-1 mb-5">
         <div class="text-center mb-4 px-3">
-            <h2 class="fw-bold">Informasi Data Perkara Publik</h2>
-            <p class="text-muted">Data diperbarui secara real-time dari sistem administrasi.</p>
+            <h2 class="fw-bold fs-3">Informasi Data Perkara Publik</h2>
+            <p class="text-muted fs-6">Data diperbarui secara real-time dari sistem administrasi.</p>
         </div>
-        <div id="publicDataContainer">
-            <div class="text-center py-5" id="loadingStatus">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2">Memuat data dari server...</p>
-            </div>
-        </div>
+        <div id="publicDataContainer"></div>
     </main>
 
     <!-- Modal Pop Up Detail Perkara -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
-                <!-- Header: Tombol X di Kiri Atas (justify-content-start) -->
                 <div class="modal-header bg-info text-white d-flex justify-content-start align-items-center">
                     <button type="button" class="btn-close btn-close-white me-3 m-0" onclick="closeDetailModal()"></button>
-                    <h5 class="modal-title fw-bold m-0">Detail Perkara</h5>
+                    <h5 class="modal-title fw-bold m-0 fs-5">Detail Perkara</h5>
                 </div>
                 <div class="modal-body position-relative bg-light">
-                    <!-- Loading Animasi -->
                     <div id="detailLoading" style="display: none;">
-                        <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+                        <div class="spinner-border text-info" role="status"></div>
                     </div>
-                    <!-- Isi Detail Gaya Card -->
                     <div class="row" id="detailContent"></div>
                 </div>
             </div>
@@ -69,8 +61,6 @@
             try {
                 const response = await fetch('/api/data');
                 const data = await response.json();
-
-                if (!response.ok || data.error) throw new Error(data.error || 'Gagal memuat API');
                 
                 if (!data.perkara || data.perkara.length <= 1) {
                     container.innerHTML = '<div class="text-center"><p class="text-muted">Belum ada data perkara.</p></div>';
@@ -79,16 +69,14 @@
 
                 const headersPerkara = data.perkara[0]; 
                 const rowsPerkara = data.perkara.slice(1); 
-                
-                // Simpan data detail di variabel global
                 detailHeaders = data.detail[0] || [];
                 detailData = data.detail.slice(1) || [];
                 
+                /* Penambahan table-bordered */
                 let tableHtml = `
                     <div class="table-responsive shadow-sm bg-white border">
-                        <table class="table table-sm table-hover table-striped mb-0">
-                            <thead class="table-dark">
-                                <tr>
+                        <table class="table table-sm table-bordered table-hover table-striped mb-0">
+                            <thead class="table-dark"><tr>
                 `;
 
                 headersPerkara.forEach(h => { tableHtml += `<th>${h}</th>`; });
@@ -99,18 +87,14 @@
                     for (let i = 0; i < headersPerkara.length; i++) {
                         tableHtml += `<td>${row[i] || '-'}</td>`;
                     }
-                    // Tombol Lihat (Mengirim ID/Kolom pertama sebagai rujukan)
                     const rowId = row[0] || '';
-                    tableHtml += `<td><button class="btn btn-info btn-sm text-white fw-bold shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
-                    tableHtml += `</tr>`;
+                    tableHtml += `<td><button class="btn btn-info btn-sm text-white fw-bold shadow-sm py-0" onclick="lihatDetail('${rowId}')">Lihat</button></td></tr>`;
                 });
 
                 tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
 
-            } catch (error) {
-                container.innerHTML = `<div class="text-center text-danger fw-bold">Kesalahan: ${error.message}</div>`;
-            }
+            } catch (error) { container.innerHTML = `<div class="text-center text-danger fw-bold">Kesalahan: ${error.message}</div>`; }
         }
 
         function lihatDetail(id) {
@@ -121,19 +105,19 @@
             document.getElementById('detailLoading').style.display = 'flex';
             document.getElementById('detailContent').innerHTML = '';
 
-            // Simulasi loading sebentar
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 let html = '';
                 
                 if(row) {
                     detailHeaders.forEach((header, i) => {
+                        // Perubahan ke div agar tag HTML dari Quill bisa ter-render sempurna
                         html += `
                         <div class="col-md-6 mb-3">
                             <div class="card shadow-sm border-0 h-100">
                                 <div class="card-body py-2">
-                                    <small class="text-muted fw-bold d-block">${header}</small>
-                                    <span class="fs-6">${row[i] || '-'}</span>
+                                    <small class="text-muted fw-bold d-block mb-1">${header}</small>
+                                    <div class="text-dark" style="font-size: 0.9rem;">${row[i] || '-'}</div>
                                 </div>
                             </div>
                         </div>`;
@@ -144,7 +128,7 @@
                 
                 document.getElementById('detailContent').innerHTML = html;
                 document.getElementById('detailLoading').style.display = 'none';
-            }, 600); 
+            }, 500); 
         }
 
         function closeDetailModal() {
@@ -153,7 +137,7 @@
                 const modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
                 if(modal) modal.hide();
                 document.getElementById('detailLoading').style.display = 'none';
-            }, 400); // Animasi loading saat tutup
+            }, 300); 
         }
 
         window.onload = loadPublicData;
