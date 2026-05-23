@@ -29,13 +29,13 @@
         <div id="publicDataContainer"></div>
     </main>
 
-    <!-- Modal Pop Up Detail Perkara -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-info text-white d-flex justify-content-start align-items-center">
                     <button type="button" class="btn-close btn-close-white me-3 m-0" onclick="closeDetailModal()"></button>
-                    <h5 class="modal-title fw-bold m-0 fs-5">Detail Perkara</h5>
+                    <!-- Tambahan ID untuk mengubah judul secara dinamis -->
+                    <h5 class="modal-title fw-bold m-0 fs-5" id="detailModalTitle">Detail Perkara</h5>
                 </div>
                 <div class="modal-body position-relative bg-light">
                     <div id="detailLoading" style="display: none;">
@@ -53,6 +53,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let sheetHeadersPerkara = [];
+        let perkaraData = [];
         let detailHeaders = [];
         let detailData = [];
 
@@ -67,25 +69,31 @@
                     return;
                 }
 
-                const headersPerkara = data.perkara[0]; 
-                const rowsPerkara = data.perkara.slice(1); 
+                sheetHeadersPerkara = data.perkara[0]; 
+                perkaraData = data.perkara.slice(1); 
                 detailHeaders = data.detail[0] || [];
                 detailData = data.detail.slice(1) || [];
                 
-                /* Penambahan table-bordered */
+                // Cari index kolom yang bernama 'detail' (untuk disembunyikan/dihapus dari tabel)
+                const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+
                 let tableHtml = `
                     <div class="table-responsive shadow-sm bg-white border">
                         <table class="table table-sm table-bordered table-hover table-striped mb-0">
                             <thead class="table-dark"><tr>
                 `;
 
-                headersPerkara.forEach(h => { tableHtml += `<th>${h}</th>`; });
+                // Render Header Utama (Kecuali kolom detail)
+                sheetHeadersPerkara.forEach((h, i) => { 
+                    if(i !== skipIdx) tableHtml += `<th>${h}</th>`; 
+                });
                 tableHtml += `<th>Detail</th></tr></thead><tbody>`;
 
-                rowsPerkara.forEach(row => {
+                // Render Baris
+                perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
-                    for (let i = 0; i < headersPerkara.length; i++) {
-                        tableHtml += `<td>${row[i] || '-'}</td>`;
+                    for (let i = 0; i < sheetHeadersPerkara.length; i++) {
+                        if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`;
                     }
                     const rowId = row[0] || '';
                     tableHtml += `<td><button class="btn btn-info btn-sm text-white fw-bold shadow-sm py-0" onclick="lihatDetail('${rowId}')">Lihat</button></td></tr>`;
@@ -105,13 +113,25 @@
             document.getElementById('detailLoading').style.display = 'flex';
             document.getElementById('detailContent').innerHTML = '';
 
+            // MENGUBAH JUDUL MODAL MENJADI "Pemohon vs Termohon"
+            const pRow = perkaraData.find(r => r[0] === id);
+            const idxPemohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+            const idxTermohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+            
+            if (pRow && idxPemohon !== -1 && idxTermohon !== -1) {
+                const pemohon = pRow[idxPemohon] || 'Pemohon';
+                const termohon = pRow[idxTermohon] || 'Termohon';
+                document.getElementById('detailModalTitle').innerText = `${pemohon} vs ${termohon}`;
+            } else {
+                document.getElementById('detailModalTitle').innerText = `Detail Perkara`;
+            }
+
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 let html = '';
                 
                 if(row) {
                     detailHeaders.forEach((header, i) => {
-                        // Perubahan ke div agar tag HTML dari Quill bisa ter-render sempurna
                         html += `
                         <div class="col-md-6 mb-3">
                             <div class="card shadow-sm border-0 h-100">
