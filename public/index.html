@@ -34,6 +34,7 @@
         </div>
     </main>
 
+    <!-- Modal Pop Up -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
@@ -104,15 +105,20 @@
 
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
-                // Nama kolom Sidang diganti menjadi Sidang Terakhir
-                const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
+                
+                const leftFields = ["rincian informasi", "no reg", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
                 leftFields.forEach(f => {
                     const idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
                     if(idx !== -1) {
                         let fieldVal = row ? (row[idx] || '-') : '-';
+                        let labelText = detailHeaders[idx];
                         
+                        // Override Label Visual
+                        if(labelText.toLowerCase().trim() === 'sidang') labelText = 'Sidang Terakhir';
+                        if(labelText.toLowerCase().trim() === 'rincian informasi') labelText = 'No Reg';
+
                         if (f === 'link putusan' && fieldVal !== '-') {
                             let linkUrl = fieldVal;
                             if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
@@ -122,7 +128,7 @@
                         leftHtml += `
                         <div class="card shadow-sm border-0 mb-2">
                             <div class="card-body py-1 px-3">
-                                <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${detailHeaders[idx]}</div>
+                                <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div>
                                 <div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div>
                             </div>
                         </div>`;
