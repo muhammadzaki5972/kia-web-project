@@ -194,7 +194,6 @@ async function loadData() {
                 if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`;
             }
             const rowId = row[0] || '';
-            // Tombol Lihat diubah menjadi btn-warning
             rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
             rowHtml += `
                 <td>
@@ -245,6 +244,13 @@ function bukaModalTambah() {
     document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    
+    // Perubahan Judul sesuai permintaan
+    document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru";
+    document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
+    document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold";
+    document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
+
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -312,22 +318,27 @@ function lihatDetail(id) {
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
         
-        // Menambahkan "tgl register" di urutan yang tepat
-        const leftFields = ["rincian informasi", "no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
+        // Logika Array bersih menggunakan alias dinamis
+        const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
 
         leftFields.forEach(f => {
-            let idx = detailHeaders.findIndex(h => h.toLowerCase().trim() === f);
             let fieldVal = '-';
             let labelText = '';
             
-            // Pencarian Lintas Sheet (Mendukung Jika "Tgl Register" ada di DataPerkara)
+            // Pencarian Index Dinamis
+            const findIdx = (headers) => headers.findIndex(h => {
+                let val = h.toLowerCase().trim();
+                return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang');
+            });
+
+            let idx = findIdx(sheetHeadersDetail);
             if(idx !== -1) {
                 fieldVal = row ? (row[idx] || '-') : '-';
-                labelText = detailHeaders[idx];
+                labelText = sheetHeadersDetail[idx];
             } else {
-                idx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === f);
+                idx = findIdx(sheetHeadersPerkara);
                 if(idx !== -1) {
                     fieldVal = pRow ? (pRow[idx] || '-') : '-';
                     labelText = sheetHeadersPerkara[idx];
@@ -335,10 +346,9 @@ function lihatDetail(id) {
             }
 
             if(idx !== -1) {
-                if(labelText.toLowerCase().trim() === 'sidang') labelText = 'Sidang Terakhir';
-                if(labelText.toLowerCase().trim() === 'rincian informasi') labelText = 'No Reg';
+                if(f === 'no reg') labelText = 'No Reg';
+                if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
 
-                // Format Tanggal ke DD/MM/YYYY
                 const lowerF = f.toLowerCase();
                 if(lowerF.includes('tgl') || lowerF.includes('tanggal') || lowerF.includes('sidang')) {
                     if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) {
@@ -364,7 +374,7 @@ function lihatDetail(id) {
         });
         leftHtml += '</div>';
 
-        const idxPermohonan = detailHeaders.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `
             <div class="col-md-6">
                 <div class="card shadow-sm border-0">
