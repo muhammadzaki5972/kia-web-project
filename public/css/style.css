@@ -3,6 +3,14 @@ body {
     background-color: #f8f9fa !important;
 }
 
+/* Tambahkan ini di style.css agar tampilan hasil popup lebih kecil */
+.modal-body {
+    font-size: 0.85rem;
+}
+.modal-body .card-body .text-dark {
+    font-size: 0.85rem !important;
+}
+
 /* Modifikasi Tabel */
 .table-sm {
     font-size: 0.85rem !important; 
