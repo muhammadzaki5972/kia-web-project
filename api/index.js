@@ -17,49 +17,85 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
-// --- ROUTE READ (Mengambil Data dari 2 Sheet) ---
+// Helper mencari baris berdasarkan ID (Kolom A)
+async function findRowIndex(sheetName, id) {
+    const res = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${sheetName}!A:A` });
+    const rows = res.data.values || [];
+    const index = rows.findIndex(row => row[0] === id);
+    return index !== -1 ? index + 1 : null; // API Google Sheets dimulai dari index 1
+}
+
+// --- READ ---
 app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F' }),
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:I' })
     ]);
-    
-    res.json({
-        perkara: resPerkara.data.values || [],
-        detail: resDetail.data.values || []
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    res.json({ perkara: resPerkara.data.values || [], detail: resDetail.data.values || [] });
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- ROUTE CREATE (Menyimpan Data ke 2 Sheet) ---
+// --- CREATE ---
 app.post('/api/data', async (req, res) => {
   const { barisPerkara, barisDetail } = req.body; 
   try {
     await Promise.all([
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID,
-            range: 'DataPerkara!A:F',
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: [barisPerkara] },
+            spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F',
+            valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] },
         }),
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID,
-            range: 'detail!A:I',
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: [barisDetail] },
+            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:I',
+            valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
         })
     ]);
-    res.status(201).json({ message: 'Data berhasil ditambahkan ke kedua sheet' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    res.status(201).json({ message: 'Data berhasil ditambahkan' });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// --- UPDATE (EDIT) ---
+app.put('/api/data/:id', async (req, res) => {
+    const { id } = req.params;
+    const { barisPerkara, barisDetail } = req.body;
+    try {
+        const idxPerkara = await findRowIndex('DataPerkara', id);
+        const idxDetail = await findRowIndex('detail', id);
+
+        if(idxPerkara) await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID, range: `DataPerkara!A${idxPerkara}:F${idxPerkara}`,
+            valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] }
+        });
+        
+        if(idxDetail) await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:I${idxDetail}`,
+            valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
+        });
+
+        res.json({ message: 'Data berhasil diupdate' });
+    } catch (e) { res.status(500).json({error: e.message}); }
+});
+
+// --- DELETE (HAPUS) ---
+app.delete('/api/data/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const idxPerkara = await findRowIndex('DataPerkara', id);
+        const idxDetail = await findRowIndex('detail', id);
+
+        const meta = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
+        const sheetIdPerkara = meta.data.sheets.find(s => s.properties.title === 'DataPerkara').properties.sheetId;
+        const sheetIdDetail = meta.data.sheets.find(s => s.properties.title === 'detail').properties.sheetId;
+
+        const requests = [];
+        if(idxPerkara) requests.push({ deleteDimension: { range: { sheetId: sheetIdPerkara, dimension: 'ROWS', startIndex: idxPerkara - 1, endIndex: idxPerkara } }});
+        if(idxDetail) requests.push({ deleteDimension: { range: { sheetId: sheetIdDetail, dimension: 'ROWS', startIndex: idxDetail - 1, endIndex: idxDetail } }});
+
+        if(requests.length > 0) {
+            await sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests } });
+        }
+        res.json({ message: 'Data dihapus' });
+    } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 module.exports = app;
-
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(3000, () => console.log('Server berjalan di port 3000'));
-}
