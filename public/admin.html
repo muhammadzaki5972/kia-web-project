@@ -3,59 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dasbor Admin - KIA</title>
+    <title>Dasbor Admin - KIACEH</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Panel Admin - Data Perkara</a>
-            <div class="d-flex gap-2">
-                <a href="index.html" class="btn btn-outline-light btn-sm">Lihat Web Publik</a>
-                <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+    <!-- Navbar Responsif Admin -->
+    <nav class="navbar navbar-dark bg-dark py-3">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/National_emblem_of_Indonesia_Garuda_Pancasila.svg/600px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Logo Garuda" class="brand-logo">
+                <div class="d-flex flex-column lh-1">
+                    <span class="fs-4 fw-bold">KIACEH</span>
+                    <span class="fs-6 fw-normal text-white-50">Panel Admin Data Perkara</span>
+                </div>
+            </a>
+            <div class="d-flex gap-2 mt-2 mt-sm-0 w-sm-100">
+                <a href="index.html" class="btn btn-outline-light btn-sm flex-grow-1">Web Publik</a>
+                <button class="btn btn-danger btn-sm flex-grow-1" onclick="logout()">Logout</button>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Manajemen Data Perkara</h2>
+    <div class="container mt-4 mt-md-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <h3 class="fw-bold m-0">Manajemen Data</h3>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#tambahDataModal">
                 + Tambah Data
             </button>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-0" style="overflow-x: auto;">
-                <table class="table table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr id="tableHeader">
-                            <!-- Header digenerate otomatis dari JS -->
-                        </tr>
-                    </thead>
-                    <tbody id="dataTable">
-                        <tr><td colspan="7" class="text-center py-4">Memuat data...</td></tr>
-                    </tbody>
-                </table>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <!-- Fitur table-responsive agar tabel bisa di-scroll ke samping di HP -->
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr id="tableHeader">
+                                <!-- Header digenerate otomatis dari JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="dataTable">
+                            <tr><td colspan="7" class="text-center py-4">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Tambah Data -->
+    <!-- Modal Tambah Data Responsif -->
     <div class="modal fade" id="tambahDataModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Input Data Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title fw-bold">Input Data Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="formTambahData">
-                        <!-- Input form akan dibuat otomatis oleh main.js berdasarkan header Spreadsheet -->
                         <div id="dynamicFormContainer"></div>
-                        
-                        <button type="submit" class="btn btn-primary w-100 mt-3" id="btnSubmit">Simpan ke Spreadsheet</button>
+                        <button type="submit" class="btn btn-primary w-100 mt-3 py-2 fw-bold" id="btnSubmit">Simpan ke Spreadsheet</button>
                     </form>
                 </div>
             </div>
