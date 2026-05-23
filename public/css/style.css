@@ -1,32 +1,32 @@
+/* Pengaturan Layout Dasar agar Footer selalu di bawah */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa !important;
 }
 
-.card {
-    border-radius: 10px;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+/* Modifikasi area tabel untuk freeze header */
+.table-responsive {
+    max-height: 70vh; /* Menentukan tinggi maksimal tabel agar bisa di-scroll di dalamnya */
+    overflow-y: auto;
+    border-radius: 8px;
 }
 
-/* Efek interaktif pada kartu di halaman publik */
-#publicDataContainer .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-}
-
-/* Kustomisasi Tabel */
+/* Freeze Header pada Tabel */
 .table thead th {
     background-color: #212529;
     color: white;
     border-bottom: none;
     padding: 12px 15px;
-    white-space: nowrap; /* Mencegah judul kolom terpotong di HP */
+    white-space: nowrap;
+    position: sticky; /* Membuat header tabel freeze */
+    top: 0;
+    z-index: 10;
 }
 
 .table td {
     vertical-align: middle;
-    padding: 12px 15px;
-    white-space: nowrap; /* Menjaga tata letak tabel di HP */
+    padding: 10px 15px;
+    white-space: nowrap;
 }
 
 /* Pengaturan Logo & Header KIACEH */
