@@ -12,7 +12,8 @@
     <nav class="navbar navbar-dark bg-dark py-3 sticky-top">
         <div class="container d-flex flex-wrap justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/National_emblem_of_Indonesia_Garuda_Pancasila.svg/600px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Logo Garuda" class="brand-logo">
+                <!-- Link Logo Garuda Baru -->
+                <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo">
                 <div class="d-flex flex-column lh-1">
                     <span class="fs-4 fw-bold">KIACEH</span>
                     <span class="fs-6 fw-normal text-white-50">Panel Admin Data Perkara</span>
@@ -47,7 +48,6 @@
         </div>
     </main>
 
-    <!-- Modal Form (Bisa untuk Tambah atau Edit) -->
     <div class="modal fade" id="tambahDataModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content border-0">
@@ -65,13 +65,11 @@
         </div>
     </div>
 
-    <!-- Modal Pop Up Detail Perkara -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-info text-white d-flex justify-content-start align-items-center">
                     <button type="button" class="btn-close btn-close-white me-3 m-0" onclick="closeDetailModal()"></button>
-                    <!-- Tambahan ID untuk mengubah judul secara dinamis -->
                     <h5 class="modal-title fw-bold m-0 fs-5" id="detailModalTitle">Detail Perkara</h5>
                 </div>
                 <div class="modal-body position-relative bg-light">
