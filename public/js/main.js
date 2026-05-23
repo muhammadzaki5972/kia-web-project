@@ -15,36 +15,53 @@ let quillInstances = {};
 let isEditMode = false;
 let editId = null;
 
-// Fungsi untuk membaca format tanggal dari Spreadsheet (DD/MM/YYYY) menjadi format Kalender HTML (YYYY-MM-DD)
+// Fungsi untuk membaca format tanggal dari Spreadsheet agar tidak kosong saat di-Edit
 function parseDate(dateStr) {
-    if (!dateStr) return '';
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // Sudah format YYYY-MM-DD
+    if (!dateStr || dateStr === '-') return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // Sudah format kalender (YYYY-MM-DD)
+    
     const parts = dateStr.split(/[\/\-]/);
     if (parts.length === 3) {
-        if (parts[2].length === 4) {
-            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`; // DD/MM/YYYY ke YYYY-MM-DD
+        if (parts[2].length === 4) { // Format DD/MM/YYYY
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        } else if (parts[0].length === 4) { // Format YYYY/MM/DD
+            return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
         }
     }
-    return dateStr; 
+    
+    // Fallback sistem pembaca waktu otomatis
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    return ''; 
 }
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
+    // Override Nama Visual tanpa mengubah Spreadsheet aslinya
+    let label = headerText;
+    if (headerText.toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
+    if (headerText.toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
+
     const id = `${idPrefix}_${index}`;
-    const lowerHeader = headerText.toLowerCase().trim();
+    const lowerHeader = label.toLowerCase().trim();
     const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sinkron</small>` : '';
 
     if (lowerHeader === 'rincian permohonan' || lowerHeader === 'isi permohonan') {
         return `
             <div class="col-12 mb-3">
-                <label class="form-label fw-bold">${headerText}</label>
+                <label class="form-label fw-bold">${label}</label>
                 <div id="${id}_quill" style="height: 150px; background: white;"></div>
                 <input type="hidden" id="${id}">
             </div>`;
     } else if (lowerHeader === 'status sengketa') {
         return `
             <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">${headerText}</label>
-                <select class="form-select" id="${id}" required>
+                <label class="form-label fw-bold">${label}</label>
+                <select class="form-select status-dropdown" id="${id}" required>
                     <option value="" disabled selected>-- Pilih Status --</option>
                     <option value="Dalam Proses">Dalam Proses</option>
                     <option value="Selesai">Selesai</option>
@@ -54,15 +71,15 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     } else if (lowerHeader.includes('tgl') || lowerHeader.includes('tanggal') || lowerHeader === 'sidang terakhir') {
         return `
             <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">${headerText}</label>
+                <label class="form-label fw-bold">${label}</label>
                 <input type="date" class="form-control" id="${id}" required>
                 ${hint}
             </div>`;
     } else {
         return `
             <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">${headerText}</label>
-                <input type="text" class="form-control" id="${id}" required placeholder="Isi ${headerText}">
+                <label class="form-label fw-bold">${label}</label>
+                <input type="text" class="form-control" id="${id}" required placeholder="Isi ${label}">
                 ${hint}
             </div>`;
     }
@@ -87,38 +104,44 @@ function initQuill(headers, idPrefix) {
     });
 }
 
-// Fungsi Khusus Mengunci Link Putusan
+// Fungsi Otomatis Mengunci/Membuka Kolom Link Putusan
 function attachStatusLogic() {
-    let statusId = null, linkId = null;
+    let statusIds = [], linkIds = [];
     
-    // Cari elemen di kedua sheet
     sheetHeadersPerkara.forEach((h, i) => {
-        if(h.toLowerCase().trim() === 'status sengketa') statusId = `inputPerkara_${i}`;
-        if(h.toLowerCase().trim() === 'link putusan') linkId = `inputPerkara_${i}`;
+        if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`);
+        if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`);
     });
     sheetHeadersDetail.forEach((h, i) => {
-        if(h.toLowerCase().trim() === 'status sengketa') statusId = `inputDetail_${i}`;
-        if(h.toLowerCase().trim() === 'link putusan') linkId = `inputDetail_${i}`;
+        if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`);
+        if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`);
     });
 
-    if(statusId && linkId) {
-        const statusEl = document.getElementById(statusId);
-        const linkEl = document.getElementById(linkId);
-        
-        window.applyStatusLogic = () => {
-            if(statusEl.value === 'Dalam Proses') {
-                linkEl.value = '-';
-                linkEl.setAttribute('readonly', true);
-                linkEl.removeAttribute('required');
-            } else if (statusEl.value === 'Selesai') {
-                if(linkEl.value === '-') linkEl.value = '';
-                linkEl.removeAttribute('readonly');
-                linkEl.setAttribute('required', true);
-            }
-        };
-        
-        statusEl.addEventListener('change', window.applyStatusLogic);
-    }
+    window.applyStatusLogic = () => {
+        statusIds.forEach(sId => {
+            const statusEl = document.getElementById(sId);
+            if (!statusEl) return;
+            
+            linkIds.forEach(lId => {
+                const linkEl = document.getElementById(lId);
+                if (!linkEl) return;
+                
+                if(statusEl.value === 'Dalam Proses') {
+                    linkEl.value = '-';
+                    linkEl.setAttribute('readonly', true);
+                    linkEl.removeAttribute('required');
+                } else if (statusEl.value === 'Selesai') {
+                    if(linkEl.value === '-') linkEl.value = '';
+                    linkEl.removeAttribute('readonly');
+                }
+            });
+        });
+    };
+    
+    statusIds.forEach(sId => {
+        const el = document.getElementById(sId);
+        if(el) el.addEventListener('change', window.applyStatusLogic);
+    });
 }
 
 async function loadData() {
@@ -144,8 +167,9 @@ async function loadData() {
         detailData = data.detail.slice(1) || [];
         quillInstances = {}; 
 
-        // Menyembunyikan kolom "detail" yang berupa teks kosong
+        // Sembunyikan kolom Detail dari tabel utama
         const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+        
         sheetHeadersPerkara.forEach((h, i) => { 
             if(i !== skipIdx) { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); }
         });
@@ -160,7 +184,7 @@ async function loadData() {
 
         initQuill(sheetHeadersPerkara, 'inputPerkara');
         initQuill(sheetHeadersDetail, 'inputDetail');
-        attachStatusLogic(); // Pasang logika Status vs Link
+        attachStatusLogic(); 
 
         if(document.getElementById('inputPerkara_0')) {
             document.getElementById('inputPerkara_0').addEventListener('input', (e) => {
@@ -224,9 +248,7 @@ function bukaModalTambah() {
     Object.values(quillInstances).forEach(q => q.setContents([]));
     document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     
-    // Jalankan Status Logic
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
-    
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -235,7 +257,6 @@ function bukaModalEdit(id) {
     const rowP = perkaraData.find(r => r[0] === id) || [];
     const rowD = detailData.find(r => r[0] === id) || [];
 
-    // Pengisian Form Utama + Fitur Tanggal & Select
     sheetHeadersPerkara.forEach((h, i) => {
         const inputId = `inputPerkara_${i}`;
         const val = rowP[i] || '';
@@ -249,7 +270,6 @@ function bukaModalEdit(id) {
         }
     });
 
-    // Pengisian Form Detail + Fitur Tanggal & Select
     sheetHeadersDetail.forEach((h, i) => {
         const inputId = `inputDetail_${i}`;
         const val = rowD[i] || '';
@@ -264,9 +284,12 @@ function bukaModalEdit(id) {
     });
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
-    
-    // Aktifkan logika disable Link Putusan jika Status = Dalam Proses
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    
+    document.getElementById('modalFormTitle').innerText = `Edit Data Perkara: ${id}`;
+    document.getElementById('modalFormHeader').className = "modal-header bg-warning text-dark";
+    document.getElementById('btnSubmit').className = "btn btn-warning w-100 mt-4 py-2 fw-bold text-dark";
+    document.getElementById('btnSubmit').innerText = "Simpan Perubahan";
 
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
@@ -298,7 +321,7 @@ function lihatDetail(id) {
             return;
         }
 
-        const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
+        const leftFields = ["rincian informasi", "no reg", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "sidang terakhir", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
 
@@ -307,6 +330,10 @@ function lihatDetail(id) {
             if(idx !== -1) {
                 let fieldVal = row ? (row[idx] || '-') : '-';
                 
+                let labelText = sheetHeadersDetail[idx];
+                if(labelText.toLowerCase().trim() === 'sidang') labelText = 'Sidang Terakhir';
+                if(labelText.toLowerCase().trim() === 'rincian informasi') labelText = 'No Reg';
+
                 if (f === 'link putusan' && fieldVal !== '-') {
                     let linkUrl = fieldVal;
                     if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
@@ -316,7 +343,7 @@ function lihatDetail(id) {
                 leftHtml += `
                 <div class="card shadow-sm border-0 mb-2">
                     <div class="card-body py-1 px-3">
-                        <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${sheetHeadersDetail[idx]}</div>
+                        <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div>
                         <div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div>
                     </div>
                 </div>`;
