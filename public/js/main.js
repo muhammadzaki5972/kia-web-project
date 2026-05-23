@@ -1,4 +1,3 @@
-// Proteksi Halaman
 if (window.location.pathname.includes('admin.html') && !sessionStorage.getItem('isLoggedIn')) {
     window.location.href = 'login.html';
 }
@@ -8,7 +7,6 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Variabel Global untuk menyimpan nama kolom dari Sheet A1:F1
 let sheetHeaders = [];
 
 async function loadData() {
@@ -31,16 +29,13 @@ async function loadData() {
             return;
         }
 
-        // 1. BUAT HEADER TABEL & FORM INPUT (Dari baris 1)
         sheetHeaders = data[0]; 
         
         sheetHeaders.forEach((headerText, index) => {
-            // Generate Table Header
             const th = document.createElement('th');
             th.textContent = headerText;
             thead.appendChild(th);
 
-            // Generate Form Input secara dinamis
             formContainer.innerHTML += `
                 <div class="mb-3">
                     <label class="form-label fw-bold">${headerText}</label>
@@ -49,16 +44,14 @@ async function loadData() {
             `;
         });
         
-        // Kolom aksi tambahan untuk tabel
         const thAksi = document.createElement('th');
         thAksi.textContent = 'Aksi';
         thead.appendChild(thAksi);
 
-        // 2. BUAT ISI TABEL (Dari baris 2 dst)
         const rows = data.slice(1);
         
         if(rows.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${sheetHeaders.length + 1}" class="text-center">Belum ada data perkara</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${sheetHeaders.length + 1}" class="text-center text-muted">Belum ada data perkara yang tercatat.</td></tr>`;
             return;
         }
 
@@ -85,14 +78,12 @@ async function loadData() {
     }
 }
 
-// Menangani Submit Form Dinamis
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit');
     btnSubmit.innerText = "Menyimpan...";
     btnSubmit.disabled = true;
 
-    // Kumpulkan data dari 6 form input yang dibuat dinamis tadi
     let barisBaru = [];
     for (let i = 0; i < sheetHeaders.length; i++) {
         barisBaru.push(document.getElementById(`inputCol_${i}`).value);
@@ -102,7 +93,7 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
         const response = await fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ barisData: barisBaru }) // Kirim sebagai array
+            body: JSON.stringify({ barisData: barisBaru }) 
         });
 
         if(response.ok) {
@@ -110,7 +101,7 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
             document.getElementById('formTambahData').reset();
             const modal = bootstrap.Modal.getInstance(document.getElementById('tambahDataModal'));
             modal.hide();
-            loadData(); // Refresh Data
+            loadData(); 
         } else {
             const errData = await response.json();
             alert('Gagal: ' + errData.error);
