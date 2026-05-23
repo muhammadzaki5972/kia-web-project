@@ -85,14 +85,12 @@ async function loadData() {
         detailData = data.detail.slice(1) || [];
         quillInstances = {}; 
 
-        // --- BUAT HEADER ---
         const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
         sheetHeadersPerkara.forEach((h, i) => { 
             if(i !== skipIdx) { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); }
         });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
-        // --- BUAT FORM ---
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => formHtml += renderInput(h, 'inputPerkara', i, false));
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
@@ -110,7 +108,6 @@ async function loadData() {
             });
         }
 
-        // --- BUAT ISI TABEL ---
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) {
@@ -131,7 +128,6 @@ async function loadData() {
     }
 }
 
-// Tambahkan event listener untuk tombol submit agar form tidak error
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit');
@@ -165,7 +161,7 @@ function bukaModalTambah() {
     isEditMode = false; editId = null;
     document.getElementById('formTambahData').reset();
     Object.values(quillInstances).forEach(q => q.setContents([]));
-    document.getElementById('inputDetail_0').removeAttribute('readonly'); // Unlock
+    document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -186,7 +182,7 @@ function bukaModalEdit(id) {
         document.getElementById(inputId).value = rowD[i] || '';
     });
 
-    document.getElementById('inputDetail_0').setAttribute('readonly', true); // Lock ID
+    document.getElementById('inputDetail_0').setAttribute('readonly', true); 
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
@@ -200,23 +196,62 @@ function lihatDetail(id) {
     const modalEl = document.getElementById('detailModal');
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
+    
     document.getElementById('detailLoading').style.display = 'flex';
     document.getElementById('detailContent').innerHTML = '';
 
     const pRow = perkaraData.find(r => r[0] === id);
     const idxPemohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
     const idxTermohon = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
-    document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[idxPemohon]} vs ${pRow[idxTermohon]}` : 'Detail';
+    document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[idxPemohon] || 'Pemohon'} vs ${pRow[idxTermohon] || 'Termohon'}` : 'Detail Perkara';
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
-        let html = '';
-        if(row) {
-            sheetHeadersDetail.forEach((h, i) => {
-                html += `<div class="col-md-6 mb-3"><div class="card shadow-sm border-0 h-100"><div class="card-body py-2"><small class="text-muted fw-bold d-block mb-1">${h}</small><div class="text-dark">${row[i] || '-'}</div></div></div></div>`;
-            });
-        } else { html = '<div class="col-12 text-center text-muted">Data kosong.</div>'; }
-        document.getElementById('detailContent').innerHTML = html;
+        if(!row) {
+            document.getElementById('detailContent').innerHTML = '<div class="col-12 text-center text-muted">Data detail tidak ditemukan.</div>';
+            document.getElementById('detailLoading').style.display = 'none';
+            return;
+        }
+
+        const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "link putusan"];
+        
+        let leftHtml = '<div class="col-md-6">';
+
+        leftFields.forEach(f => {
+            const idx = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === f);
+            if(idx !== -1) {
+                let fieldVal = row ? (row[idx] || '-') : '-';
+                
+                // Menjadikan "Link Putusan" sebagai Tautan
+                if (f === 'link putusan' && fieldVal !== '-') {
+                    let linkUrl = fieldVal;
+                    if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
+                    fieldVal = `<a href="${linkUrl}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
+                }
+
+                leftHtml += `
+                <div class="card shadow-sm border-0 mb-2">
+                    <div class="card-body py-1 px-3">
+                        <div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${sheetHeadersDetail[idx]}</div>
+                        <div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div>
+                    </div>
+                </div>`;
+            }
+        });
+        leftHtml += '</div>';
+
+        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+        let rightHtml = `
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div>
+                    <div class="card-body scrollable-box" style="font-size: 0.85rem;">
+                        <div class="text-dark">${idxPermohonan !== -1 ? (row[idxPermohonan] || '-') : '-'}</div>
+                    </div>
+                </div>
+            </div>`;
+
+        document.getElementById('detailContent').innerHTML = leftHtml + rightHtml;
         document.getElementById('detailLoading').style.display = 'none';
     }, 500); 
 }
