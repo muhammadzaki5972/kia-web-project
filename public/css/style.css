@@ -1,24 +1,21 @@
-/* Pengaturan Layout Dasar agar Footer selalu di bawah */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa !important;
 }
 
-/* Modifikasi area tabel untuk freeze header */
 .table-responsive {
-    max-height: 70vh; /* Menentukan tinggi maksimal tabel agar bisa di-scroll di dalamnya */
+    max-height: 70vh; 
     overflow-y: auto;
     border-radius: 8px;
 }
 
-/* Freeze Header pada Tabel */
 .table thead th {
     background-color: #212529;
     color: white;
     border-bottom: none;
     padding: 12px 15px;
     white-space: nowrap;
-    position: sticky; /* Membuat header tabel freeze */
+    position: sticky; 
     top: 0;
     z-index: 10;
 }
@@ -29,30 +26,33 @@ body {
     white-space: nowrap;
 }
 
-/* Pengaturan Logo & Header KIACEH */
 .brand-logo {
     width: 48px;
     height: auto;
     margin-right: 12px;
 }
 
-/* Responsivitas untuk Layar HP (Mobile & Tablet kecil) */
+/* Loading Overlay Modal */
+#detailLoading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 1055;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 0 8px 8px;
+}
+
 @media (max-width: 576px) {
     .brand-logo {
         width: 38px;
         margin-right: 10px;
     }
-    
-    .navbar-brand .fs-4 {
-        font-size: 1.25rem !important;
-    }
-    
-    .navbar-brand .fs-6 {
-        font-size: 0.8rem !important;
-    }
-    
-    .navbar .btn {
-        width: 100%;
-        margin-top: 10px;
-    }
+    .navbar-brand .fs-4 { font-size: 1.25rem !important; }
+    .navbar-brand .fs-6 { font-size: 0.8rem !important; }
+    .navbar .btn { width: 100%; margin-top: 10px; }
 }
