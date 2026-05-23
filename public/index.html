@@ -34,11 +34,9 @@
         </div>
     </main>
 
-    <!-- Modal Pop Up -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
-                <!-- Header Modal: Judul di tengah, tombol silang (hitam) di kanan -->
                 <div class="modal-header bg-info position-relative">
                     <h5 class="modal-title fw-bold fs-5 w-100 text-center text-dark" id="detailModalTitle">Detail Perkara</h5>
                     <button type="button" class="btn-close position-absolute end-0 me-3" onclick="closeDetailModal()"></button>
@@ -106,7 +104,8 @@
 
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
-                const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang", "link putusan"];
+                // Nama kolom Sidang diganti menjadi Sidang Terakhir
+                const leftFields = ["rincian informasi", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
                 leftFields.forEach(f => {
@@ -114,14 +113,12 @@
                     if(idx !== -1) {
                         let fieldVal = row ? (row[idx] || '-') : '-';
                         
-                        // Logika Khusus untuk membuat Link Putusan bisa di-klik
                         if (f === 'link putusan' && fieldVal !== '-') {
                             let linkUrl = fieldVal;
                             if (!linkUrl.startsWith('http')) linkUrl = 'https://' + linkUrl;
                             fieldVal = `<a href="${linkUrl}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
                         }
 
-                        // Mengurangi ukuran font untuk pop-up detail (0.75rem dan 0.85rem)
                         leftHtml += `
                         <div class="card shadow-sm border-0 mb-2">
                             <div class="card-body py-1 px-3">
