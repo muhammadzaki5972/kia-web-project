@@ -12,6 +12,7 @@ function logout() {
 
 // ... (Sisa kode fetch loadData dan formTambahData tetap sama seperti sebelumnya) ...
 // Fungsi Load Data dari Backend
+// Fungsi Load Data dari Backend
 async function loadData() {
     const thead = document.getElementById('tableHeader');
     const tbody = document.getElementById('dataTable');
@@ -20,32 +21,41 @@ async function loadData() {
         const response = await fetch('/api/data');
         const data = await response.json();
         
+        // PENTING: Cek apakah server mengembalikan pesan error
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Terjadi kesalahan saat mengambil data API');
+        }
+
         thead.innerHTML = '';
         tbody.innerHTML = '';
 
-        if(data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data</td></tr>';
+        // Cek apakah data benar-benar kosong
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data di Spreadsheet</td></tr>';
             return;
         }
 
-        // 1. BUAT HEADER DARI BARIS PERTAMA SPREADSHEET (Indeks 0)
+        // 1. BUAT HEADER
         const headers = data[0]; 
+        if (!headers) {
+             throw new Error('Baris pertama di Spreadsheet kosong. Harap isi judul kolom!');
+        }
+
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
             thead.appendChild(th);
         });
         
-        // Tambahkan kolom 'Aksi' di ujung header
         const thAksi = document.createElement('th');
         thAksi.textContent = 'Aksi';
         thead.appendChild(thAksi);
 
-        // 2. BUAT ISI TABEL DARI BARIS KEDUA DAN SETERUSNYA
+        // 2. BUAT ISI TABEL
         const rows = data.slice(1);
         
         if(rows.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${headers.length + 1}" class="text-center">Belum ada data</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${headers.length + 1}" class="text-center">Belum ada baris data di bawah header</td></tr>`;
             return;
         }
 
@@ -53,9 +63,7 @@ async function loadData() {
             const tr = document.createElement('tr');
             let rowHtml = '';
             
-            // Looping isi baris menyesuaikan jumlah kolom header
             for (let i = 0; i < headers.length; i++) {
-                // Jika ini adalah kolom status (asumsi indeks ke-3 / kolom ke-4), berikan badge
                 if (i === 3) {
                     rowHtml += `<td><span class="badge bg-info">${row[i] || '-'}</span></td>`;
                 } else {
@@ -63,7 +71,6 @@ async function loadData() {
                 }
             }
             
-            // Tambahkan tombol aksi di ujung baris
             rowHtml += `
                 <td>
                     <button class="btn btn-warning btn-sm">Edit</button>
@@ -75,6 +82,9 @@ async function loadData() {
             tbody.appendChild(tr);
         });
     } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-danger">Gagal memuat data: ${error.message}</td></tr>`;
+        // Tampilkan error aslinya di dalam tabel agar kita tahu masalahnya
+        thead.innerHTML = '';
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger fw-bold text-center">Gagal memuat: ${error.message}</td></tr>`;
+        console.error("Detail Error:", error);
     }
 }
