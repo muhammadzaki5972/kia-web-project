@@ -24,7 +24,7 @@ app.get('/api/data', async (req, res) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A2:D', // Sesuaikan range dengan tabel Anda
+      range: 'DataPerkara!A:E', // Sesuaikan range dengan tabel Anda
     });
     res.json(response.data.values || []);
   } catch (error) {
