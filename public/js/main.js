@@ -16,11 +16,11 @@ let quillInstances = {};
 let isEditMode = false;
 let editId = null;
 
-// Fungsi Render Input Dinamis (Teks, Tanggal, atau Quill)
+// Fungsi Render Input Dinamis
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     const id = `${idPrefix}_${index}`;
     const lowerHeader = headerText.toLowerCase();
-    const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Sama dengan ${sheetHeadersPerkara[0]} Utama</small>` : '';
+    const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sama dengan Utama</small>` : '';
 
     if (lowerHeader === 'rincian permohonan') {
         return `
@@ -45,7 +45,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     }
 }
 
-// Inisialisasi Text Editor setelah HTML di-render
+// Inisialisasi Text Editor
 function initQuill(headers, idPrefix) {
     headers.forEach((header, index) => {
         if (header.toLowerCase() === 'rincian permohonan') {
@@ -54,7 +54,6 @@ function initQuill(headers, idPrefix) {
                 theme: 'snow',
                 modules: { toolbar: [['bold', 'italic', 'underline'], [{'list':'ordered'},{'list':'bullet'}]] }
             });
-            // Update input hidden saat teks berubah
             quillInstances[id].on('text-change', () => {
                 document.getElementById(id).value = quillInstances[id].root.innerHTML;
             });
@@ -80,9 +79,9 @@ async function loadData() {
         sheetHeadersDetail = data.detail[0] || [];
         perkaraData = data.perkara.slice(1);
         detailData = data.detail.slice(1) || [];
-        quillInstances = {}; // Reset instances
+        quillInstances = {}; 
         
-        // --- BUAT HEADER TABEL ---
+        // --- BUAT HEADER ---
         sheetHeadersPerkara.forEach((h) => { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
@@ -94,9 +93,14 @@ async function loadData() {
         formHtml += `</div></div>`;
         formContainer.innerHTML = formHtml;
 
-        // Init Quill
         initQuill(sheetHeadersPerkara, 'inputPerkara');
         initQuill(sheetHeadersDetail, 'inputDetail');
+
+        // Khusus sinkronisasi ID otomatis pada form detail
+        document.getElementById('inputPerkara_0').addEventListener('input', (e) => {
+            const detailIdInput = document.getElementById('inputDetail_0');
+            if(detailIdInput) detailIdInput.value = e.target.value;
+        });
 
         // --- BUAT ISI TABEL ---
         if(perkaraData.length === 0) {
@@ -107,7 +111,11 @@ async function loadData() {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) rowHtml += `<td>${row[i] || '-'}</td>`;
             const rowId = row[0] || '';
-            rowHtml += `<td><button class="btn btn-info btn-sm text-white py-0 shadow-sm disabled">Lihat</button></td>`;
+            
+            // Perbaikan: Tombol lihat di admin kini aktif dan memanggil fungsi lihatDetail
+            rowHtml += `<td><button class="btn btn-info btn-sm text-white py-0 shadow-sm" onclick="lihatDetail('${rowId}')">Lihat</button></td>`;
+            
+            // Tombol Edit dan Hapus
             rowHtml += `
                 <td>
                     <button class="btn btn-warning btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${rowId}')">Edit</button>
@@ -122,12 +130,15 @@ async function loadData() {
 function bukaModalTambah() {
     isEditMode = false; editId = null;
     document.getElementById('formTambahData').reset();
-    Object.values(quillInstances).forEach(q => q.setContents([])); // Bersihkan editor teks
+    Object.values(quillInstances).forEach(q => q.setContents([])); 
     
     document.getElementById('modalFormTitle').innerText = "Input Data Perkara Baru";
     document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold";
     document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
+    
+    // Perbaikan: Membuat input detail 0 tidak bisa diketik manual (otomatis ikut form utama)
+    document.getElementById('inputDetail_0').setAttribute('readonly', true);
     
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
@@ -138,19 +149,19 @@ function bukaModalEdit(id) {
     const rowP = perkaraData.find(r => r[0] === id) || [];
     const rowD = detailData.find(r => r[0] === id) || [];
 
-    // Isi Form Utama
     sheetHeadersPerkara.forEach((h, i) => {
         const inputId = `inputPerkara_${i}`;
         if(quillInstances[inputId]) {
             quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowP[i] || '');
+            document.getElementById(inputId).value = rowP[i] || ''; // Trigger hidden input
         } else { document.getElementById(inputId).value = rowP[i] || ''; }
     });
 
-    // Isi Form Detail
     sheetHeadersDetail.forEach((h, i) => {
         const inputId = `inputDetail_${i}`;
         if(quillInstances[inputId]) {
             quillInstances[inputId].clipboard.dangerouslyPasteHTML(rowD[i] || '');
+            document.getElementById(inputId).value = rowD[i] || ''; // Trigger hidden input
         } else { document.getElementById(inputId).value = rowD[i] || ''; }
     });
 
@@ -158,16 +169,17 @@ function bukaModalEdit(id) {
     document.getElementById('modalFormHeader').className = "modal-header bg-warning text-dark";
     document.getElementById('btnSubmit').className = "btn btn-warning w-100 mt-4 py-2 fw-bold text-dark";
     document.getElementById('btnSubmit').innerText = "Simpan Perubahan";
+    document.getElementById('inputDetail_0').setAttribute('readonly', true);
     
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
 }
 
 // Hapus Data
 async function hapusData(id) {
-    if(!confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data dengan ID/Register ${id} secara permanen dari kedua Sheet?`)) return;
-    
+    if(!confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data dengan Register "${id}" secara permanen?`)) return;
     try {
-        const response = await fetch(`/api/data/${id}`, { method: 'DELETE' });
+        // Perbaikan encodeURIComponent agar kebal terhadap slash (/)
+        const response = await fetch(`/api/data?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
         if(response.ok) { alert('Data berhasil dihapus!'); loadData(); } 
         else { const err = await response.json(); alert('Gagal menghapus: ' + err.error); }
     } catch (error) { alert('Terjadi kesalahan koneksi.'); }
@@ -186,7 +198,8 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
     let barisDetail = [];
     for (let i = 0; i < sheetHeadersDetail.length; i++) barisDetail.push(document.getElementById(`inputDetail_${i}`).value);
 
-    const url = isEditMode ? `/api/data/${editId}` : '/api/data';
+    // Perbaikan URI Component
+    const url = isEditMode ? `/api/data?id=${encodeURIComponent(editId)}` : '/api/data';
     const method = isEditMode ? 'PUT' : 'POST';
 
     try {
@@ -204,5 +217,46 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
     } catch (error) { alert('Terjadi kesalahan koneksi.'); } 
     finally { btnSubmit.innerText = originalText; btnSubmit.disabled = false; }
 });
+
+// --- FUNGSI MODAL DETAIL (Dikombalikan agar bisa ditutup) ---
+function lihatDetail(id) {
+    const modalEl = document.getElementById('detailModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+    
+    document.getElementById('detailLoading').style.display = 'flex';
+    document.getElementById('detailContent').innerHTML = '';
+
+    setTimeout(() => {
+        const row = detailData.find(r => r[0] === id);
+        let html = '';
+        if(row) {
+            sheetHeadersDetail.forEach((header, i) => {
+                html += `
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body py-2">
+                            <small class="text-muted fw-bold d-block mb-1">${header}</small>
+                            <div class="text-dark" style="font-size: 0.9rem;">${row[i] || '-'}</div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        } else {
+            html = '<div class="col-12 text-center text-muted py-5">Data detail belum diinput.</div>';
+        }
+        document.getElementById('detailContent').innerHTML = html;
+        document.getElementById('detailLoading').style.display = 'none';
+    }, 500); 
+}
+
+function closeDetailModal() {
+    document.getElementById('detailLoading').style.display = 'flex';
+    setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+        if(modal) modal.hide();
+        document.getElementById('detailLoading').style.display = 'none';
+    }, 300); 
+}
 
 if (window.location.pathname.includes('admin.html')) window.onload = loadData;
