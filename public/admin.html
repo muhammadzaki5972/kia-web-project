@@ -23,9 +23,21 @@
             </button>
         </div>
 
+        <!-- Panel Filter dan Pencarian -->
+        <div class="filter-panel d-flex gap-2 align-items-center">
+            <input type="text" class="form-control w-25" id="searchData" placeholder="Cari nama instansi atau ID...">
+            <select class="form-select w-25" id="filterStatus">
+                <option value="Semua">Semua Status</option>
+                <option value="Diterima">Diterima</option>
+                <option value="Diproses">Diproses</option>
+                <option value="Selesai">Selesai</option>
+            </select>
+            <button class="btn btn-primary" onclick="applyFilter()">Terapkan</button>
+        </div>
+
         <div class="card shadow-sm">
-            <div class="card-body">
-                <table class="table table-hover">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
@@ -36,10 +48,22 @@
                         </tr>
                     </thead>
                     <tbody id="dataTable">
-                        <!-- Data akan dimuat dari Google Sheets melalui main.js -->
-                        <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+                        <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                <span class="text-muted" style="font-size: 0.9em;">Menampilkan data 1-10</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">Sebelumnya</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Selanjutnya</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
