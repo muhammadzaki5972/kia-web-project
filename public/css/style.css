@@ -3,13 +3,13 @@ body {
     background-color: #f8f9fa !important;
 }
 
-/* Modifikasi Tabel: Ukuran Font & Garis Transparan */
+/* Modifikasi Tabel: Ukuran Font, Garis Transparan & Rata Tengah */
 .table-sm {
-    font-size: 0.85rem !important; /* Font lebih kecil */
+    font-size: 0.85rem !important; 
 }
 
 .table-bordered td, .table-bordered th {
-    border: 1px solid rgba(0, 0, 0, 0.1) !important; /* Garis semi-transparan */
+    border: 1px solid rgba(0, 0, 0, 0.1) !important; 
 }
 
 .table-responsive {
@@ -27,12 +27,14 @@ body {
     position: sticky; 
     top: 0;
     z-index: 10;
+    text-align: center; /* Teks Rata Tengah (Permintaan Baru) */
 }
 
 .table td {
     vertical-align: middle;
     padding: 8px 12px;
     white-space: nowrap;
+    text-align: center; /* Teks Rata Tengah (Permintaan Baru) */
 }
 
 .brand-logo {
@@ -41,13 +43,11 @@ body {
     margin-right: 12px;
 }
 
-/* Kustomisasi Quill Editor */
 .ql-container {
     font-family: 'Segoe UI', sans-serif !important;
     font-size: 0.9rem !important;
 }
 
-/* Loading Overlay Modal */
 #detailLoading {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(255, 255, 255, 0.9); z-index: 1055;
