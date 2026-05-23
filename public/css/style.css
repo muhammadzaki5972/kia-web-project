@@ -1,73 +1,29 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa !important;
-}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa !important; }
+.table-sm { font-size: 0.85rem !important; }
+.table-bordered td, .table-bordered th { border: 1px solid rgba(0, 0, 0, 0.1) !important; }
+.table-responsive { max-height: 70vh; overflow-y: auto; border-radius: 8px; }
+.table thead th { background-color: #212529; color: white; border-bottom: none; padding: 10px 12px; white-space: nowrap; position: sticky; top: 0; z-index: 10; text-align: center; }
+.table td { vertical-align: middle; padding: 8px 12px; white-space: nowrap; text-align: center; }
 
-/* Tambahkan ini di style.css agar tampilan hasil popup lebih kecil */
-.modal-body {
-    font-size: 0.85rem;
-}
-.modal-body .card-body .text-dark {
-    font-size: 0.85rem !important;
-}
+.brand-logo { height: 48px; width: auto; margin-right: 12px; object-fit: contain; }
 
-/* Modifikasi Tabel */
-.table-sm {
-    font-size: 0.85rem !important; 
-}
-
-.table-bordered td, .table-bordered th {
-    border: 1px solid rgba(0, 0, 0, 0.1) !important; 
-}
-
-.table-responsive {
-    max-height: 70vh; 
+/* Fitur Scroll untuk Isi Permohonan */
+.scrollable-box {
+    max-height: 450px; 
     overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 15px;
     border-radius: 8px;
+    background-color: #fff;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
 }
 
-.table thead th {
-    background-color: #212529;
-    color: white;
-    border-bottom: none;
-    padding: 10px 12px;
-    white-space: nowrap;
-    position: sticky; 
-    top: 0;
-    z-index: 10;
-    text-align: center; 
-}
+.ql-container { font-family: 'Segoe UI', sans-serif !important; font-size: 0.9rem !important; }
 
-.table td {
-    vertical-align: middle;
-    padding: 8px 12px;
-    white-space: nowrap;
-    text-align: center; 
-}
-
-/* Penyesuaian Ukuran Logo Garuda */
-.brand-logo {
-    height: 48px; /* Diubah menggunakan tinggi agar proporsional */
-    width: auto;
-    margin-right: 12px;
-    object-fit: contain;
-}
-
-.ql-container {
-    font-family: 'Segoe UI', sans-serif !important;
-    font-size: 0.9rem !important;
-}
-
-#detailLoading {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 255, 255, 0.9); z-index: 1055;
-    display: flex; justify-content: center; align-items: center;
-    border-radius: 0 0 8px 8px;
-}
+#detailLoading { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 1055; display: flex; justify-content: center; align-items: center; border-radius: 0 0 8px 8px; }
 
 @media (max-width: 576px) {
     .brand-logo { height: 38px; margin-right: 10px; }
     .navbar-brand .fs-4 { font-size: 1.25rem !important; }
-    .navbar-brand .fs-6 { font-size: 0.8rem !important; }
     .navbar .btn { width: 100%; margin-top: 10px; }
 }
