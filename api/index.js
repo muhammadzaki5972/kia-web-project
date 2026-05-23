@@ -17,12 +17,12 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
-// Helper mencari baris berdasarkan ID (Kolom A)
+// Helper mencari baris berdasarkan ID
 async function findRowIndex(sheetName, id) {
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${sheetName}!A:A` });
     const rows = res.data.values || [];
     const index = rows.findIndex(row => row[0] === id);
-    return index !== -1 ? index + 1 : null; // API Google Sheets dimulai dari index 1
+    return index !== -1 ? index + 1 : null; 
 }
 
 // --- READ ---
@@ -55,8 +55,8 @@ app.post('/api/data', async (req, res) => {
 });
 
 // --- UPDATE (EDIT) ---
-app.put('/api/data/:id', async (req, res) => {
-    const { id } = req.params;
+app.put('/api/data', async (req, res) => {
+    const id = req.query.id; // Diubah menggunakan query untuk mencegah error garis miring
     const { barisPerkara, barisDetail } = req.body;
     try {
         const idxPerkara = await findRowIndex('DataPerkara', id);
@@ -77,8 +77,8 @@ app.put('/api/data/:id', async (req, res) => {
 });
 
 // --- DELETE (HAPUS) ---
-app.delete('/api/data/:id', async (req, res) => {
-    const { id } = req.params;
+app.delete('/api/data', async (req, res) => {
+    const id = req.query.id; // Diubah menggunakan query
     try {
         const idxPerkara = await findRowIndex('DataPerkara', id);
         const idxDetail = await findRowIndex('detail', id);
