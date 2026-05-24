@@ -82,19 +82,19 @@
                 const response = await fetch('/api/data');
                 const data = await response.json();
                 
-                if (!data.perkara || data.perkara.length <= 1) {
+                if (!data.perkara || data.perkara.length <= 0) {
                     container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return;
                 }
 
-                sheetHeadersPerkara = data.perkara; 
-                perkaraData = data.perkara.slice(1); 
+                sheetHeadersPerkara = data.perkara || []; 
+                perkaraData = data.perkara.slice(1) || []; 
                 detailHeaders = data.detail || [];
                 detailData = data.detail.slice(1) || [];
                 
-                const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+                const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
 
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
-                sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h}</th>`; });
+                sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
                 tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
 
                 perkaraData.forEach(row => {
@@ -115,9 +115,9 @@
             if (!tbody) return;
 
             const rows = tbody.getElementsByTagName('tr');
-            const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
-            const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
-            const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+            const idxPem = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('pemohon'));
+            const idxTerm = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('termohon'));
+            const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
 
             for (let i = 0; i < rows.length; i++) {
                 const cells = rows[i].getElementsByTagName('td');
@@ -144,21 +144,25 @@
             document.getElementById('detailContent').innerHTML = '';
 
             const pRow = perkaraData.find(r => r === id);
-            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail';
+            const idxPemHeader = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('pemohon'));
+            const idxTermHeader = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('termohon'));
+            
+            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[idxPemHeader] || 'Pemohon'} vs ${pRow[idxTermHeader] || 'Termohon'}` : 'Detail Perkara';
 
             setTimeout(() => {
                 const row = detailData.find(r => r === id);
                 const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
-                let datesCollected = []; // Kolektor objek waktu untuk melacak update terbaru
+                let datesCollected = [];
 
                 leftFields.forEach(f => {
                     let fieldVal = '-';
                     let labelText = '';
                     
                     const findIdx = (headers) => headers.findIndex(h => {
-                        let val = h.toLowerCase().trim();
+                        if(!h) return false;
+                        let val = String(h).toLowerCase().trim();
                         return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang');
                     });
 
@@ -178,7 +182,6 @@
                         if(f === 'no reg') labelText = 'No Reg';
                         if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
 
-                        // Ambil dan catat tanggal untuk validasi penanda pembaruan terakhir di footer pop-up
                         if(fieldVal !== '-' && fieldVal !== '') {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) {
                                 datesCollected.push(new Date(fieldVal));
@@ -188,7 +191,6 @@
                             }
                         }
 
-                        // Mengubah format internal (YYYY-MM-DD) menjadi (DD/MM/YYYY) saat tayang di pop-up
                         const lowerF = f.toLowerCase();
                         if(lowerF.includes('tgl') || lowerF.includes('tanggal') || lowerF.includes('sidang')) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) {
@@ -214,7 +216,6 @@
                 });
                 leftHtml += '</div>';
 
-                // Tampilkan Tanggal Pembaruan Otomatis Terkini di kanan bawah Pop Up berdasarkan input kalender terbaru
                 let latestDateStr = '-';
                 if (datesCollected.length > 0) {
                     let maxDate = new Date(Math.max.apply(null, datesCollected));
@@ -227,7 +228,7 @@
                 }
                 document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
 
-                const idxPermohonan = detailHeaders.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+                const idxPermohonan = detailHeaders.findIndex(h => h && String(h).toLowerCase().trim() === 'isi permohonan');
                 let rightHtml = `
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0">
