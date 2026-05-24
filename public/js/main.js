@@ -208,6 +208,37 @@ async function loadData() {
     }
 }
 
+// --- LOGIKA PENCARIAN LIVE SEARCH ---
+function filterTable() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const tbody = document.getElementById('dataTable');
+    if (!tbody) return;
+
+    const rows = tbody.getElementsByTagName('tr');
+    const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+    const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+    const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+        if(cells.length <= 1) continue; // Bypass baris empty/loading
+
+        const actualIdxPem = idxPem > skipIdx ? idxPem - 1 : idxPem;
+        const actualIdxTerm = idxTerm > skipIdx ? idxTerm - 1 : idxTerm;
+
+        const pemohon = cells[actualIdxPem] ? cells[actualIdxPem].textContent.toLowerCase() : '';
+        const termohon = cells[actualIdxTerm] ? cells[actualIdxTerm].textContent.toLowerCase() : '';
+
+        rows[i].style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
+    }
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    filterTable(); // Reset ke awal
+}
+// -------------------------------------
+
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit');
@@ -245,7 +276,6 @@ function bukaModalTambah() {
     
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
     
-    // Perubahan Judul sesuai permintaan
     document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru";
     document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold";
@@ -318,7 +348,6 @@ function lihatDetail(id) {
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
         
-        // Logika Array bersih menggunakan alias dinamis
         const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
@@ -327,7 +356,6 @@ function lihatDetail(id) {
             let fieldVal = '-';
             let labelText = '';
             
-            // Pencarian Index Dinamis
             const findIdx = (headers) => headers.findIndex(h => {
                 let val = h.toLowerCase().trim();
                 return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang');
