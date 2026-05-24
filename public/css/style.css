@@ -16,3 +16,10 @@ body {
     background: rgba(255, 255, 255, 0.8); z-index: 1055; 
     display: flex; justify-content: center; align-items: center; 
 }
+
+/* Update: Rata tengah dan perkecil ukuran teks pada tabel hasil */
+.table-hasil th, .table-hasil td {
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-size: 0.85rem !important;
+}
