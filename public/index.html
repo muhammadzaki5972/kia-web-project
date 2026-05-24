@@ -48,8 +48,8 @@
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header position-relative" style="background: #e9ecef; border-bottom: 1px solid #dee2e6;">
-                    <h5 class="modal-title fw-bold fs-5 w-100 text-center text-dark" id="detailModalTitle">Detail Perkara</h5>
+                <div class="modal-header position-relative bg-info text-dark">
+                    <h5 class="modal-title fw-bold fs-5 w-100 text-center" id="detailModalTitle">Detail Perkara</h5>
                     <button type="button" class="btn-close position-absolute end-0 me-3" onclick="closeDetailModal()"></button>
                 </div>
                 <div class="modal-body position-relative bg-light">
@@ -60,7 +60,7 @@
                 </div>
                 <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-light py-2" style="min-height: 55px; border-top: 1px solid #dee2e6;">
                     <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold shadow-sm" onclick="closeDetailModal()">Tutup</button>
-                    <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-normal" style="font-size: 0.72rem;" id="modalLastUpdated">
+                    <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-normal" style="font-size: 0.75rem;" id="modalLastUpdated">
                         Data terakhir diperbarui tanggal: -
                     </div>
                 </div>
@@ -68,7 +68,7 @@
         </div>
     </div>
 
-    <footer>
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
         <div class="container">&copy; 2026 Komisi Informasi Aceh (KIACEH). Semua hak dilindungi.</div>
     </footer>
 
@@ -94,13 +94,13 @@
                 const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
 
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
-                sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
+                sheetHeadersPerkara.forEach((h, i) => { if(skipIdx === -1 || i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
                 tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
 
                 perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) {
-                        if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`;
+                        if(skipIdx === -1 || i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`;
                     }
                     tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row}')">Lihat</button></td></tr>`;
                 });
@@ -123,11 +123,16 @@
                 const cells = rows[i].getElementsByTagName('td');
                 if(cells.length <= 1) continue;
 
-                const actualIdxPem = idxPem > skipIdx ? idxPem - 1 : idxPem;
-                const actualIdxTerm = idxTerm > skipIdx ? idxTerm - 1 : idxTerm;
+                let cellPemIdx = idxPem;
+                let cellTermIdx = idxTerm;
+                
+                if (skipIdx !== -1) {
+                    if (idxPem > skipIdx) cellPemIdx--;
+                    if (idxTerm > skipIdx) cellTermIdx--;
+                }
 
-                const pemohon = cells[actualIdxPem] ? cells[actualIdxPem].textContent.toLowerCase() : '';
-                const termohon = cells[actualIdxTerm] ? cells[actualIdxTerm].textContent.toLowerCase() : '';
+                const pemohon = cells[cellPemIdx] ? cells[cellPemIdx].textContent.toLowerCase() : '';
+                const termohon = cells[cellTermIdx] ? cells[cellTermIdx].textContent.toLowerCase() : '';
 
                 rows[i].style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
             }
