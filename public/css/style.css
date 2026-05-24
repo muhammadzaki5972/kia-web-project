@@ -17,9 +17,33 @@ body {
     display: flex; justify-content: center; align-items: center; 
 }
 
-/* Update: Rata tengah dan perkecil ukuran teks pada tabel hasil */
-.table-hasil th, .table-hasil td {
+/* UPDATE: Tabel Rata Tengah, Middle Align, & Perkecil Teks */
+.table th, .table td {
     text-align: center !important;
     vertical-align: middle !important;
-    font-size: 0.85rem !important;
+    font-size: 0.85rem !important; 
+    padding: 0.5rem !important; /* Jarak padding proporsional */
+}
+.table th {
+    white-space: nowrap; /* Menjaga header tidak turun ke bawah/berantakan */
+}
+
+/* UPDATE: Footer Beku (Freeze) & Diperkecil */
+.footer-freeze {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1030;
+    font-size: 0.75rem; /* Teks footer lebih kecil */
+    padding: 0.5rem 0; /* Tinggi footer diperkecil */
+    background-color: #212529;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+/* Memberikan jarak ekstra agar data paling bawah tidak tertutup footer freeze */
+main.container {
+    padding-bottom: 40px;
 }
