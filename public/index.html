@@ -26,6 +26,18 @@
             <h2 class="fw-bold fs-3">Informasi Data Perkara Publik</h2>
             <p class="text-muted fs-6">Data diperbarui secara real-time.</p>
         </div>
+
+        <!-- Fitur Pencarian Responsif -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8 col-lg-6">
+                <div class="input-group shadow-sm">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cari Pemohon / Termohon..." oninput="filterTable()">
+                    <button class="btn btn-primary fw-bold" onclick="filterTable()">Cari</button>
+                    <button class="btn btn-secondary fw-bold" onclick="clearSearch()">Hapus</button>
+                </div>
+            </div>
+        </div>
+
         <div id="publicDataContainer">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -79,7 +91,7 @@
 
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
                 sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h}</th>`; });
-                tableHtml += `<th>Detail</th></tr></thead><tbody>`;
+                tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
 
                 perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
@@ -93,6 +105,37 @@
             } catch (error) { container.innerHTML = `<div class="text-center text-danger">Error: ${error.message}</div>`; }
         }
 
+        // --- FUNGSI PENCARIAN LIVE SEARCH ---
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const tbody = document.getElementById('dataTable');
+            if (!tbody) return;
+
+            const rows = tbody.getElementsByTagName('tr');
+            const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+            const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+            const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                if(cells.length <= 1) continue; // Skip jika baris loading kosong
+
+                const actualIdxPem = idxPem > skipIdx ? idxPem - 1 : idxPem;
+                const actualIdxTerm = idxTerm > skipIdx ? idxTerm - 1 : idxTerm;
+
+                const pemohon = cells[actualIdxPem] ? cells[actualIdxPem].textContent.toLowerCase() : '';
+                const termohon = cells[actualIdxTerm] ? cells[actualIdxTerm].textContent.toLowerCase() : '';
+
+                rows[i].style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterTable(); // Reset pencarian
+        }
+        // ------------------------------------
+
         function lihatDetail(id) {
             new bootstrap.Modal(document.getElementById('detailModal')).show();
             document.getElementById('detailLoading').style.display = 'flex';
@@ -105,8 +148,6 @@
 
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
-                
-                // Array bersih untuk menghindari duplikat No Reg
                 const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
@@ -114,7 +155,6 @@
                     let fieldVal = '-';
                     let labelText = '';
                     
-                    // Fungsi cerdas mencari index (mendukung alias nama kolom di Spreadsheet)
                     const findIdx = (headers) => headers.findIndex(h => {
                         let val = h.toLowerCase().trim();
                         return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang');
@@ -133,7 +173,6 @@
                     }
 
                     if(idx !== -1) {
-                        // Kustomisasi Label Visual
                         if(f === 'no reg') labelText = 'No Reg';
                         if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
 
