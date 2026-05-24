@@ -116,7 +116,7 @@ async function loadData() {
         sheetHeadersPerkara = data.perkara || []; sheetHeadersDetail = data.detail || []; perkaraData = data.perkara.slice(1) || []; detailData = data.detail.slice(1) || [];
         
         const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
-        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h || '-'}</th>`; });
+        sheetHeadersPerkara.forEach((h, i) => { if(skipIdx === -1 || i !== skipIdx) thead.innerHTML += `<th>${h || '-'}</th>`; });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
@@ -132,7 +132,7 @@ async function loadData() {
 
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
-            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
+            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(skipIdx === -1 || i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
             rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row}')">Lihat</button></td>`;
             rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row}')">Hapus</button></td></tr>`;
             tbody.innerHTML += rowHtml;
@@ -149,8 +149,17 @@ function filterTable() {
     rows.forEach(r => {
         const cells = r.getElementsByTagName('td');
         if(cells.length <= 1) return;
-        const pemohon = cells[idxPem > skipIdx ? idxPem - 1 : idxPem] ? cells[idxPem > skipIdx ? idxPem - 1 : idxPem].textContent.toLowerCase() : '';
-        const termohon = cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm] ? cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm].textContent.toLowerCase() : '';
+        
+        let cellPemIdx = idxPem;
+        let cellTermIdx = idxTerm;
+        
+        if (skipIdx !== -1) {
+            if (idxPem > skipIdx) cellPemIdx--;
+            if (idxTerm > skipIdx) cellTermIdx--;
+        }
+
+        const pemohon = cells[cellPemIdx] ? cells[cellPemIdx].textContent.toLowerCase() : '';
+        const termohon = cells[cellTermIdx] ? cells[cellTermIdx].textContent.toLowerCase() : '';
         r.style.display = (pemohon.includes(q) || termohon.includes(q)) ? '' : 'none';
     });
 }
