@@ -66,17 +66,40 @@
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [];
 
+        // Fungsi Pelindung Super (Mencegah Crash dari Tipe Data Kosong/Angka)
+        function getSafeIdx(headers, keyword, exact = false) {
+            if (!headers || !Array.isArray(headers)) return -1;
+            return headers.findIndex(h => {
+                if (h == null) return false;
+                const text = String(h).toLowerCase().trim();
+                return exact ? text === keyword : text.includes(keyword);
+            });
+        }
+
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
             try {
-                const response = await fetch('/api/data'); const data = await response.json();
-                if (!data.perkara || data.perkara.length <= 1) { container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return; }
-
-                sheetHeadersPerkara = data.perkara; perkaraData = data.perkara.slice(1); 
-                detailHeaders = data.detail || []; detailData = data.detail.slice(1) || [];
+                const response = await fetch('/api/data'); 
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || `Gagal terhubung ke server (Status: ${response.status})`);
+                }
                 
-                // Proteksi Teks (String(h))
-                const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                if (!data.perkara || data.perkara.length <= 1) { 
+                    container.innerHTML = '<div class="text-center"><p class="text-muted">Data Spreadsheet masih kosong.</p></div>'; 
+                    return; 
+                }
+
+                sheetHeadersPerkara = data.perkara || []; 
+                perkaraData = data.perkara.slice(1) || []; 
+                detailHeaders = data.detail || []; 
+                detailData = data.detail.slice(1) || [];
+                
+                const skipIdx = getSafeIdx(sheetHeadersPerkara, 'detail', true);
+                
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
                 sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
                 tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
@@ -88,25 +111,24 @@
                 });
                 tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
-            } catch (error) { container.innerHTML = `<div class="text-center text-danger">Error: ${error.message}</div>`; }
+            } catch (error) { 
+                container.innerHTML = `<div class="alert alert-danger text-center fw-bold shadow-sm mx-3">Peringatan: ${error.message}</div>`; 
+            }
         }
 
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const rows = document.querySelectorAll('#dataTable tr');
             
-            // Proteksi Teks (String(h))
-            const idxPem = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('pemohon'));
-            const idxTerm = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('termohon'));
-            const skipIdx = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().trim() === 'detail');
+            const idxPem = getSafeIdx(sheetHeadersPerkara, 'pemohon');
+            const idxTerm = getSafeIdx(sheetHeadersPerkara, 'termohon');
+            const skipIdx = getSafeIdx(sheetHeadersPerkara, 'detail', true);
             
             rows.forEach(row => {
                 const cells = row.getElementsByTagName('td');
                 if(cells.length <= 1) return;
                 
-                let cellPemIdx = idxPem;
-                let cellTermIdx = idxTerm;
-                
+                let cellPemIdx = idxPem; let cellTermIdx = idxTerm;
                 if (skipIdx !== -1) {
                     if (idxPem > skipIdx) cellPemIdx--;
                     if (idxTerm > skipIdx) cellTermIdx--;
@@ -125,9 +147,8 @@
 
             const pRow = perkaraData.find(r => r === id);
             
-            // Proteksi Teks (String(h))
-            const idxPemHeader = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('pemohon'));
-            const idxTermHeader = sheetHeadersPerkara.findIndex(h => h && String(h).toLowerCase().includes('termohon'));
+            const idxPemHeader = getSafeIdx(sheetHeadersPerkara, 'pemohon');
+            const idxTermHeader = getSafeIdx(sheetHeadersPerkara, 'termohon');
             document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[idxPemHeader] || 'Pemohon'} vs ${pRow[idxTermHeader] || 'Termohon'}` : 'Detail';
 
             setTimeout(() => {
@@ -140,13 +161,56 @@
                 leftFields.forEach(f => {
                     let fieldVal = '-', labelText = '';
                     
-                    // Proteksi Teks (String(h))
                     const findIdx = (headers) => headers.findIndex(h => { 
-                        if(!h) return false;
+                        if(h == null) return false;
                         const val = String(h).toLowerCase().trim(); 
                         return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); 
                     });
 
                     let idx = findIdx(detailHeaders);
                     if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = detailHeaders[idx]; } 
-                    else { idx = findIdx(sheetHeadersPerkara); if(idx !== -1) { fieldVal = pRow ? (pRow[idx] || '-')
+                    else { idx = findIdx(sheetHeadersPerkara); if(idx !== -1) { fieldVal = pRow ? (pRow[idx] || '-') : '-'; labelText = sheetHeadersPerkara[idx]; } }
+
+                    if(idx !== -1) {
+                        if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
+                        
+                        // Menangkap otomatis seluruh tanggal untuk kalkulator footer
+                        if(fieldVal !== '-' && fieldVal !== '') {
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { datesCollected.push(new Date(fieldVal)); } 
+                            else if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/.test(fieldVal)) { const p = fieldVal.split(/[\/\-]/); datesCollected.push(new Date(`${p}-${p}-${p}`)); }
+                        }
+
+                        if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p}/${p}/${p}`; }
+                        }
+                        if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
+                        
+                        leftHtml += `<div class="card shadow-sm border-0 mb-2"><div class="card-body py-1 px-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div><div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div></div></div>`;
+                    }
+                });
+                leftHtml += '</div>';
+
+                // Menjalankan Logika Update Tanggal Footer
+                let latestDateStr = '-';
+                if (datesCollected.length > 0) {
+                    let maxDate = new Date(Math.max.apply(null, datesCollected));
+                    if (!isNaN(maxDate.getTime())) {
+                        const dd = String(maxDate.getDate()).padStart(2, '0');
+                        const mm = String(maxDate.getMonth() + 1).padStart(2, '0');
+                        const yyyy = maxDate.getFullYear();
+                        latestDateStr = `${dd}/${mm}/${yyyy}`;
+                    }
+                }
+                document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
+
+                const idxPermohonan = getSafeIdx(detailHeaders, 'isi permohonan', true);
+                let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
+                
+                document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
+            }, 500); 
+        }
+        function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
+        window.onload = loadPublicData;
+    </script>
+</body>
+</html>
