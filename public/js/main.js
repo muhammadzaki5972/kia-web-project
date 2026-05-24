@@ -236,10 +236,10 @@ function lihatDetail(id) {
                 const yyyy = maxDate.getFullYear();
                 latestDateStr = `${dd}/${mm}/${yyyy}`;
             }
-        }
-        if (document.getElementById('modalLastUpdated')) {
-            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
-        }
+             if (document.getElementById('modalLastUpdated')) {
+            const today = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + today;
+            }
 
         const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
