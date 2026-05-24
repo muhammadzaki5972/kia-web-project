@@ -28,7 +28,7 @@ app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F' }),
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:J' }) // Range J
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N' }) // Diperlebar sampai N
     ]);
     res.json({ perkara: resPerkara.data.values || [], detail: resDetail.data.values || [] });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -43,7 +43,7 @@ app.post('/api/data', async (req, res) => {
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] },
         }),
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:J', // Range J
+            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N', // Diperlebar sampai N
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
         })
     ]);
@@ -64,7 +64,7 @@ app.put('/api/data', async (req, res) => {
         });
         
         if(idxDetail) await sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:J${idxDetail}`, // Range J
+            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:N${idxDetail}`, // Diperlebar sampai N
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
         });
 
