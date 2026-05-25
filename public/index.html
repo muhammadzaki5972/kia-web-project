@@ -75,13 +75,12 @@
                 sheetHeadersPerkara = data.perkara; perkaraData = data.perkara.slice(1); 
                 detailHeaders = data.detail || []; detailData = data.detail.slice(1) || [];
                 
-                const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+                const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
                 sheetHeadersPerkara.forEach((h, i) => { 
-                    // Jangan tampilkan kolom 'detail' dan kolom hidden 'tanggal update' di tabel utama publik
-                    const lowH = h.toLowerCase().trim();
+                    const lowH = String(h || '').toLowerCase().trim();
                     if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui') {
-                        tableHtml += `<th>${h}</th>`; 
+                        tableHtml += `<th>${h || '-'}</th>`; 
                     }
                 });
                 tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
@@ -89,7 +88,7 @@
                 perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                        const lowH = (sheetHeadersPerkara[i] || '').toLowerCase().trim();
+                        const lowH = String(sheetHeadersPerkara[i] || '').toLowerCase().trim();
                         if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui') {
                             tableHtml += `<td>${row[i] || '-'}</td>`; 
                         }
@@ -104,9 +103,9 @@
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const rows = document.querySelectorAll('#dataTable tr');
-            const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
-            const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
-            const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+            const idxPem = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('pemohon'));
+            const idxTerm = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('termohon'));
+            const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
             
             rows.forEach(row => {
                 const cells = row.getElementsByTagName('td');
@@ -123,7 +122,9 @@
             document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
 
             const pRow = perkaraData.find(r => r === id);
-            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail';
+            const pemStr = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('pemohon'));
+            const termStr = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('termohon'));
+            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[pemStr] || 'Pemohon'} vs ${pRow[termStr] || 'Termohon'}` : 'Detail';
 
             setTimeout(() => {
                 const row = detailData.find(r => r === id);
@@ -134,7 +135,7 @@
 
                 leftFields.forEach(f => {
                     let fieldVal = '-', labelText = '';
-                    const findIdx = (headers) => headers.findIndex(h => { const val = h.toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
+                    const findIdx = (headers) => headers.findIndex(h => { const val = String(h || '').toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
 
                     let idx = findIdx(detailHeaders);
                     if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = detailHeaders[idx]; } 
@@ -158,9 +159,8 @@
                 });
                 leftHtml += '</div>';
 
-                // UPDATE LOGIKA: Ambil tanggal dari kolom Tanggal Update Google Sheet hasil submit Admin
                 let latestDateStr = '-';
-                const idxUpdate = sheetHeadersPerkara.findIndex(h => h && (h.toLowerCase().trim() === 'tanggal update' || h.toLowerCase().trim() === 'terakhir diperbarui'));
+                const idxUpdate = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'tanggal update' || String(h || '').toLowerCase().trim() === 'terakhir diperbarui');
                 let rawUpdateDate = (idxUpdate !== -1 && pRow) ? pRow[idxUpdate] : '';
 
                 if (rawUpdateDate && rawUpdateDate !== '-') {
@@ -169,7 +169,6 @@
                         latestDateStr = `${p}/${p}/${p}`;
                     } else { latestDateStr = rawUpdateDate; }
                 } else if (datesCollected.length > 0) {
-                    // Fallback data lama jika kolom Tanggal Update di sheet masih kosong
                     let maxDate = new Date(Math.max.apply(null, datesCollected));
                     if (!isNaN(maxDate.getTime())) {
                         const dd = String(maxDate.getDate()).padStart(2, '0');
@@ -183,7 +182,7 @@
                     document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
                 }
 
-                const idxPermohonan = detailHeaders.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+                const idxPermohonan = detailHeaders.findIndex(h => String(h || '').toLowerCase().trim() === 'isi permohonan');
                 let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
                 
                 document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
