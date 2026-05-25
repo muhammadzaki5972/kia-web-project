@@ -20,15 +20,15 @@ const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 async function findRowIndex(sheetName, id) {
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${sheetName}!A:A` });
     const rows = res.data.values || [];
-    const index = rows.findIndex(row => row[0] === id);
+    const index = rows.findIndex(row => row === id);
     return index !== -1 ? index + 1 : null; 
 }
 
 app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F' }),
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N' }) // Diperlebar sampai N
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:G' }), // Diperlebar ke G untuk kolom Tanggal Update
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N' })
     ]);
     res.json({ perkara: resPerkara.data.values || [], detail: resDetail.data.values || [] });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -39,11 +39,11 @@ app.post('/api/data', async (req, res) => {
   try {
     await Promise.all([
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:F',
+            spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:G', // Diperlebar ke G
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] },
         }),
         sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N', // Diperlebar sampai N
+            spreadsheetId: SPREADSHEET_ID, range: 'detail!A:N',
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
         })
     ]);
@@ -59,12 +59,12 @@ app.put('/api/data', async (req, res) => {
         const idxDetail = await findRowIndex('detail', id);
 
         if(idxPerkara) await sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID, range: `DataPerkara!A${idxPerkara}:F${idxPerkara}`,
+            spreadsheetId: SPREADSHEET_ID, range: `DataPerkara!A${idxPerkara}:G${idxPerkara}`, // Diperlebar ke G
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] }
         });
         
         if(idxDetail) await sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:N${idxDetail}`, // Diperlebar sampai N
+            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:N${idxDetail}`,
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
         });
 
