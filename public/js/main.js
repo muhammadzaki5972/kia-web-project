@@ -8,26 +8,21 @@ function parseDate(dateStr) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
     const parts = dateStr.split(/[\/\-]/);
     if (parts.length === 3) {
-        if (parts.length === 4) return `${parts}-${parts.padStart(2, '0')}-${parts.padStart(2, '0')}`;
-        else if (parts.length === 4) return `${parts}-${parts.padStart(2, '0')}-${parts.padStart(2, '0')}`;
+        if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        else if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
     }
     const d = new Date(dateStr);
-    return !isNaN(d.getTime()) ? d.toISOString().split('T') : '';
+    return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : '';
 }
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     let label = headerText;
-    const lower = headerText ? headerText.toString().toLowerCase().trim() : '';
-    
-    if (lower === 'sidang') label = 'Sidang Terakhir';
-    if (lower === 'rincian informasi') label = 'No Reg';
+    if (headerText.toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
+    if (headerText.toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
 
     const id = `${idPrefix}_${index}`;
+    const lower = label.toLowerCase().trim();
     const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sinkron</small>` : '';
-
-    if (lower === 'tanggal update' || lower === 'terakhir diperbarui') {
-        return `<input type="hidden" id="${id}">`;
-    }
 
     if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
         return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><div id="${id}_quill" style="height: 150px; background: white;"></div><input type="hidden" id="${id}"></div>`;
@@ -68,8 +63,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
 
 function initQuill(headers, idPrefix) {
     headers.forEach((h, i) => {
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
+        if (h.toLowerCase().trim() === 'rincian permohonan' || h.toLowerCase().trim() === 'isi permohonan') {
             const id = `${idPrefix}_${i}`;
             quillInstances[id] = new Quill(`#${id}_quill`, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{'list':'ordered'},{'list':'bullet'}]] } });
             quillInstances[id].on('text-change', () => { document.getElementById(id).value = quillInstances[id].root.innerHTML; });
@@ -79,16 +73,8 @@ function initQuill(headers, idPrefix) {
 
 function attachStatusLogic() {
     let statusIds = [], linkIds = [];
-    sheetHeadersPerkara.forEach((h, i) => { 
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'status sengketa') statusIds.push(`inputPerkara_${i}`); 
-        if(lower === 'link putusan') linkIds.push(`inputPerkara_${i}`); 
-    });
-    sheetHeadersDetail.forEach((h, i) => { 
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'status sengketa') statusIds.push(`inputDetail_${i}`); 
-        if(lower === 'link putusan') linkIds.push(`inputDetail_${i}`); 
-    });
+    sheetHeadersPerkara.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`); });
+    sheetHeadersDetail.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`); });
 
     window.applyStatusLogic = () => {
         statusIds.forEach(sId => {
@@ -111,15 +97,10 @@ async function loadData() {
         thead.innerHTML = ''; tbody.innerHTML = ''; formContainer.innerHTML = '';
         if (!data.perkara || data.perkara.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">Data kosong.</td></tr>'; return; }
         
-        sheetHeadersPerkara = data.perkara; sheetHeadersDetail = data.detail || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
+        sheetHeadersPerkara = data.perkara[0]; sheetHeadersDetail = data.detail[0] || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
         
-        const skipIdx = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().trim() === 'detail');
-        sheetHeadersPerkara.forEach((h, i) => { 
-            const lowH = h ? h.toString().toLowerCase().trim() : '';
-            if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui') {
-                thead.innerHTML += `<th>${h}</th>`; 
-            }
-        });
+        const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h}</th>`; });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
@@ -135,14 +116,9 @@ async function loadData() {
 
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
-            for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                const lowH = sheetHeadersPerkara[i] ? sheetHeadersPerkara[i].toString().toLowerCase().trim() : '';
-                if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui') {
-                    rowHtml += `<td>${row[i] || '-'}</td>`; 
-                }
-            }
-            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row}')">Lihat</button></td>`;
-            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row}')">Hapus</button></td></tr>`;
+            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
+            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row[0]}')">Lihat</button></td>`;
+            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
             tbody.innerHTML += rowHtml;
         });
     } catch (e) { tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Error: ${e.message}</td></tr>`; }
@@ -151,9 +127,9 @@ async function loadData() {
 function filterTable() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#dataTable tr');
-    const idxPem = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().includes('pemohon'));
-    const idxTerm = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().includes('termohon'));
-    const skipIdx = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().trim() === 'detail');
+    const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+    const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+    const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
     rows.forEach(r => {
         const cells = r.getElementsByTagName('td');
         if(cells.length <= 1) return;
@@ -167,10 +143,108 @@ function clearSearch() { document.getElementById('searchInput').value = ''; filt
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit'); btnSubmit.innerText = "Memproses..."; btnSubmit.disabled = true;
+    let barisPerkara = []; sheetHeadersPerkara.forEach((_, i) => barisPerkara.push(document.getElementById(`inputPerkara_${i}`).value || ''));
+    let barisDetail = []; sheetHeadersDetail.forEach((_, i) => barisDetail.push(document.getElementById(`inputDetail_${i}`).value || ''));
     
-    const now = new Date();
-    const offset = 7 * 60; // Waktu Indonesia Barat (WIB)
-    const localTime = new Date(now.getTime() + (offset - now.getTimezoneOffset()) * 60000);
-    const todayWibStr = localTime.toISOString().split('T');
+    try {
+        const res = await fetch(isEditMode ? `/api/data?id=${encodeURIComponent(editId)}` : '/api/data', {
+            method: isEditMode ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ barisPerkara, barisDetail }) 
+        });
+        if(res.ok) { alert(`Data berhasil ${isEditMode ? 'diupdate' : 'ditambahkan'}!`); bootstrap.Modal.getInstance(document.getElementById('tambahDataModal')).hide(); loadData(); } 
+        else { const err = await res.json(); alert('Gagal: ' + err.error); }
+    } catch (e) { alert('Terjadi kesalahan koneksi.'); } finally { btnSubmit.innerText = isEditMode ? "Simpan Perubahan" : "Simpan Data Baru"; btnSubmit.disabled = false; }
+});
+
+function bukaModalTambah() {
+    isEditMode = false; editId = null; document.getElementById('formTambahData').reset();
+    Object.values(quillInstances).forEach(q => q.setContents([])); document.getElementById('inputDetail_0').removeAttribute('readonly'); 
+    if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru"; document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
+    document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold"; document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
+    new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
+}
+
+function bukaModalEdit(id) {
+    isEditMode = true; editId = id;
+    const rowP = perkaraData.find(r => r[0] === id) || [], rowD = detailData.find(r => r[0] === id) || [];
     
     sheetHeadersPerkara.forEach((h, i) => {
+        const el = document.getElementById(`inputPerkara_${i}`); const val = rowP[i] || '';
+        if(quillInstances[`inputPerkara_${i}`]) { quillInstances[`inputPerkara_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
+        else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
+    });
+    sheetHeadersDetail.forEach((h, i) => {
+        const el = document.getElementById(`inputDetail_${i}`); const val = rowD[i] || '';
+        if(quillInstances[`inputDetail_${i}`]) { quillInstances[`inputDetail_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
+        else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
+    });
+
+    document.getElementById('inputDetail_0').setAttribute('readonly', true); 
+    if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    document.getElementById('modalFormTitle').innerText = `Edit Data Perkara: ${id}`; document.getElementById('modalFormHeader').className = "modal-header bg-warning text-dark";
+    document.getElementById('btnSubmit').className = "btn btn-warning w-100 mt-4 py-2 fw-bold text-dark"; document.getElementById('btnSubmit').innerText = "Simpan Perubahan";
+    new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
+}
+
+async function hapusData(id) { if(!confirm(`Yakin ingin menghapus ${id}?`)) return; const res = await fetch(`/api/data?id=${encodeURIComponent(id)}`, { method: 'DELETE' }); if(res.ok) loadData(); else alert("Gagal"); }
+
+function lihatDetail(id) {
+    const modalEl = document.getElementById('detailModal'); new bootstrap.Modal(modalEl).show();
+    document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
+    const pRow = perkaraData.find(r => r[0] === id);
+    document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail Perkara';
+
+    setTimeout(() => {
+        const row = detailData.find(r => r[0] === id);
+        const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
+        
+        let leftHtml = '<div class="col-md-6">';
+        let datesCollected = [];
+
+        leftFields.forEach(f => {
+            let fieldVal = '-', labelText = '';
+            const findIdx = (headers) => headers.findIndex(h => { const val = h.toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
+            
+            let idx = findIdx(sheetHeadersDetail);
+            if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = sheetHeadersDetail[idx]; } 
+            else { idx = findIdx(sheetHeadersPerkara); if(idx !== -1) { fieldVal = pRow ? (pRow[idx] || '-') : '-'; labelText = sheetHeadersPerkara[idx]; } }
+
+            if(idx !== -1) {
+                if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
+                
+                if(fieldVal !== '-' && fieldVal !== '') {
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { datesCollected.push(new Date(fieldVal)); } 
+                    else if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/.test(fieldVal)) { const p = fieldVal.split(/[\/\-]/); datesCollected.push(new Date(`${p[2]}-${p[1]}-${p[0]}`)); }
+                }
+
+                if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
+                }
+
+                if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
+                leftHtml += `<div class="card shadow-sm border-0 mb-2"><div class="card-body py-1 px-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div><div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div></div></div>`;
+            }
+        });
+        leftHtml += '</div>';
+
+        let latestDateStr = '-';
+        if (datesCollected.length > 0) {
+            let maxDate = new Date(Math.max.apply(null, datesCollected));
+            if (!isNaN(maxDate.getTime())) {
+                const dd = String(maxDate.getDate()).padStart(2, '0');
+                const mm = String(maxDate.getMonth() + 1).padStart(2, '0');
+                const yyyy = maxDate.getFullYear();
+                latestDateStr = `${dd}/${mm}/${yyyy}`;
+            }
+        }
+        if (document.getElementById('modalLastUpdated')) {
+            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
+        }
+
+        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+        let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
+        document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
+    }, 500); 
+}
+function closeDetailModal() { const m = bootstrap.Modal.getInstance(document.getElementById('detailModal')); if(m) m.hide(); }
+window.onload = loadData;
