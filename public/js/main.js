@@ -3,7 +3,6 @@ function logout() { sessionStorage.removeItem('isLoggedIn'); window.location.hre
 
 let sheetHeadersPerkara = [], sheetHeadersDetail = [], detailData = [], perkaraData = [], quillInstances = {}, isEditMode = false, editId = null;
 
-// Penyetrika Data (Normalizer)
 function normalizeData(arr) {
     if (!arr || !Array.isArray(arr) || arr.length === 0) return [];
     if (arr.length === 1 && Array.isArray(arr) && Array.isArray(arr)) return arr;
@@ -101,8 +100,7 @@ function attachStatusLogic() {
 async function loadData() {
     const thead = document.getElementById('tableHeader'), tbody = document.getElementById('dataTable'), formContainer = document.getElementById('dynamicFormContainer');
     try {
-        const res = await fetch('/api/data'); 
-        const data = await res.json();
+        const res = await fetch('/api/data'); const data = await res.json();
         thead.innerHTML = ''; tbody.innerHTML = ''; formContainer.innerHTML = '';
         
         let rawPerkara = normalizeData(data.perkara || []);
@@ -110,7 +108,9 @@ async function loadData() {
 
         if (rawPerkara.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">Data kosong.</td></tr>'; return; }
         
-        sheetHeadersPerkara = rawPerkara; sheetHeadersDetail = rawDetail || []; perkaraData = rawPerkara.slice(1); detailData = rawDetail.slice(1) || [];
+        // UPDATE: Membatasi hanya mengambil baris A1 sampai F1 (kolom 1 sampai 6)
+        sheetHeadersPerkara = rawPerkara.slice(0, 6); 
+        sheetHeadersDetail = rawDetail || []; perkaraData = rawPerkara.slice(1); detailData = rawDetail.slice(1) || [];
         
         const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
         sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h || '-'}</th>`; });
