@@ -28,6 +28,11 @@ body {
     white-space: nowrap;
 }
 
+.header-freeze {
+    position: fixed;
+    background: linear-gradient(135deg, #1e8a8a, #38ba8f) !important;
+}
+
 /* UPDATE 2: Warna Gradient untuk Footer */
 .footer-freeze {
     position: fixed;
