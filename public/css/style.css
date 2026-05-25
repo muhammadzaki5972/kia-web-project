@@ -56,7 +56,7 @@ main.container {
 
 /* UPDATE 3: Warna Tabel Header Menjadi #196791 */
 .table thead.table-dark th {
-    background-color: #196791 !important;
+    background: linear-gradient(135deg, #38ba8f, #1e8a8a) !important;
     color: #ffffff !important;
     border-color: #196791 !important;
 }
