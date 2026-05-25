@@ -1,6 +1,6 @@
 // ... (Bagian atas file tetap sama)
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
-    let label = headerText || 'Kolom';
+    let label = headerText || 'baris';
     if ((headerText ? String(headerText).toLowerCase().trim() : '') === 'sidang') label = 'Sidang Terakhir';
     if ((headerText ? String(headerText).toLowerCase().trim() : '') === 'rincian informasi') label = 'No Reg';
 
