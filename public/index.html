@@ -66,16 +66,29 @@
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [];
 
+        // Penyetrika Data (Normalizer): Mencegah API yang mengirim Array bertumpuk menjadi satu kolom (berkoma)
+        function normalizeData(arr) {
+            if (!arr || !Array.isArray(arr) || arr.length === 0) return [];
+            if (arr.length === 1 && Array.isArray(arr) && Array.isArray(arr)) return arr;
+            if (Array.isArray(arr) && Array.isArray(arr)) return arr.map(r => Array.isArray(r) ? r : r);
+            return arr;
+        }
+
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
             try {
-                const response = await fetch('/api/data'); const data = await response.json();
-                if (!data.perkara || data.perkara.length <= 1) { container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return; }
-
-                sheetHeadersPerkara = data.perkara; perkaraData = data.perkara.slice(1); 
-                detailHeaders = data.detail || []; detailData = data.detail.slice(1) || [];
+                const response = await fetch('/api/data'); 
+                const data = await response.json();
                 
-                // Pelindung string diterapkan di sini
+                let rawPerkara = normalizeData(data.perkara || []);
+                let rawDetail = normalizeData(data.detail || []);
+
+                if (rawPerkara.length <= 1) { container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return; }
+
+                sheetHeadersPerkara = rawPerkara; perkaraData = rawPerkara.slice(1); 
+                detailHeaders = rawDetail || []; detailData = rawDetail.slice(1);
+                
+                // Pelindung String agar toLowerCase tidak error
                 const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
                 sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
