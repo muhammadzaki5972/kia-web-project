@@ -60,7 +60,6 @@
         </div>
     </div>
 
-    <!-- UPDATE: Footer diubah menggunakan class footer-freeze -->
     <footer class="footer-freeze">&copy; 2026 Komisi Informasi Aceh (KIACEH).</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -73,8 +72,8 @@
                 const response = await fetch('/api/data'); const data = await response.json();
                 if (!data.perkara || data.perkara.length <= 1) { container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return; }
 
-                sheetHeadersPerkara = data.perkara[0]; perkaraData = data.perkara.slice(1); 
-                detailHeaders = data.detail[0] || []; detailData = data.detail.slice(1) || [];
+                sheetHeadersPerkara = data.perkara; perkaraData = data.perkara.slice(1); 
+                detailHeaders = data.detail || []; detailData = data.detail.slice(1) || [];
                 
                 const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
@@ -84,7 +83,7 @@
                 perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`; }
-                    tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row[0]}')">Lihat</button></td></tr>`;
+                    tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row}')">Lihat</button></td></tr>`;
                 });
                 tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
@@ -112,15 +111,14 @@
             new bootstrap.Modal(document.getElementById('detailModal')).show();
             document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
 
-            const pRow = perkaraData.find(r => r[0] === id);
+            const pRow = perkaraData.find(r => r === id);
             document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail';
 
             setTimeout(() => {
-                const row = detailData.find(r => r[0] === id);
+                const row = detailData.find(r => r === id);
                 const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
                 
                 let leftHtml = '<div class="col-md-6">';
-                let datesCollected = [];
 
                 leftFields.forEach(f => {
                     let fieldVal = '-', labelText = '';
@@ -133,13 +131,8 @@
                     if(idx !== -1) {
                         if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
                         
-                        if(fieldVal !== '-' && fieldVal !== '') {
-                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { datesCollected.push(new Date(fieldVal)); } 
-                            else if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/.test(fieldVal)) { const p = fieldVal.split(/[\/\-]/); datesCollected.push(new Date(`${p[2]}-${p[1]}-${p[0]}`)); }
-                        }
-
                         if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
-                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p}/${p}/${p}`; }
                         }
                         if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
                         
@@ -148,15 +141,11 @@
                 });
                 leftHtml += '</div>';
 
-                let latestDateStr = '-';
-                if (datesCollected.length > 0) {
-                    let maxDate = new Date(Math.max.apply(null, datesCollected));
-                    if (!isNaN(maxDate.getTime())) {
-                        const dd = String(maxDate.getDate()).padStart(2, '0');
-                        const mm = String(maxDate.getMonth() + 1).padStart(2, '0');
-                        const yyyy = maxDate.getFullYear();
-                        latestDateStr = `${dd}/${mm}/${yyyy}`;
-                    }
+                // Mengambil nilai secara eksklusif dari kolom O (index 14 pada array)
+                let latestDateStr = (row && row) ? row : '-';
+                if (latestDateStr !== '-' && /^\d{4}-\d{2}-\d{2}$/.test(latestDateStr)) {
+                    const p = latestDateStr.split('-');
+                    latestDateStr = `${p}/${p}/${p}`; // Ubah format YYYY-MM-DD ke DD/MM/YYYY jika perlu
                 }
                 if (document.getElementById('modalLastUpdated')) {
                     document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
