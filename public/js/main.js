@@ -17,19 +17,12 @@ function parseDate(dateStr) {
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     let label = headerText;
-    const lower = headerText ? headerText.toString().toLowerCase().trim() : '';
-    
-    if (lower === 'sidang') label = 'Sidang Terakhir';
-    if (lower === 'rincian informasi') label = 'No Reg';
-    // UPDATE LOGIKA 2: Ubah nama label "Sidang Sengketa" menjadi "Tgl Buat/Perbarui"
-    if (lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') label = 'Tgl Buat/Perbarui';
+    if (headerText.toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
+    if (headerText.toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
 
     const id = `${idPrefix}_${index}`;
+    const lower = label.toLowerCase().trim();
     const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sinkron</small>` : '';
-
-    if (lower === 'tanggal update' || lower === 'terakhir diperbarui') {
-        return `<input type="hidden" id="${id}">`;
-    }
 
     if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
         return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><div id="${id}_quill" style="height: 150px; background: white;"></div><input type="hidden" id="${id}"></div>`;
@@ -61,9 +54,6 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 </select>
                 ${hint}
             </div>`;
-    } else if (lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') {
-        // Otomatis dikunci readonly agar tidak bisa dimanipulasi manual
-        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control" id="${id}" readonly></div>`;
     } else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control" id="${id}">${hint}</div>`;
     } else {
@@ -73,8 +63,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
 
 function initQuill(headers, idPrefix) {
     headers.forEach((h, i) => {
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
+        if (h.toLowerCase().trim() === 'rincian permohonan' || h.toLowerCase().trim() === 'isi permohonan') {
             const id = `${idPrefix}_${i}`;
             quillInstances[id] = new Quill(`#${id}_quill`, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{'list':'ordered'},{'list':'bullet'}]] } });
             quillInstances[id].on('text-change', () => { document.getElementById(id).value = quillInstances[id].root.innerHTML; });
@@ -84,16 +73,8 @@ function initQuill(headers, idPrefix) {
 
 function attachStatusLogic() {
     let statusIds = [], linkIds = [];
-    sheetHeadersPerkara.forEach((h, i) => { 
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'status sengketa') statusIds.push(`inputPerkara_${i}`); 
-        if(lower === 'link putusan') linkIds.push(`inputPerkara_${i}`); 
-    });
-    sheetHeadersDetail.forEach((h, i) => { 
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'status sengketa') statusIds.push(`inputDetail_${i}`); 
-        if(lower === 'link putusan') linkIds.push(`inputDetail_${i}`); 
-    });
+    sheetHeadersPerkara.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`); });
+    sheetHeadersDetail.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`); });
 
     window.applyStatusLogic = () => {
         statusIds.forEach(sId => {
@@ -118,32 +99,14 @@ async function loadData() {
         
         sheetHeadersPerkara = data.perkara; sheetHeadersDetail = data.detail || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
         
-        const skipIdx = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().trim() === 'detail');
-        sheetHeadersPerkara.forEach((h, i) => { 
-            const lowH = h ? h.toString().toLowerCase().trim() : '';
-            if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui' && lowH !== 'sidang sengketa' && lowH !== 'tgl buat/perbarui') {
-                thead.innerHTML += `<th>${h}</th>`; 
-            }
-        });
+        const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h}</th>`; });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => formHtml += renderInput(h, 'inputPerkara', i, false));
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
-        
-        // UPDATE LOGIKA 2: Pisahkan dan letakkan kolom Tgl Buat/Perbarui di posisi paling terakhir form Data Lengkap
-        let normalFieldsHtml = '';
-        let lastFieldHtml = '';
-        sheetHeadersDetail.forEach((h, i) => {
-            const lower = h ? h.toString().toLowerCase().trim() : '';
-            if (lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') {
-                lastFieldHtml += renderInput(h, 'inputDetail', i, i === 0);
-            } else {
-                normalFieldsHtml += renderInput(h, 'inputDetail', i, i === 0);
-            }
-        });
-        
-        formHtml += normalFieldsHtml + lastFieldHtml;
+        sheetHeadersDetail.forEach((h, i) => formHtml += renderInput(h, 'inputDetail', i, i === 0));
         formHtml += `</div></div>`;
         formContainer.innerHTML = formHtml;
 
@@ -153,12 +116,7 @@ async function loadData() {
 
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
-            for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                const lowH = sheetHeadersPerkara[i] ? sheetHeadersPerkara[i].toString().toLowerCase().trim() : '';
-                if(i !== skipIdx && lowH !== 'tanggal update' && lowH !== 'terakhir diperbarui' && lowH !== 'sidang sengketa' && lowH !== 'tgl buat/perbarui') {
-                    rowHtml += `<td>${row[i] || '-'}</td>`; 
-                }
-            }
+            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
             rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row}')">Lihat</button></td>`;
             rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row}')">Hapus</button></td></tr>`;
             tbody.innerHTML += rowHtml;
@@ -169,9 +127,9 @@ async function loadData() {
 function filterTable() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#dataTable tr');
-    const idxPem = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().includes('pemohon'));
-    const idxTerm = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().includes('termohon'));
-    const skipIdx = sheetHeadersPerkara.findIndex(h => h && h.toString().toLowerCase().trim() === 'detail');
+    const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
+    const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
+    const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
     rows.forEach(r => {
         const cells = r.getElementsByTagName('td');
         if(cells.length <= 1) return;
@@ -185,21 +143,6 @@ function clearSearch() { document.getElementById('searchInput').value = ''; filt
 document.getElementById('formTambahData').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit'); btnSubmit.innerText = "Memproses..."; btnSubmit.disabled = true;
-    
-    // UPDATE LOGIKA 2: Set otomatis value input tanggal ke hari ini (Format: YYYY-MM-DD) saat form disubmit
-    const now = new Date();
-    const offset = 7 * 60; // WIB
-    const localTime = new Date(now.getTime() + (offset - now.getTimezoneOffset()) * 60000);
-    const todayWibStr = localTime.toISOString().split('T');
-    
-    sheetHeadersDetail.forEach((h, i) => {
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') {
-            const el = document.getElementById(`inputDetail_${i}`);
-            if(el) el.value = todayWibStr;
-        }
-    });
-
     let barisPerkara = []; sheetHeadersPerkara.forEach((_, i) => barisPerkara.push(document.getElementById(`inputPerkara_${i}`).value || ''));
     let barisDetail = []; sheetHeadersDetail.forEach((_, i) => barisDetail.push(document.getElementById(`inputDetail_${i}`).value || ''));
     
@@ -216,20 +159,6 @@ function bukaModalTambah() {
     isEditMode = false; editId = null; document.getElementById('formTambahData').reset();
     Object.values(quillInstances).forEach(q => q.setContents([])); document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
-    
-    // Set hari ini secara otomatis pada form tambah baru
-    const now = new Date();
-    const offset = 7 * 60;
-    const localTime = new Date(now.getTime() + (offset - now.getTimezoneOffset()) * 60000);
-    const todayWibStr = localTime.toISOString().split('T');
-    sheetHeadersDetail.forEach((h, i) => {
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') {
-            const el = document.getElementById(`inputDetail_${i}`);
-            if(el) el.value = todayWibStr;
-        }
-    });
-
     document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru"; document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold"; document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
@@ -248,19 +177,6 @@ function bukaModalEdit(id) {
         const el = document.getElementById(`inputDetail_${i}`); const val = rowD[i] || '';
         if(quillInstances[`inputDetail_${i}`]) { quillInstances[`inputDetail_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
         else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
-    });
-
-    // Set hari ini secara otomatis pada form edit (karena data diperbarui hari ini)
-    const now = new Date();
-    const offset = 7 * 60;
-    const localTime = new Date(now.getTime() + (offset - now.getTimezoneOffset()) * 60000);
-    const todayWibStr = localTime.toISOString().split('T');
-    sheetHeadersDetail.forEach((h, i) => {
-        const lower = h ? h.toString().toLowerCase().trim() : '';
-        if(lower === 'sidang sengketa' || lower === 'tgl buat/perbarui') {
-            const el = document.getElementById(`inputDetail_${i}`);
-            if(el) el.value = todayWibStr;
-        }
     });
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
@@ -287,7 +203,7 @@ function lihatDetail(id) {
 
         leftFields.forEach(f => {
             let fieldVal = '-', labelText = '';
-            const findIdx = (headers) => headers.findIndex(h => { const val = h ? h.toString().toLowerCase().trim() : ''; return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
+            const findIdx = (headers) => headers.findIndex(h => { const val = h.toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
             
             let idx = findIdx(sheetHeadersDetail);
             if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = sheetHeadersDetail[idx]; } 
@@ -312,26 +228,7 @@ function lihatDetail(id) {
         leftHtml += '</div>';
 
         let latestDateStr = '-';
-        const idxUpdate = sheetHeadersPerkara.findIndex(h => {
-            const val = h ? h.toString().toLowerCase().trim() : '';
-            return val === 'tanggal update' || val === 'terakhir diperbarui' || val === 'sidang sengketa' || val === 'tgl buat/perbarui';
-        });
-        const idxUpdateDetail = sheetHeadersDetail.findIndex(h => {
-            const val = h ? h.toString().toLowerCase().trim() : '';
-            return val === 'sidang sengketa' || val === 'tgl buat/perbarui';
-        });
-
-        let rawUpdateDate = (idxUpdate !== -1 && pRow) ? pRow[idxUpdate] : '';
-        if((!rawUpdateDate || rawUpdateDate === '-') && idxUpdateDetail !== -1 && row) {
-            rawUpdateDate = row[idxUpdateDetail];
-        }
-
-        if (rawUpdateDate && rawUpdateDate !== '-') {
-            if (/^\d{4}-\d{2}-\d{2}$/.test(rawUpdateDate)) {
-                const p = rawUpdateDate.split('-');
-                latestDateStr = `${p}/${p}/${p}`;
-            } else { latestDateStr = rawUpdateDate; }
-        } else if (datesCollected.length > 0) {
+        if (datesCollected.length > 0) {
             let maxDate = new Date(Math.max.apply(null, datesCollected));
             if (!isNaN(maxDate.getTime())) {
                 const dd = String(maxDate.getDate()).padStart(2, '0');
@@ -340,12 +237,11 @@ function lihatDetail(id) {
                 latestDateStr = `${dd}/${mm}/${yyyy}`;
             }
         }
-        
         if (document.getElementById('modalLastUpdated')) {
             document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
         }
 
-        const idxPermohonan = sheetHeadersDetail.findIndex(h => h && h.toString().toLowerCase().trim() === 'isi permohonan');
+        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
         document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
     }, 500); 
