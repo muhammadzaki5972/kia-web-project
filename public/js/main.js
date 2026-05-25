@@ -8,11 +8,11 @@ function parseDate(dateStr) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
     const parts = dateStr.split(/[\/\-]/);
     if (parts.length === 3) {
-        if (parts.length === 4) return `${parts}-${parts.padStart(2, '0')}-${parts.padStart(2, '0')}`;
-        else if (parts.length === 4) return `${parts}-${parts.padStart(2, '0')}-${parts.padStart(2, '0')}`;
+        if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        else if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
     }
     const d = new Date(dateStr);
-    return !isNaN(d.getTime()) ? d.toISOString().split('T') : '';
+    return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : '';
 }
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
@@ -97,7 +97,7 @@ async function loadData() {
         thead.innerHTML = ''; tbody.innerHTML = ''; formContainer.innerHTML = '';
         if (!data.perkara || data.perkara.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">Data kosong.</td></tr>'; return; }
         
-        sheetHeadersPerkara = data.perkara; sheetHeadersDetail = data.detail || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
+        sheetHeadersPerkara = data.perkara[0]; sheetHeadersDetail = data.detail[0] || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
         
         const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
         sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h}</th>`; });
@@ -117,8 +117,8 @@ async function loadData() {
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
-            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row}')">Lihat</button></td>`;
-            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row}')">Hapus</button></td></tr>`;
+            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row[0]}')">Lihat</button></td>`;
+            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
             tbody.innerHTML += rowHtml;
         });
     } catch (e) { tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Error: ${e.message}</td></tr>`; }
@@ -166,7 +166,7 @@ function bukaModalTambah() {
 
 function bukaModalEdit(id) {
     isEditMode = true; editId = id;
-    const rowP = perkaraData.find(r => r === id) || [], rowD = detailData.find(r => r === id) || [];
+    const rowP = perkaraData.find(r => r[0] === id) || [], rowD = detailData.find(r => r[0] === id) || [];
     
     sheetHeadersPerkara.forEach((h, i) => {
         const el = document.getElementById(`inputPerkara_${i}`); const val = rowP[i] || '';
@@ -191,11 +191,11 @@ async function hapusData(id) { if(!confirm(`Yakin ingin menghapus ${id}?`)) retu
 function lihatDetail(id) {
     const modalEl = document.getElementById('detailModal'); new bootstrap.Modal(modalEl).show();
     document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
-    const pRow = perkaraData.find(r => r === id);
+    const pRow = perkaraData.find(r => r[0] === id);
     document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail Perkara';
 
     setTimeout(() => {
-        const row = detailData.find(r => r === id);
+        const row = detailData.find(r => r[0] === id);
         const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
         
         let leftHtml = '<div class="col-md-6">';
@@ -214,11 +214,11 @@ function lihatDetail(id) {
                 
                 if(fieldVal !== '-' && fieldVal !== '') {
                     if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { datesCollected.push(new Date(fieldVal)); } 
-                    else if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/.test(fieldVal)) { const p = fieldVal.split(/[\/\-]/); datesCollected.push(new Date(`${p}-${p}-${p}`)); }
+                    else if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/.test(fieldVal)) { const p = fieldVal.split(/[\/\-]/); datesCollected.push(new Date(`${p[2]}-${p[1]}-${p[0]}`)); }
                 }
 
                 if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p}/${p}/${p}`; }
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                 }
 
                 if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
