@@ -28,7 +28,7 @@ body {
     white-space: nowrap;
 }
 
-/* Footer Beku (Freeze) & Diperkecil */
+/* UPDATE 2: Warna Gradient untuk Footer */
 .footer-freeze {
     position: fixed;
     bottom: 0;
@@ -37,12 +37,26 @@ body {
     z-index: 1030;
     font-size: 0.75rem;
     padding: 0.5rem 0;
-    background-color: #212529;
+    background: linear-gradient(135deg, #1e8a8a, #38ba8f) !important;
     color: #fff;
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    border: none !important;
 }
 
 main.container {
     padding-bottom: 40px;
+}
+
+/* UPDATE 2: Utility Class untuk Gradient Header/Navbar */
+.navbar-gradient {
+    background: linear-gradient(135deg, #1e8a8a, #38ba8f) !important;
+    border: none !important;
+}
+
+/* UPDATE 3: Warna Tabel Header Menjadi #196791 */
+.table thead.table-dark th {
+    background-color: #196791 !important;
+    color: #ffffff !important;
+    border-color: #196791 !important;
 }
