@@ -59,9 +59,9 @@ main.container {
     border: none !important;
 }
 
-/* UPDATE 3: Warna Tabel Header Menjadi #196791 */
+/* UPDATE 3: Warna Tabel Header Menjadi #339aa6 */
 .table thead.table-dark th {
-    background: linear-gradient(135deg, #38ba8f, #1e8a8a) !important;
+    background: #339aa6 !important;
     color: #ffffff !important;
     border-color: #196791 !important;
 }
