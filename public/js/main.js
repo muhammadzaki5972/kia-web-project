@@ -17,14 +17,13 @@ function parseDate(dateStr) {
 
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     let label = headerText;
-    if (headerText.toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
-    if (headerText.toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
+    if (String(headerText || '').toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
+    if (String(headerText || '').toLowerCase().trim() === 'rincian informasi') label = 'No Reg';
 
     const id = `${idPrefix}_${index}`;
-    const lower = label.toLowerCase().trim();
+    const lower = String(label || '').toLowerCase().trim();
     const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sinkron</small>` : '';
 
-    // Sembunyikan kolom Tanggal Update dari Form agar diisi otomatis oleh sistem saat simpan
     if (lower === 'tanggal update' || lower === 'terakhir diperbarui') {
         return `<input type="hidden" id="${id}">`;
     }
@@ -68,7 +67,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
 
 function initQuill(headers, idPrefix) {
     headers.forEach((h, i) => {
-        if (h.toLowerCase().trim() === 'rincian permohonan' || h.toLowerCase().trim() === 'isi permohonan') {
+        if (String(h || '').toLowerCase().trim() === 'rincian permohonan' || String(h || '').toLowerCase().trim() === 'isi permohonan') {
             const id = `${idPrefix}_${i}`;
             quillInstances[id] = new Quill(`#${id}_quill`, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{'list':'ordered'},{'list':'bullet'}]] } });
             quillInstances[id].on('text-change', () => { document.getElementById(id).value = quillInstances[id].root.innerHTML; });
@@ -78,8 +77,8 @@ function initQuill(headers, idPrefix) {
 
 function attachStatusLogic() {
     let statusIds = [], linkIds = [];
-    sheetHeadersPerkara.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`); });
-    sheetHeadersDetail.forEach((h, i) => { if(h.toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); if(h.toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`); });
+    sheetHeadersPerkara.forEach((h, i) => { if(String(h || '').toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); if(String(h || '').toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`); });
+    sheetHeadersDetail.forEach((h, i) => { if(String(h || '').toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); if(String(h || '').toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`); });
 
     window.applyStatusLogic = () => {
         statusIds.forEach(sId => {
@@ -104,10 +103,10 @@ async function loadData() {
         
         sheetHeadersPerkara = data.perkara; sheetHeadersDetail = data.detail || []; perkaraData = data.perkara.slice(1); detailData = data.detail.slice(1) || [];
         
-        const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+        const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
         sheetHeadersPerkara.forEach((h, i) => { 
-            if(i !== skipIdx && h.toLowerCase().trim() !== 'tanggal update' && h.toLowerCase().trim() !== 'terakhir diperbarui') {
-                thead.innerHTML += `<th>${h}</th>`; 
+            if(i !== skipIdx && String(h || '').toLowerCase().trim() !== 'tanggal update' && String(h || '').toLowerCase().trim() !== 'terakhir diperbarui') {
+                thead.innerHTML += `<th>${h || '-'}</th>`; 
             }
         });
         thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
@@ -126,7 +125,7 @@ async function loadData() {
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                if(i !== skipIdx && sheetHeadersPerkara[i].toLowerCase().trim() !== 'tanggal update' && sheetHeadersPerkara[i].toLowerCase().trim() !== 'terakhir diperbarui') {
+                if(i !== skipIdx && String(sheetHeadersPerkara[i] || '').toLowerCase().trim() !== 'tanggal update' && String(sheetHeadersPerkara[i] || '').toLowerCase().trim() !== 'terakhir diperbarui') {
                     rowHtml += `<td>${row[i] || '-'}</td>`; 
                 }
             }
@@ -140,9 +139,9 @@ async function loadData() {
 function filterTable() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#dataTable tr');
-    const idxPem = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('pemohon'));
-    const idxTerm = sheetHeadersPerkara.findIndex(h => h.toLowerCase().includes('termohon'));
-    const skipIdx = sheetHeadersPerkara.findIndex(h => h.toLowerCase().trim() === 'detail');
+    const idxPem = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('pemohon'));
+    const idxTerm = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('termohon'));
+    const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
     rows.forEach(r => {
         const cells = r.getElementsByTagName('td');
         if(cells.length <= 1) return;
@@ -157,12 +156,14 @@ document.getElementById('formTambahData').addEventListener('submit', async (e) =
     e.preventDefault();
     const btnSubmit = document.getElementById('btnSubmit'); btnSubmit.innerText = "Memproses..."; btnSubmit.disabled = true;
     
-    // UPDATE LOGIKA 1 & 2: Set nilai kolom Tanggal Update otomatis menggunakan Hari Ini (WIB) saat Tambah / Edit data selesai ditekan
-    const todayWib = new Date().toISOString().split('T'); // Format: YYYY-MM-DD
+    // Set format Waktu Lokal Indonesia (WIB) untuk auto input Tanggal Update
+    const dateOpts = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' };
+    const todayWibStr = new Intl.DateTimeFormat('en-CA', dateOpts).format(new Date()); 
+    
     sheetHeadersPerkara.forEach((h, i) => {
-        if(h && (h.toLowerCase().trim() === 'tanggal update' || h.toLowerCase().trim() === 'terakhir diperbarui')) {
+        if(String(h || '').toLowerCase().trim() === 'tanggal update' || String(h || '').toLowerCase().trim() === 'terakhir diperbarui') {
             const el = document.getElementById(`inputPerkara_${i}`);
-            if(el) el.value = todayWib;
+            if(el) el.value = todayWibStr;
         }
     });
 
@@ -215,7 +216,9 @@ function lihatDetail(id) {
     const modalEl = document.getElementById('detailModal'); new bootstrap.Modal(modalEl).show();
     document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
     const pRow = perkaraData.find(r => r === id);
-    document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>h.toLowerCase().includes('termohon'))]}` : 'Detail Perkara';
+    const pemStr = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('pemohon'));
+    const termStr = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('termohon'));
+    document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[pemStr] || 'Pemohon'} vs ${pRow[termStr] || 'Termohon'}` : 'Detail Perkara';
 
     setTimeout(() => {
         const row = detailData.find(r => r === id);
@@ -226,7 +229,7 @@ function lihatDetail(id) {
 
         leftFields.forEach(f => {
             let fieldVal = '-', labelText = '';
-            const findIdx = (headers) => headers.findIndex(h => { const val = h.toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
+            const findIdx = (headers) => headers.findIndex(h => { const val = String(h || '').toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
             
             let idx = findIdx(sheetHeadersDetail);
             if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = sheetHeadersDetail[idx]; } 
@@ -250,9 +253,8 @@ function lihatDetail(id) {
         });
         leftHtml += '</div>';
 
-        // UPDATE LOGIKA: Gunakan data kolom Tanggal Update Google Sheet hasil simpan admin
         let latestDateStr = '-';
-        const idxUpdate = sheetHeadersPerkara.findIndex(h => h && (h.toLowerCase().trim() === 'tanggal update' || h.toLowerCase().trim() === 'terakhir diperbarui'));
+        const idxUpdate = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'tanggal update' || String(h || '').toLowerCase().trim() === 'terakhir diperbarui');
         let rawUpdateDate = (idxUpdate !== -1 && pRow) ? pRow[idxUpdate] : '';
 
         if (rawUpdateDate && rawUpdateDate !== '-') {
@@ -274,7 +276,7 @@ function lihatDetail(id) {
             document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
         }
 
-        const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
+        const idxPermohonan = sheetHeadersDetail.findIndex(h => String(h || '').toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
         document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
     }, 500); 
