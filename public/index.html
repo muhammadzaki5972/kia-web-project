@@ -66,8 +66,14 @@
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [];
 
+        // Mencegah error jika API merubah bentuk data
         function normalizeData(arr) {
-            if (!arr || !Array.isArray(arr) || arr.length === 0) return [];
+            if (!arr || arr.length === 0) return [];
+            if (!Array.isArray(arr) && typeof arr === 'object') {
+                const headers = Object.keys(arr);
+                const rows = arr.map(obj => headers.map(h => obj[h]));
+                return [headers, ...rows];
+            }
             if (arr.length === 1 && Array.isArray(arr) && Array.isArray(arr)) return arr;
             if (Array.isArray(arr) && Array.isArray(arr)) return arr.map(r => Array.isArray(r) ? r : r);
             return arr;
@@ -76,48 +82,74 @@
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
             try {
-                const response = await fetch('/api/data'); const data = await response.json();
+                const response = await fetch('/api/data'); 
+                const data = await response.json();
                 
                 let rawPerkara = normalizeData(data.perkara || []);
                 let rawDetail = normalizeData(data.detail || []);
 
                 if (rawPerkara.length <= 1) { container.innerHTML = '<div class="text-center"><p class="text-muted">Data kosong.</p></div>'; return; }
 
-                // UPDATE: Membatasi hanya mengambil baris A1 sampai F1 (kolom 1 sampai 6)
-                sheetHeadersPerkara = rawPerkara.slice(0, 6); 
+                sheetHeadersPerkara = rawPerkara; 
                 perkaraData = rawPerkara.slice(1); 
                 detailHeaders = rawDetail || []; detailData = rawDetail.slice(1);
                 
-                const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
+                // MENGUNCI HEADER HANYA BARIS A1 SAMPAI F1 (6 Kolom)
+                const tableHeaders = sheetHeadersPerkara.slice(0, 6);
+                
                 let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
                 
-                sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; });
-                tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
+                tableHeaders.forEach(h => { tableHtml += `<th>${h || '-'}</th>`; });
+                tableHtml += `</tr></thead><tbody id="dataTable">`;
 
                 perkaraData.forEach(row => {
                     tableHtml += `<tr>`;
-                    // Loop disesuaikan dengan panjang susunan header A1-F1
-                    for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`; }
+                    // Mencetak data hanya untuk kolom A, B, C, D, E
+                    for (let i = 0; i < 5; i++) { 
+                        tableHtml += `<td>${row[i] || '-'}</td>`; 
+                    }
+                    // Mengubah kolom F (Detail) menjadi tombol Lihat
                     tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row}')">Lihat</button></td></tr>`;
                 });
+                
                 tableHtml += `</tbody></table></div>`;
                 container.innerHTML = tableHtml;
-            } catch (error) { container.innerHTML = `<div class="text-center text-danger">Error: ${error.message}</div>`; }
+            } catch (error) { 
+                console.error(error);
+                container.innerHTML = `<div class="text-center text-danger"><h5>Terjadi Kesalahan</h5><p>${error.message}</p></div>`; 
+            }
         }
 
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const rows = document.querySelectorAll('#dataTable tr');
-            const idxPem = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('pemohon'));
-            const idxTerm = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().includes('termohon'));
-            const skipIdx = sheetHeadersPerkara.findIndex(h => String(h || '').toLowerCase().trim() === 'detail');
             
             rows.forEach(row => {
                 const cells = row.getElementsByTagName('td');
-                if(cells.length <= 1) return;
-                const pemohon = cells[idxPem > skipIdx ? idxPem - 1 : idxPem] ? cells[idxPem > skipIdx ? idxPem - 1 : idxPem].textContent.toLowerCase() : '';
-                const termohon = cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm] ? cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm].textContent.toLowerCase() : '';
+                if(cells.length < 5) return; // Memastikan baris valid
+                // Sesuai dengan A1-F1, Pemohon ada di kolom 3 (Index 2), Termohon di kolom 4 (Index 3)
+                const pemohon = cells ? cells.textContent.toLowerCase() : '';
+                const termohon = cells ? cells.textContent.toLowerCase() : '';
                 row.style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
             });
         }
-        function clearSearch() {
+        
+        function clearSearch() { document.getElementById('searchInput').value = ''; filterTable(); }
+
+        function lihatDetail(id) {
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+            document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
+
+            const pRow = perkaraData.find(r => r === id);
+            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[sheetHeadersPerkara.findIndex(h=>String(h || '').toLowerCase().includes('pemohon'))]} vs ${pRow[sheetHeadersPerkara.findIndex(h=>String(h || '').toLowerCase().includes('termohon'))]}` : 'Detail';
+
+            setTimeout(() => {
+                const row = detailData.find(r => r === id);
+                const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
+                
+                let leftHtml = '<div class="col-md-6">';
+                let datesCollected = [];
+
+                leftFields.forEach(f => {
+                    let fieldVal = '-', labelText = '';
+                    const findIdx = (headers) => headers.findIndex(h => { const val = String(h || '').toLowerCase().trim(); return val === f || (f
