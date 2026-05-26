@@ -227,19 +227,22 @@ function lihatDetail(id) {
         });
         leftHtml += '</div>';
 
-        let latestDateStr = '-';
+        let latestUpdatedDate = '-';
         if (datesCollected.length > 0) {
-            let maxDate = new Date(Math.max.apply(null, datesCollected));
-            if (!isNaN(maxDate.getTime())) {
-                const dd = String(maxDate.getDate()).padStart(2, '0');
-                const mm = String(maxDate.getMonth() + 1).padStart(2, '0');
-                const yyyy = maxDate.getFullYear();
-                latestDateStr = `${dd}/${mm}/${yyyy}`;
-            }
-        }
-        if (document.getElementById('modalLastUpdated')) {
-            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestDateStr;
-        }
+        let maxDate = new Date(Math.max.apply(null, datesCollected));
+    
+        if (!isNaN(maxDate.getTime())) {
+        const dd = String(maxDate.getDate()).padStart(2, '0');
+        const mm = String(maxDate.getMonth() + 1).padStart(2, '0');
+        const yyyy = maxDate.getFullYear();
+        
+        latestUpdatedDate = `${dd}/${mm}/${yyyy}`;
+    }
+}
+
+if (document.getElementById('modalLastUpdated')) {
+    document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestUpdatedDate;
+}
 
         const idxPermohonan = sheetHeadersDetail.findIndex(h => h.toLowerCase().trim() === 'isi permohonan');
         let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
