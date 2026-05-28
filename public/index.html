@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons (Ditambahkan untuk ikon Sosmed & Menu) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-dark bg-primary shadow-sm py-3 sticky-top">
+    
+    <!-- UPDATE: Header dengan Linear Gradient Biru Tua ke Biru Muda -->
+    <nav class="navbar navbar-dark shadow-sm py-3 sticky-top" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);">
         <div class="container d-flex flex-wrap justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
                 <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo">
@@ -17,9 +22,54 @@
                     <span class="fs-6 fw-normal text-white-50">Komisi Informasi Aceh</span>
                 </div>
             </a>
-            <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm">Login</a>
+            
+            <!-- UPDATE: Tombol Login & Tombol Hamburger -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold px-3">Login</a>
+                <button class="navbar-toggler border-0 p-1 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
         </div>
     </nav>
+
+    <!-- UPDATE: Panel Menu Hamburger (Offcanvas) -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
+        <div class="offcanvas-header border-bottom bg-light">
+            <h5 class="offcanvas-title fw-bold" id="menuOffcanvasLabel" style="color: #002b5e;">Menu Navigasi</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column p-4">
+            <ul class="navbar-nav flex-grow-1 pe-3">
+                <li class="nav-item mb-3">
+                    <a class="nav-link text-dark fw-bold fs-5 d-flex align-items-center" href="index.html">
+                        <i class="bi bi-house-door-fill me-3 fs-4" style="color: #0099ff;"></i> Beranda
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link text-dark fw-bold fs-5 d-flex align-items-center" href="https://kia.acehprov.go.id" target="_blank">
+                        <i class="bi bi-globe me-3 fs-4 text-info"></i> Ke Website Utama
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Sosmed di bagian bawah panel -->
+            <div class="mt-auto pt-4 border-top">
+                <p class="text-muted fw-bold mb-3">Ikuti Sosial Media Kami:</p>
+                <div class="d-flex gap-4">
+                    <a href="https://instagram.com" target="_blank" class="text-decoration-none transition-hover" style="color: #E1306C;" title="Instagram">
+                        <i class="bi bi-instagram fs-2"></i>
+                    </a>
+                    <a href="https://facebook.com" target="_blank" class="text-decoration-none transition-hover" style="color: #1877F2;" title="Facebook">
+                        <i class="bi bi-facebook fs-2"></i>
+                    </a>
+                    <a href="https://youtube.com" target="_blank" class="text-decoration-none transition-hover" style="color: #FF0000;" title="YouTube">
+                        <i class="bi bi-youtube fs-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main class="container mt-5 flex-grow-1 mb-5">
         <div class="text-center mb-4 px-3">
@@ -47,7 +97,7 @@
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-info position-relative">
                     <h5 class="modal-title fw-bold fs-5 w-100 text-center text-dark" id="detailModalTitle">Detail Perkara</h5>
-                    <button type="button" class="btn-close position-absolute end-0 me-3" onclick="closeDetailModal()"></button>
+                    <button type="button" class="btn-close position-absolute end-0 me-3 shadow-none" onclick="closeDetailModal()"></button>
                 </div>
                 <div class="modal-body position-relative bg-light">
                     <div id="detailLoading" style="display: none;"><div class="spinner-border text-info" role="status"></div></div>
@@ -74,17 +124,14 @@
             if (!container) return;
 
             try {
-                // Pastikan status loading muncul kembali jika fungsi dipanggil ulang
                 container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat data...</p></div>';
 
                 const response = await fetch('/api/data');
                 
-                // Cek apakah server mengembalikan respons error (contoh: 500 atau 404)
                 if (!response.ok) {
                     throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
                 }
 
-                // Parse respons sebagai teks terlebih dahulu untuk menghindari crash jika bukan JSON
                 const textData = await response.text();
                 let data;
                 try {
@@ -98,7 +145,6 @@
                     return; 
                 }
 
-                // Fallback aman untuk semua array
                 sheetHeadersPerkara = data.perkara[0] || []; 
                 perkaraData = data.perkara.slice(1) || []; 
                 detailHeaders = (data.detail && data.detail[0]) ? data.detail[0] : []; 
@@ -114,7 +160,7 @@
                 tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
 
                 perkaraData.forEach(row => {
-                    if (!row || row.length === 0) return; // Lewati baris yang benar-benar kosong
+                    if (!row || row.length === 0) return; 
 
                     tableHtml += `<tr>`;
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
@@ -208,7 +254,6 @@
 
         function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
 
-        // Menggunakan DOMContentLoaded agar fungsi terjamin jalan setelah elemen HTML siap
         document.addEventListener('DOMContentLoaded', loadPublicData);
     </script>
 </body>
