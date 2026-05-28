@@ -25,6 +25,62 @@
         .table-responsive::-webkit-scrollbar-track { background: #f8f9fa; }
         .table-responsive::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* --- UPDATE: Animasi Ikon Hamburger ke X --- */
+        .animated-icon {
+            width: 26px;
+            height: 20px;
+            position: relative;
+            margin: 0px;
+            transform: rotate(0deg);
+            transition: .5s ease-in-out;
+            cursor: pointer;
+        }
+        .animated-icon span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: #fff;
+            border-radius: 9px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: .25s ease-in-out;
+        }
+        .animated-icon span:nth-child(1) { top: 0px; }
+        .animated-icon span:nth-child(2) { top: 8px; }
+        .animated-icon span:nth-child(3) { top: 16px; }
+        .animated-icon.open span:nth-child(1) { top: 8px; transform: rotate(135deg); }
+        .animated-icon.open span:nth-child(2) { opacity: 0; left: -60px; }
+        .animated-icon.open span:nth-child(3) { top: 8px; transform: rotate(-135deg); }
+
+        /* --- UPDATE: Tampilan Panel Menu Offcanvas --- */
+        .custom-offcanvas { max-width: 320px; border-left: none; box-shadow: -5px 0 25px rgba(0,0,0,0.15); }
+        .offcanvas-menu-link {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            padding: 12px 15px;
+        }
+        .offcanvas-menu-link:hover {
+            background-color: #f0f7ff;
+            transform: translateX(6px); /* Efek bergeser ke kanan sedikit saat disentuh */
+        }
+        .social-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px; 
+            height: 45px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .social-icon-btn:hover {
+            transform: translateY(-4px); /* Efek melayang */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            background: white;
+        }
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
@@ -42,39 +98,50 @@
             
             <div class="d-flex align-items-center gap-2 gap-md-3">
                 <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold px-2 px-md-3">Login</a>
-                <button class="navbar-toggler border-0 p-1 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
-                    <span class="navbar-toggler-icon"></span>
+                
+                <!-- UPDATE: Tombol Hamburger Animasi -->
+                <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
+                    <div class="animated-icon" id="navIcon">
+                        <span></span><span></span><span></span>
+                    </div>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Panel Menu Hamburger -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
-        <div class="offcanvas-header border-bottom bg-light">
-            <h5 class="offcanvas-title fw-bold" id="menuOffcanvasLabel" style="color: #002b5e;">Menu Navigasi</h5>
-            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <!-- UPDATE: Panel Menu Hamburger (Offcanvas) Lebih Elegan -->
+    <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
+        <!-- Header Menu disamakan gradiennya dengan navbar -->
+        <div class="offcanvas-header shadow-sm" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);">
+            <h5 class="offcanvas-title fw-bold text-white" id="menuOffcanvasLabel">Menu Navigasi</h5>
+            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body d-flex flex-column p-4">
-            <ul class="navbar-nav flex-grow-1 pe-3">
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-dark fw-bold fs-5 d-flex align-items-center" href="index.html">
+        <div class="offcanvas-body d-flex flex-column p-4 bg-white">
+            <ul class="navbar-nav flex-grow-1 pe-3 mt-2">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark fw-bold fs-6 d-flex align-items-center offcanvas-menu-link" href="index.html">
                         <i class="bi bi-house-door-fill me-3 fs-4" style="color: #0099ff;"></i> Beranda
                     </a>
                 </li>
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-dark fw-bold fs-5 d-flex align-items-center" href="https://kia.acehprov.go.id" target="_blank">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark fw-bold fs-6 d-flex align-items-center offcanvas-menu-link" href="https://kia.acehprov.go.id" target="_blank">
                         <i class="bi bi-globe me-3 fs-4 text-info"></i> Ke Website Utama
                     </a>
                 </li>
             </ul>
             
             <div class="mt-auto pt-4 border-top">
-                <p class="text-muted fw-bold mb-3">Ikuti Sosial Media Kami:</p>
-                <div class="d-flex gap-4">
-                    <a href="https://instagram.com" target="_blank" class="text-decoration-none transition-hover" style="color: #E1306C;" title="Instagram"><i class="bi bi-instagram fs-2"></i></a>
-                    <a href="https://facebook.com" target="_blank" class="text-decoration-none transition-hover" style="color: #1877F2;" title="Facebook"><i class="bi bi-facebook fs-2"></i></a>
-                    <a href="https://youtube.com" target="_blank" class="text-decoration-none transition-hover" style="color: #FF0000;" title="YouTube"><i class="bi bi-youtube fs-2"></i></a>
+                <p class="text-muted fw-bold mb-3" style="font-size: 0.9rem;">Ikuti Sosial Media Kami:</p>
+                <div class="d-flex gap-3">
+                    <a href="https://instagram.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #E1306C;" title="Instagram">
+                        <i class="bi bi-instagram fs-4"></i>
+                    </a>
+                    <a href="https://facebook.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #1877F2;" title="Facebook">
+                        <i class="bi bi-facebook fs-4"></i>
+                    </a>
+                    <a href="https://youtube.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #FF0000;" title="YouTube">
+                        <i class="bi bi-youtube fs-4"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -83,15 +150,14 @@
     <!-- Main Content -->
     <main class="container mt-4 mt-md-5 flex-grow-1 mb-5 pb-4">
         <div class="text-center mb-4 px-2">
-            <h2 class="fw-bold fs-4 fs-md-3">Sistem Informasi Sengketa</h2>
-                <h6>Komisi Informasi Aceh</h6>
+            <h2 class="fw-bold fs-4 fs-md-3">Sistem Informasi Sengketa Komisi Informasi Aceh</h2>
             
             <div class="row justify-content-center mt-4">
                 <div class="col-12 col-md-8 col-lg-6">
                     <div class="input-group search-box-elegant shadow bg-white p-1">
                         <input type="text" id="searchInput" class="form-control px-3" placeholder="Cari Pemohon / Termohon..." oninput="filterTable()">
-                        <button class="btn btn-primary rounded-pill px-3 px-md-4 fw-bold me-1" onclick="filterTable()">&#128269</button>
-                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary" onclick="clearSearch()">&#10060</button>
+                        <button class="btn btn-primary rounded-pill px-3 px-md-4 fw-bold me-1" onclick="filterTable()">Cari</button>
+                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary" onclick="clearSearch()">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -105,7 +171,7 @@
         </div>
     </main>
 
-    <!-- Tombol Scroll to Top (Menggunakan style display default none) -->
+    <!-- Tombol Scroll to Top -->
     <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed" 
             style="bottom: 80px; right: 20px; width: 50px; height: 50px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0;" 
             onclick="scrollToTop()" title="Kembali ke Atas">
@@ -169,7 +235,6 @@
                 
                 const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
                 
-                // PERBAIKAN: Struktur pembungkus dipisah. .table-elegant-wrapper di luar, .table-responsive di dalam.
                 let tableHtml = `<div class="bg-white shadow-sm table-elegant-wrapper">
                                     <div class="table-responsive">
                                         <table class="table table-sm table-hover table-striped mb-0 align-middle">
@@ -274,20 +339,30 @@
 
         document.addEventListener('DOMContentLoaded', loadPublicData);
 
-        // PERBAIKAN: Fungsi Scroll To Top Universal
+        // Fungsi Scroll To Top Universal
         const btnScrollTop = document.getElementById('btnScrollTop');
         window.addEventListener('scroll', () => {
-            // Menggunakan documentElement.scrollTop agar kompatibel di semua browser HP
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
                 btnScrollTop.style.display = "flex";
             } else {
                 btnScrollTop.style.display = "none";
             }
         });
-        
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // UPDATE: Logika JavaScript untuk Animasi Ikon Hamburger
+        const myOffcanvas = document.getElementById('menuOffcanvas');
+        const navIcon = document.getElementById('navIcon');
+        
+        myOffcanvas.addEventListener('show.bs.offcanvas', () => {
+            navIcon.classList.add('open');
+        });
+        
+        myOffcanvas.addEventListener('hide.bs.offcanvas', () => {
+            navIcon.classList.remove('open');
+        });
     </script>
 </body>
 </html>
