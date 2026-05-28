@@ -35,7 +35,10 @@
             </div>
         </div>
         <div id="publicDataContainer">
-            <div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat data...</p></div>
+            <div class="text-center py-5" id="loadingStatus">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Memuat data...</p>
+            </div>
         </div>
     </main>
 
@@ -47,4 +50,166 @@
                     <button type="button" class="btn-close position-absolute end-0 me-3" onclick="closeDetailModal()"></button>
                 </div>
                 <div class="modal-body position-relative bg-light">
-                    <div id="detailLoading" style="display: none;"><div class="spinner-border text-info"
+                    <div id="detailLoading" style="display: none;"><div class="spinner-border text-info" role="status"></div></div>
+                    <div class="row" id="detailContent"></div>
+                </div>
+                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-light py-2" style="min-height: 55px; border-top: 1px solid #dee2e6;">
+                    <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold shadow-sm" onclick="closeDetailModal()">Tutup</button>
+                    <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-normal" style="font-size: 0.75rem;" id="modalLastUpdated">
+                        Data terakhir diperbarui tanggal: -
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-freeze">&copy; 2026 Komisi Informasi Aceh (KIACEH).</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
+
+        async function loadPublicData() {
+            const container = document.getElementById('publicDataContainer');
+            if (!container) return;
+
+            try {
+                // Pastikan status loading muncul kembali jika fungsi dipanggil ulang
+                container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat data...</p></div>';
+
+                const response = await fetch('/api/data');
+                
+                // Cek apakah server mengembalikan respons error (contoh: 500 atau 404)
+                if (!response.ok) {
+                    throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
+                }
+
+                // Parse respons sebagai teks terlebih dahulu untuk menghindari crash jika bukan JSON
+                const textData = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(textData);
+                } catch (e) {
+                    throw new Error("Format respons dari server tidak valid.");
+                }
+
+                if (!data || !data.perkara || data.perkara.length <= 1) { 
+                    container.innerHTML = '<div class="text-center py-5"><p class="text-muted fw-bold">Belum ada data sengketa yang tersedia.</p></div>'; 
+                    return; 
+                }
+
+                // Fallback aman untuk semua array
+                sheetHeadersPerkara = data.perkara[0] || []; 
+                perkaraData = data.perkara.slice(1) || []; 
+                detailHeaders = (data.detail && data.detail[0]) ? data.detail[0] : []; 
+                detailData = (data.detail && data.detail.length > 1) ? data.detail.slice(1) : [];
+                updateData = (data.update && data.update.length > 1) ? data.update.slice(1) : [];
+                
+                const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
+                let tableHtml = `<div class="table-responsive shadow-sm bg-white border"><table class="table table-sm table-bordered table-hover table-striped mb-0"><thead class="table-dark"><tr>`;
+                
+                sheetHeadersPerkara.forEach((h, i) => { 
+                    if(i !== skipIdx) tableHtml += `<th>${h || '-'}</th>`; 
+                });
+                tableHtml += `<th>Detail</th></tr></thead><tbody id="dataTable">`;
+
+                perkaraData.forEach(row => {
+                    if (!row || row.length === 0) return; // Lewati baris yang benar-benar kosong
+
+                    tableHtml += `<tr>`;
+                    for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
+                        if(i !== skipIdx) tableHtml += `<td>${row[i] || '-'}</td>`; 
+                    }
+                    tableHtml += `<td><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-0" onclick="lihatDetail('${row[0] || ''}')">Lihat</button></td></tr>`;
+                });
+                tableHtml += `</tbody></table></div>`;
+                
+                container.innerHTML = tableHtml;
+
+            } catch (error) { 
+                console.error("Load Data Error:", error);
+                container.innerHTML = `
+                    <div class="text-center py-5 my-4 border border-danger rounded bg-white shadow-sm">
+                        <h5 class="text-danger fw-bold">Gagal Memuat Data</h5>
+                        <p class="text-muted mb-3">${error.message}</p>
+                        <button class="btn btn-outline-danger btn-sm px-4 fw-bold" onclick="loadPublicData()">Coba Muat Ulang</button>
+                    </div>`; 
+            }
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#dataTable tr');
+            const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
+            const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+            const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
+            
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                if(cells.length <= 1) return;
+                const pemohon = cells[idxPem > skipIdx ? idxPem - 1 : idxPem] ? cells[idxPem > skipIdx ? idxPem - 1 : idxPem].textContent.toLowerCase() : '';
+                const termohon = cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm] ? cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm].textContent.toLowerCase() : '';
+                row.style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
+            });
+        }
+        function clearSearch() { document.getElementById('searchInput').value = ''; filterTable(); }
+
+        function lihatDetail(id) {
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+            document.getElementById('detailLoading').style.display = 'flex'; document.getElementById('detailContent').innerHTML = '';
+
+            const pRow = perkaraData.find(r => r[0] === id);
+            const getIndexPem = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('pemohon'));
+            const getIndexTerm = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('termohon'));
+            document.getElementById('detailModalTitle').innerText = pRow ? `${pRow[getIndexPem] || 'Pemohon'} vs ${pRow[getIndexTerm] || 'Termohon'}` : 'Detail';
+
+            setTimeout(() => {
+                const row = detailData.find(r => r[0] === id);
+                const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
+                
+                let leftHtml = '<div class="col-md-6">';
+
+                leftFields.forEach(f => {
+                    let fieldVal = '-', labelText = '';
+                    const findIdx = (headers) => headers.findIndex(h => { const val = (`${h}`).toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
+
+                    let idx = findIdx(detailHeaders);
+                    if(idx !== -1) { fieldVal = row ? (row[idx] || '-') : '-'; labelText = detailHeaders[idx]; } 
+                    else { idx = findIdx(sheetHeadersPerkara); if(idx !== -1) { fieldVal = pRow ? (pRow[idx] || '-') : '-'; labelText = sheetHeadersPerkara[idx]; } }
+
+                    if(idx !== -1) {
+                        if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
+                        
+                        if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
+                        }
+                        if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
+                        
+                        leftHtml += `<div class="card shadow-sm border-0 mb-2"><div class="card-body py-1 px-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div><div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div></div></div>`;
+                    }
+                });
+                leftHtml += '</div>';
+
+                const pRowIndex = perkaraData.findIndex(r => r[0] === id);
+                let latestUpdatedDate = '-';
+                if (pRowIndex !== -1 && updateData[pRowIndex] && updateData[pRowIndex][0]) {
+                    latestUpdatedDate = updateData[pRowIndex][0];
+                }
+                if (document.getElementById('modalLastUpdated')) {
+                    document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestUpdatedDate;
+                }
+
+                const idxPermohonan = detailHeaders.findIndex(h => (`${h}`).toLowerCase().trim() === 'isi permohonan');
+                let rightHtml = `<div class="col-md-6"><div class="card shadow-sm border-0"><div class="card-header bg-light fw-bold" style="font-size: 0.85rem;">Isi Permohonan</div><div class="card-body scrollable-box" style="font-size: 0.85rem;"><div class="text-dark">${idxPermohonan !== -1 ? (row ? row[idxPermohonan] || '-' : '-') : '-'}</div></div></div></div>`;
+                
+                document.getElementById('detailContent').innerHTML = leftHtml + rightHtml; document.getElementById('detailLoading').style.display = 'none';
+            }, 500); 
+        }
+
+        function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
+
+        // Menggunakan DOMContentLoaded agar fungsi terjamin jalan setelah elemen HTML siap
+        document.addEventListener('DOMContentLoaded', loadPublicData);
+    </script>
+</body>
+</html>
