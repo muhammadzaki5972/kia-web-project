@@ -1,5 +1,5 @@
 body { 
-    font-family: 'Inter'; 
+    font-family: 'Segoe UI', Inter, Geneva, Verdana, sans-serif; 
     background-color: #f8f9fa; 
 }
 .brand-logo { height: 40px; width: auto; margin-right: 12px; object-fit: contain; }
