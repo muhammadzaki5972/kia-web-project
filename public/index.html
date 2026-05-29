@@ -243,7 +243,7 @@
                         if(f === 'tgl register') labelText = 'Tgl Register';
                         
                         if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
-                            if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
+                            if (/^\d{2}-\d{2}-\d{4}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
                         if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan <i class="bi bi-box-arrow-up-right"></i></a>`;
                         return { label: labelText, val: fieldVal };
@@ -275,11 +275,11 @@
                         if (f === 'status sengketa') {
                             const statusStr = displayVal.toLowerCase();
                             if (statusStr.includes('selesai')) {
-                                displayVal = `<span class="badge bg-success shadow-sm px-2 py-2 fs-5 rounded-pill">${displayVal}</span>`;
+                                displayVal = `<span class="badge bg-success shadow-sm px-2 py-4 fs-7 rounded-pill">${displayVal}</span>`;
                             } else if (statusStr.includes('dalam proses')) {
-                                displayVal = `<span class="badge bg-warning text-dark shadow-sm px-2 py-2 fs-5 rounded-pill">${displayVal}</span>`;
+                                displayVal = `<span class="badge bg-warning text-dark shadow-sm px-4 py-2 fs-7 rounded-pill">${displayVal}</span>`;
                             } else if (displayVal !== '-') {
-                                displayVal = `<span class="badge bg-secondary shadow-sm px-2 py-2 fs-5 rounded-pill">${displayVal}</span>`;
+                                displayVal = `<span class="badge bg-secondary shadow-sm px-2 py-4 fs-7 rounded-pill">${displayVal}</span>`;
                             }
                         }
 
