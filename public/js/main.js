@@ -15,7 +15,6 @@ function parseDate(dateStr) {
     return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : '';
 }
 
-// UPDATE: Fungsi untuk mengontrol Dropdown Isu Sengketa & Input Manual (Other)
 window.toggleIsuLainnya = (id) => {
     const selectEl = document.getElementById(`${id}_select`);
     const otherEl = document.getElementById(`${id}_other`);
@@ -37,7 +36,6 @@ window.updateIsuLainnya = (id) => {
     hiddenEl.value = otherEl.value;
 };
 
-// UPDATE: Helper untuk me-load data Isu Sengketa saat klik "Edit"
 function syncIsuSengketaForEdit(idPrefix, index, val) {
     const selectEl = document.getElementById(`${idPrefix}_${index}_select`);
     const otherEl = document.getElementById(`${idPrefix}_${index}_other`);
@@ -74,7 +72,6 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
         return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><div id="${id}_quill" style="height: 150px; background: white;"></div><input type="hidden" id="${id}"></div>`;
     } 
-    // UPDATE: Render Input Khusus Isu Sengketa (Dropdown + Other)
     else if (lower === 'isu sengketa') {
         return `
             <div class="col-md-6 mb-3">
@@ -140,51 +137,83 @@ function initQuill(headers, idPrefix) {
     });
 }
 
-// UPDATE: Logika Penguncian Dinamis (Link, No Putusan, Tgl Putusan)
+// UPDATE: Logika Penguncian Dinamis (Putusan & Persidangan)
 function attachStatusLogic() {
-    let statusIds = [], targetIds = [];
+    let statusIds = [], putusanTargetIds = [], sidangTargetIds = [];
     
-    // Deteksi label yang wajib dikunci saat "Dalam Proses"
-    const isTargetHeader = (h) => {
+    // Deteksi label Atribut Putusan
+    const isPutusanHeader = (h) => {
         const low = (`${h}`).toLowerCase().trim();
         return low === 'link putusan' || low === 'nomor putusan' || low === 'tgl diputuskan' || low === 'tgl putusan' || low === 'tanggal putusan';
     };
 
+    // Deteksi label Atribut Persidangan
+    const isSidangHeader = (h) => {
+        const low = (`${h}`).toLowerCase().trim();
+        return low === 'sidang' || low === 'sidang terakhir' || low === 'tgl sidang selanjutnya' || low === 'tanggal sidang selanjutnya' || low === 'agenda sidang selanjutnya';
+    };
+
     sheetHeadersPerkara.forEach((h, i) => { 
         if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); 
-        if(isTargetHeader(h)) targetIds.push(`inputPerkara_${i}`); 
+        if(isPutusanHeader(h)) putusanTargetIds.push(`inputPerkara_${i}`);
+        if(isSidangHeader(h)) sidangTargetIds.push(`inputPerkara_${i}`);
     });
     sheetHeadersDetail.forEach((h, i) => { 
         if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); 
-        if(isTargetHeader(h)) targetIds.push(`inputDetail_${i}`); 
+        if(isPutusanHeader(h)) putusanTargetIds.push(`inputDetail_${i}`);
+        if(isSidangHeader(h)) sidangTargetIds.push(`inputDetail_${i}`);
     });
+
+    // Helper Fungsi Pengunci
+    const lockField = (t, valIfText) => {
+        if(!t) return;
+        t.setAttribute('readonly', true);
+        t.style.backgroundColor = '#e9ecef'; // Efek visual terkunci
+        
+        if (t.tagName === 'SELECT') {
+            t.disabled = true;
+            t.value = valIfText; // Mengeset nilai ke '-'
+        } else {
+            // Trik khusus untuk Date Input: ubah sementara ke text agar bisa menampung '-'
+            if (t.type === 'date' || t.dataset.wasDate === 'true') {
+                t.dataset.wasDate = 'true';
+                t.type = 'text';
+            }
+            t.disabled = true;
+            t.value = valIfText;
+        }
+    };
+
+    // Helper Fungsi Pembuka Kunci
+    const unlockField = (t) => {
+        if(!t) return;
+        t.removeAttribute('readonly');
+        t.style.backgroundColor = '';
+        t.disabled = false;
+        
+        // Kembalikan tipe ke date jika sebelumnya diubah secara paksa
+        if (t.dataset.wasDate === 'true') {
+            t.type = 'date';
+        }
+        
+        // Bersihkan tanda strip otomatis saat dibuka
+        if (t.value === '-') t.value = '';
+    };
 
     window.applyStatusLogic = () => {
         statusIds.forEach(sId => {
             const s = document.getElementById(sId);
             if(!s) return;
-            targetIds.forEach(tId => {
-                const t = document.getElementById(tId);
-                if(!t) return;
-                
-                if(s.value === 'Dalam Proses') { 
-                    // Jika belum selesai, tidak mungkin ada putusan. Kunci dan isi "-"
-                    t.setAttribute('readonly', true);
-                    t.style.backgroundColor = '#e9ecef'; // Efek visual abu-abu tanda terkunci
-                    if (t.type === 'date') { 
-                        t.value = ''; 
-                        t.disabled = true; // Khusus format tanggal, nonaktifkan penuh 
-                    } else { 
-                        t.value = '-'; 
-                    }
-                } else if (s.value === 'Selesai') { 
-                    // Jika selesai, buka kunci agar admin dapat mengisi data Putusan
-                    t.removeAttribute('readonly'); 
-                    t.style.backgroundColor = '';
-                    t.disabled = false;
-                    if(t.value === '-') t.value = '';
-                }
-            });
+            
+            if(s.value === 'Dalam Proses') { 
+                // Jika masih berproses, Putusan KUNCI & Sidang DIBUKA
+                putusanTargetIds.forEach(tId => lockField(document.getElementById(tId), '-'));
+                sidangTargetIds.forEach(tId => unlockField(document.getElementById(tId)));
+            } else if (s.value === 'Selesai') { 
+                // Jika sudah selesai, Putusan DIBUKA & Sidang KUNCI
+                putusanTargetIds.forEach(tId => unlockField(document.getElementById(tId)));
+                sidangTargetIds.forEach(tId => lockField(document.getElementById(tId), '-'));
+            }
         });
     };
     
@@ -301,11 +330,12 @@ function bukaModalTambah() {
     Object.values(quillInstances).forEach(q => q.setContents([])); 
     document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     
-    // Reset Isu Sengketa dropdowns
     document.querySelectorAll('select[id$="_select"]').forEach(s => s.value = '');
     document.querySelectorAll('input[id$="_other"]').forEach(o => { o.value = ''; o.classList.add('d-none'); });
 
+    // Panggil logika kunci status
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    
     document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru"; document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold"; document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
@@ -320,7 +350,6 @@ function bukaModalEdit(id) {
         if(quillInstances[`inputPerkara_${i}`]) { quillInstances[`inputPerkara_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
         else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
         
-        // Panggil helper untuk parsing data ke dropdown Isu Sengketa
         if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputPerkara', i, val);
     });
     sheetHeadersDetail.forEach((h, i) => {
@@ -328,12 +357,14 @@ function bukaModalEdit(id) {
         if(quillInstances[`inputDetail_${i}`]) { quillInstances[`inputDetail_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
         else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
         
-        // Panggil helper untuk parsing data ke dropdown Isu Sengketa
         if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputDetail', i, val);
     });
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
+    
+    // Terapkan penyesuaian dinamis setelah data di-load
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
+    
     document.getElementById('modalFormTitle').innerText = `Edit Data Perkara: ${id}`; document.getElementById('modalFormHeader').className = "modal-header bg-warning text-dark";
     document.getElementById('btnSubmit').className = "btn btn-warning w-100 mt-4 py-2 fw-bold text-dark"; document.getElementById('btnSubmit').innerText = "Simpan Perubahan";
     new bootstrap.Modal(document.getElementById('tambahDataModal')).show();
