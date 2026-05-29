@@ -4,24 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
+    
     <style>
-        .search-box-elegant { border-radius: 2rem; overflow: hidden; }
-        .search-box-elegant input { border: none !important; box-shadow: none !important; }
+        /* Tipografi Baru */
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6 !important; }
+        h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .hero-title, .poppins-font { font-family: 'Poppins', sans-serif; }
+
+        /* Search Box Premium dengan Filter */
+        .search-box-elegant { border-radius: 3rem; overflow: hidden; padding: 0.35rem; }
+        .search-box-elegant input, .search-box-elegant select { box-shadow: none !important; font-size: 0.95rem; }
+        .search-box-elegant select { font-weight: 600; }
         
+        /* Tabel & Hover Effects */
         .table-elegant-wrapper {
             border-radius: 0.75rem;
             overflow: hidden; 
-            border: 1px solid #dee2e6;
+            border: 1px solid #e2e8f0;
+            background: white;
         }
-        
         .table-responsive::-webkit-scrollbar { height: 8px; }
         .table-responsive::-webkit-scrollbar-track { background: #f8f9fa; }
         .table-responsive::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        tbody tr { transition: all 0.25s ease; cursor: default; }
+        tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.06); background-color: #ffffff !important; z-index: 10; position: relative; }
 
+        /* Animasi Hamburger Icon */
         .animated-icon {
             width: 26px; height: 20px; position: relative; margin: 0px;
             transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
@@ -41,57 +58,51 @@
         .custom-offcanvas { max-width: 320px; border-left: none; box-shadow: -5px 0 25px rgba(0,0,0,0.15); }
         .offcanvas-menu-link { transition: all 0.3s ease; border-radius: 0.5rem; padding: 12px 15px; }
         .offcanvas-menu-link:hover { background-color: #f0f7ff; transform: translateX(6px); }
+        
         .social-icon-btn {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 45px; height: 45px; border-radius: 50%; background: #f8f9fa; transition: all 0.3s ease;
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); transition: all 0.3s ease; color: white;
         }
-        .social-icon-btn:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); background: white; }
+        .social-icon-btn:hover { transform: translateY(-4px); background: white; color: #0099ff !important; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 
-        /* --- Tipografi & Optimalisasi Mobile Modal --- */
-        .info-label {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #6c757d;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-        .info-value {
-            font-size: 0.95rem;
-            color: #1a1d20;
-            font-weight: 600;
-        }
+        /* --- Tipografi Modal --- */
+        .info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; font-weight: 700; margin-bottom: 0.3rem; }
+        .info-value { font-size: 0.95rem; color: #1a1d20; font-weight: 600; }
         .fs-7 { font-size: 0.85rem !important; }
-        .card-rincian {
-            max-height: 480px; 
-            overflow-y: auto;
+        .card-rincian { max-height: 480px; overflow-y: auto; }
+
+        @media (max-width: 991.98px) {
+            .card-rincian { max-height: none; overflow-y: visible; }
+            .modal-body { padding: 1rem !important; }
+            .search-box-elegant { flex-direction: column; border-radius: 1rem; padding: 0.8rem; gap: 0.5rem; }
+            .search-box-elegant .vr { display: none; }
+            .search-box-elegant select, .search-box-elegant input { border-radius: 0.5rem !important; background: #f8f9fa !important; padding: 0.75rem 1rem !important;}
+            .search-box-elegant button { width: 100%; margin: 0.2rem 0 !important; }
         }
 
-        /* Mematikan "Double Scroll" dan merapikan padding saat dibuka di HP */
-        @media (max-width: 991.98px) {
-            .card-rincian {
-                max-height: none; 
-                overflow-y: visible;
-            }
-            .modal-body { padding: 1rem !important; }
-        }
+        /* Micro-Interactions: Animasi Fade-In-Up */
+        .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(25px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        
+        /* Gradient khusus untuk header tabel */
+        .bg-gradient-primary { background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%); }
     </style>
 </head>
-<body class="bg-light d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100">
     
-    <nav class="navbar navbar-dark shadow-sm py-3 sticky-top" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);">
+    <nav class="navbar navbar-dark shadow-sm py-3 sticky-top bg-gradient-primary">
         <div class="container d-flex flex-wrap justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
-                <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 40px; height: auto; margin-right: 10px;">
+                <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 40px; height: auto; margin-right: 12px;">
                 <div class="d-flex flex-column lh-1">
                     <span class="fs-5 fs-md-4 fw-bold text-white">KIACEH</span>
-                    <span class="fw-normal text-white-50" style="font-size: 0.75rem;">Komisi Informasi Aceh</span>
+                    <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
                 </div>
             </a>
             
             <div class="d-flex align-items-center gap-2 gap-md-3">
-                <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold px-2 px-md-3">Login</a>
-                <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas">
+                <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold px-3 px-md-4 rounded-pill shadow-sm">Login</a>
+                <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas">
                     <div class="animated-icon" id="navIcon">
                         <span></span><span></span><span></span>
                     </div>
@@ -100,10 +111,10 @@
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
-        <div class="offcanvas-header shadow-sm" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);">
-            <h5 class="offcanvas-title fw-bold text-white" id="menuOffcanvasLabel">Menu Navigasi</h5>
-            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas">
+        <div class="offcanvas-header shadow-sm bg-gradient-primary">
+            <h5 class="offcanvas-title fw-bold text-white poppins-font">Menu Navigasi</h5>
+            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body d-flex flex-column p-4 bg-white">
             <ul class="navbar-nav flex-grow-1 pe-3 mt-2">
@@ -118,61 +129,64 @@
                     </a>
                 </li>
             </ul>
-            
-            <div class="mt-auto pt-4 border-top">
-                <p class="text-muted fw-bold mb-3" style="font-size: 0.9rem;">Ikuti Sosial Media Kami:</p>
-                <div class="d-flex gap-3">
-                    <a href="https://instagram.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #E1306C;" title="Instagram"><i class="bi bi-instagram fs-4"></i></a>
-                    <a href="https://facebook.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #1877F2;" title="Facebook"><i class="bi bi-facebook fs-4"></i></a>
-                    <a href="https://youtube.com" target="_blank" class="text-decoration-none social-icon-btn" style="color: #FF0000;" title="YouTube"><i class="bi bi-youtube fs-4"></i></a>
-                </div>
-            </div>
         </div>
     </div>
 
-    <main class="container mt-4 mt-md-5 flex-grow-1 mb-5 pb-4">
-        <div class="text-center mb-4 px-2">
-            <h2 class="fw-bold fs-4 fs-md-3">Sistem Informasi Sengketa Komisi Informasi Aceh</h2>
+    <section class="hero-section text-center py-5 text-white position-relative bg-gradient-primary shadow-sm" style="overflow: hidden;">
+        <div class="container position-relative z-1 mt-2 mb-3 fade-in-up">
+            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.75rem, 4vw, 2.5rem);">Sistem Informasi Sengketa</h1>
+            <p class="text-white-50 mb-5 fs-6 fw-normal">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
-            <div class="row justify-content-center mt-4">
-                <div class="col-12 col-md-8 col-lg-6">
-                    <div class="input-group search-box-elegant shadow bg-white p-1">
-                        <input type="text" id="searchInput" class="form-control px-3" placeholder="Cari Pemohon / Termohon..." oninput="filterTable()">
-                        <button class="btn btn-primary rounded-pill px-3 px-md-4 fw-bold me-1" onclick="filterTable()"><i class="bi bi-search"></i></button>
-                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary" onclick="clearSearch()"><i class="bi bi-backspace-fill" style="color: red;"></i></button>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
+                        <select id="statusFilter" class="form-select border-0 bg-transparent text-secondary py-2 px-3" style="cursor: pointer; flex: 0 0 auto; width: auto;" onchange="filterTable()">
+                            <option value="">Semua Status</option>
+                            <option value="selesai">Selesai</option>
+                            <option value="dalam proses">Dalam Proses</option>
+                        </select>
+                        
+                        <div class="vr my-2 bg-secondary opacity-25"></div>
+                        
+                        <input type="text" id="searchInput" class="form-control border-0 px-3 bg-transparent py-2" placeholder="Cari Nama Pemohon atau Termohon..." oninput="filterTable()">
+                        
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold mx-1 shadow-sm d-flex align-items-center justify-content-center" onclick="filterTable()"><i class="bi bi-search me-1"></i> Cari</button>
+                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary shadow-sm" title="Hapus Pencarian" onclick="clearSearch()"><i class="bi bi-backspace-fill text-danger"></i></button>
                     </div>
                 </div>
             </div>
         </div>
-        
+    </section>
+
+    <main class="container mt-5 flex-grow-1 mb-5 pb-4">
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-muted fw-bold">Memuat data...</p>
+                <p class="mt-3 text-muted fw-bold poppins-font">Memuat Data Sengketa...</p>
             </div>
         </div>
     </main>
 
     <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed" 
-            style="bottom: 80px; right: 20px; width: 50px; height: 50px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0;" 
+            style="bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;" 
             onclick="scrollToTop()" title="Kembali ke Atas">
         <i class="bi bi-chevron-up fs-4 text-white"></i>
     </button>
 
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 shadow-sm z-1">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 z-1">
                     <button type="button" class="btn-close position-absolute end-0 top-0 mt-3 me-3 shadow-none" onclick="closeDetailModal()"></button>
                     <h5 class="modal-title fw-bold fs-5 text-center text-dark w-100" id="detailModalTitle">Detail Perkara</h5>
                     <div id="detailModalSubtitle" class="w-100"></div>
                 </div>
                 <div class="modal-body position-relative bg-light px-4 py-4">
                     <div id="detailLoading" style="display: none;" class="text-center py-5"><div class="spinner-border text-info" role="status"></div></div>
-                    <div id="detailContent"></div>
+                    <div id="detailContent" class="fade-in-up"></div>
                 </div>
-                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-white py-3 border-top shadow-sm" style="min-height: 65px;">
-                    <button type="button" class="btn btn-secondary px-5 rounded-pill fw-bold shadow-sm" onclick="closeDetailModal()">Tutup</button>
+                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 65px;">
+                    <button type="button" class="btn btn-secondary px-5 rounded-pill fw-bold shadow-sm" onclick="closeDetailModal()">Tutup Jendela</button>
                     <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;" id="modalLastUpdated">
                         DIPERBARUI: -
                     </div>
@@ -181,7 +195,47 @@
         </div>
     </div>
 
-    <footer class="footer-freeze">&copy; 2026 Komisi Informasi Aceh (KIACEH).</footer>
+    <footer class="bg-dark text-white pt-5 pb-3 mt-auto border-top border-5 border-info">
+        <div class="container fade-in-up">
+            <div class="row gy-4">
+                <div class="col-lg-5 col-md-12 pe-lg-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" style="width: 45px; margin-right: 15px;">
+                        <div>
+                            <h5 class="mb-0 fw-bold poppins-font">KIACEH</h5>
+                            <small class="text-white-50 fw-semibold" style="letter-spacing: 0.5px;">Komisi Informasi Aceh</small>
+                        </div>
+                    </div>
+                    <p class="text-white-50" style="font-size: 0.9rem; line-height: 1.6;">Menjamin keterbukaan informasi publik di Provinsi Aceh demi terwujudnya tata kelola pemerintahan yang baik, bersih, dan transparan.</p>
+                    <p class="text-white-50 mb-0" style="font-size: 0.85rem;"><i class="bi bi-geo-alt-fill text-info me-2 fs-6"></i>Kantor Komisi Informasi Aceh, Banda Aceh</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="fw-bold text-uppercase mb-4 poppins-font" style="letter-spacing: 1px; color: #0099ff;">Pusat Layanan</h6>
+                    <ul class="list-unstyled text-white-50" style="font-size: 0.9rem;">
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-clock-fill fs-5 me-3 text-info"></i> Senin - Jumat<br>08.00 - 16.30 WIB</li>
+                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-telephone-fill fs-5 me-3 text-info"></i> Layanan Pengaduan<br>(0651) 123456</li>
+                        <li class="mb-2 d-flex align-items-center"><i class="bi bi-envelope-at-fill fs-5 me-3 text-info"></i> sekretariat@kia.acehprov.go.id</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-uppercase mb-4 poppins-font" style="letter-spacing: 1px; color: #0099ff;">Tautan & Media</h6>
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <a href="https://kia.acehprov.go.id" target="_blank" class="text-white-50 text-decoration-none hover-info transition-hover"><i class="bi bi-chevron-right me-1 text-info" style="font-size: 0.7rem;"></i> Website Utama KI Aceh</a>
+                        <a href="login.html" class="text-white-50 text-decoration-none hover-info transition-hover"><i class="bi bi-chevron-right me-1 text-info" style="font-size: 0.7rem;"></i> Portal Admin Sengketa</a>
+                    </div>
+                    <div class="d-flex gap-3 mt-2">
+                        <a href="#" class="social-icon-btn"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="#" class="social-icon-btn"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="#" class="social-icon-btn"><i class="bi bi-youtube fs-5"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary mt-5 mb-3 opacity-25">
+            <div class="text-center text-white-50" style="font-size: 0.8rem;">
+                &copy; 2026 <strong>Komisi Informasi Aceh</strong>. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -191,7 +245,7 @@
             const container = document.getElementById('publicDataContainer');
             if (!container) return;
             try {
-                container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fw-bold">Memuat data...</p></div>';
+                container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-3 text-muted fw-bold poppins-font">Memuat Data Sengketa...</p></div>';
                 const response = await fetch('/api/data');
                 if (!response.ok) throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
                 const textData = await response.text();
@@ -199,7 +253,7 @@
                 try { data = JSON.parse(textData); } catch (e) { throw new Error("Format respons dari server tidak valid."); }
                 
                 if (!data || !data.perkara || data.perkara.length <= 1) { 
-                    container.innerHTML = '<div class="text-center py-5 bg-white rounded-3 shadow-sm"><p class="text-muted fw-bold mb-0">Belum ada data sengketa yang tersedia.</p></div>'; return; 
+                    container.innerHTML = '<div class="text-center py-5 bg-white rounded-4 shadow-sm fade-in-up border"><p class="text-muted fw-bold mb-0 poppins-font fs-5"><i class="bi bi-inbox me-2"></i> Belum ada data sengketa yang tersedia.</p></div>'; return; 
                 }
 
                 sheetHeadersPerkara = data.perkara[0] || []; perkaraData = data.perkara.slice(1) || []; 
@@ -207,39 +261,77 @@
                 updateData = (data.update && data.update.length > 1) ? data.update.slice(1) : [];
                 
                 const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
-                let tableHtml = `<div class="bg-white shadow-sm table-elegant-wrapper"><div class="table-responsive"><table class="table table-sm table-hover table-striped mb-0 align-middle"><thead class="table-dark text-nowrap"><tr>`;
+                
+                // UPDATE: Tabel Fade-In, Header Gradien & Kolom "No."
+                let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-hover mb-0 align-middle"><thead class="text-white poppins-font" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);"><tr>`;
+                
+                tableHtml += `<th class="py-3 px-4 text-center" style="width: 50px;">No.</th>`;
                 sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3">${h || '-'}</th>`; });
-                tableHtml += `<th class="py-3 px-3 text-center">Detail</th></tr></thead><tbody id="dataTable">`;
+                tableHtml += `<th class="py-3 px-4 text-center">Tindakan</th></tr></thead><tbody id="dataTable" class="border-top-0">`;
 
-                perkaraData.forEach(row => {
+                perkaraData.forEach((row, index) => {
                     if (!row || row.length === 0) return; 
                     tableHtml += `<tr>`;
-                    for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) tableHtml += `<td class="px-3 py-2 text-nowrap">${row[i] || '-'}</td>`; }
-                    tableHtml += `<td class="px-3 py-2 text-center"><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-1 px-3 rounded-pill" onclick="lihatDetail('${row[0] || ''}')">Lihat</button></td></tr>`;
+                    tableHtml += `<td class="px-4 py-3 text-center fw-bold text-secondary">${index + 1}</td>`;
+                    
+                    for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
+                        if(i !== skipIdx) {
+                            let cellData = row[i] || '-';
+                            // BONUS UI: Badge Status Otomatis di dalam tabel
+                            if (sheetHeadersPerkara[i].toLowerCase().includes('status sengketa')) {
+                                if (cellData.toLowerCase().includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
+                                else if (cellData.toLowerCase().includes('proses')) cellData = `<span class="badge bg-warning text-dark shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
+                            }
+                            tableHtml += `<td class="px-3 py-3 text-nowrap">${cellData}</td>`; 
+                        }
+                    }
+                    tableHtml += `<td class="px-4 py-3 text-center"><button class="btn btn-warning btn-sm text-dark fw-bold shadow-sm py-1 px-3 rounded-pill d-flex align-items-center justify-content-center mx-auto hover-lift" onclick="lihatDetail('${row[0] || ''}')"><i class="bi bi-eye-fill me-1"></i> Lihat</button></td></tr>`;
                 });
                 
                 tableHtml += `</tbody></table></div></div>`; container.innerHTML = tableHtml;
             } catch (error) { 
-                container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-3 bg-white shadow-sm"><h5 class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Gagal Memuat Data</h5><p class="text-muted mb-3">${error.message}</p><button class="btn btn-outline-danger btn-sm px-4 fw-bold rounded-pill" onclick="loadPublicData()">Coba Muat Ulang</button></div>`; 
+                container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-4 bg-white shadow-sm fade-in-up"><h5 class="text-danger fw-bold poppins-font"><i class="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i> Gagal Memuat Data</h5><p class="text-muted mb-4">${error.message}</p><button class="btn btn-outline-danger px-4 fw-bold rounded-pill shadow-sm" onclick="loadPublicData()">Coba Muat Ulang</button></div>`; 
             }
         }
 
+        // UPDATE: Filter berdasarkan Teks (Pencarian) DAN Status (Dropdown)
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
+            const statusVal = document.getElementById('statusFilter').value.toLowerCase();
             const rows = document.querySelectorAll('#dataTable tr');
+            
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+            const idxStatus = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
             
             rows.forEach(row => {
                 const cells = row.getElementsByTagName('td');
                 if(cells.length <= 1) return;
-                const pemohon = cells[idxPem > skipIdx ? idxPem - 1 : idxPem] ? cells[idxPem > skipIdx ? idxPem - 1 : idxPem].textContent.toLowerCase() : '';
-                const termohon = cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm] ? cells[idxTerm > skipIdx ? idxTerm - 1 : idxTerm].textContent.toLowerCase() : '';
-                row.style.display = (pemohon.includes(query) || termohon.includes(query)) ? '' : 'none';
+                
+                // Helper fungsi untuk mengambil teks, ditambah offset 1 karena ada kolom "No." di depan
+                const getCellText = (rawIdx) => {
+                    if (rawIdx === -1) return '';
+                    let actualIdx = rawIdx > skipIdx ? rawIdx - 1 : rawIdx;
+                    return cells[actualIdx + 1] ? cells[actualIdx + 1].textContent.toLowerCase() : '';
+                };
+
+                const pemohon = getCellText(idxPem);
+                const termohon = getCellText(idxTerm);
+                const status = getCellText(idxStatus);
+                
+                const matchText = pemohon.includes(query) || termohon.includes(query);
+                const matchStatus = statusVal === '' || status.includes(statusVal);
+                
+                row.style.display = (matchText && matchStatus) ? '' : 'none';
             });
         }
-        function clearSearch() { document.getElementById('searchInput').value = ''; filterTable(); }
+
+        function clearSearch() { 
+            document.getElementById('searchInput').value = ''; 
+            document.getElementById('statusFilter').value = ''; 
+            filterTable(); 
+        }
 
         function lihatDetail(id) {
             new bootstrap.Modal(document.getElementById('detailModal')).show();
@@ -284,14 +376,13 @@
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
                 
-                // UPDATE: Menyesuaikan warna teks Pemohon & Termohon agar menyatu indah dengan bg-info
-                const titleText = pRow ? `<span class="text-dark">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1">vs</span> <span class="text-dark">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
+                const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 document.getElementById('detailModalTitle').innerHTML = titleText;
                 
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-2 py-2"><i class="bi bi-hash text-muted"></i>Nomor Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-2 py-2"><i class="bi bi-calendar3 text-muted"></i> Tgl Reg: ${dataTglReg ? dataTglReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-hash text-muted"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-calendar3 text-muted"></i> Tgl: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
 
                 const col1Fields = ["status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
@@ -300,34 +391,30 @@
 
                 let htmlContent = '<div class="row align-items-stretch">';
 
-                let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column justify-content-center text-center py-4 px-3">`;
+                let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check text-info me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column justify-content-center text-center py-4 px-3">`;
                 col1Fields.forEach(f => {
                     const data = getField(f);
                     if(data) {
                         let displayVal = data.val;
                         if (f === 'status sengketa') {
                             const statusStr = displayVal.toLowerCase();
-                            if (statusStr.includes('selesai')) {
-                                displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            } else if (statusStr.includes('dalam proses')) {
-                                displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            } else if (displayVal !== '-') {
-                                displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            }
+                            if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                            else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                            else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                         }
                         htmlCol1 += `<div class="mb-3"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
                     }
                 });
                 htmlCol1 += `</div></div></div>`;
 
-                let htmlCol2 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-people me-2"></i>Perangkat Persidangan</div><div class="card-body d-flex flex-column justify-content text-center py-4 px-3">`;
+                let htmlCol2 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-people text-info me-2"></i>Perangkat Persidangan</div><div class="card-body d-flex flex-column justify-content-center text-center py-4 px-3">`;
                 col2Fields.forEach(f => {
                     const data = getField(f);
                     if(data) htmlCol2 += `<div class="mb-3"><div class="info-label">${data.label}</div><div class="info-value">${data.val}</div></div>`;
                 });
                 htmlCol2 += `</div></div></div>`;
 
-                let htmlCol3 = `<div class="col-lg-4 mb-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-file-earmark-text me-2"></i>Rincian Sengketa</div><div class="card-body card-rincian py-4 px-4">`;
+                let htmlCol3 = `<div class="col-lg-4 mb-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-file-earmark-text text-info me-2"></i>Rincian Sengketa</div><div class="card-body card-rincian py-4 px-4">`;
                 let foundCol3 = false;
                 col3Fields.forEach(f => {
                     const data = getField(f);
@@ -356,7 +443,7 @@
 
         const btnScrollTop = document.getElementById('btnScrollTop');
         window.addEventListener('scroll', () => {
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) btnScrollTop.style.display = "flex";
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) btnScrollTop.style.display = "flex";
             else btnScrollTop.style.display = "none";
         });
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
