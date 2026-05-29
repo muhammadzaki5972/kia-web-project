@@ -14,14 +14,41 @@
     <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* Tipografi Baru */
+        /* Tipografi & Dasar */
         body { font-family: 'Inter', sans-serif; background-color: #f4f7f6 !important; }
         h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .hero-title, .poppins-font { font-family: 'Poppins', sans-serif; }
 
-        /* Search Box Premium dengan Filter */
+        /* UPDATE: Animasi Loop Gradient */
+        @keyframes gradientLoop {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-animated-gradient {
+            background: linear-gradient(-45deg, #001f42, #002b5e, #007acc, #0059b3);
+            background-size: 400% 400%;
+            animation: gradientLoop 12s ease infinite;
+        }
+
+        /* UPDATE: Garis Pembatas Animasi di Header */
+        .animated-header-border {
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(90deg, #0099ff, #00ffcc, #ff007f, #0099ff);
+            background-size: 300% 100%;
+            animation: borderMove 4s linear infinite;
+        }
+        @keyframes borderMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 300% 0%; }
+        }
+
+        /* Search Box Premium & Filter Select */
         .search-box-elegant { border-radius: 3rem; overflow: hidden; padding: 0.35rem; }
-        .search-box-elegant input, .search-box-elegant select { box-shadow: none !important; font-size: 0.95rem; }
-        .search-box-elegant select { font-weight: 700; }
+        .search-box-elegant input { box-shadow: none !important; font-size: 0.95rem; }
+        
+        /* UPDATE: Mengecilkan tulisan pada filter select */
+        .search-box-elegant select { font-size: 0.85rem; font-weight: 600; box-shadow: none !important; color: #495057; }
         
         /* Tabel & Hover Effects */
         .table-elegant-wrapper {
@@ -61,39 +88,48 @@
         
         .social-icon-btn {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); transition: all 0.3s ease; color: white;
+            width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: all 0.3s ease; color: white; font-size: 0.9rem;
         }
-        .social-icon-btn:hover { transform: translateY(-4px); background: white; color: #0099ff !important; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .social-icon-btn:hover { transform: translateY(-3px); background: white; color: #0099ff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* --- Tipografi Modal --- */
+        /* Tipografi Modal & Rincian */
         .info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; font-weight: 700; margin-bottom: 0.3rem; }
         .info-value { font-size: 0.95rem; color: #1a1d20; font-weight: 600; }
-        .fs-7 { font-size: 0.85rem !important; }
+        .fs-7 { font-size: 0.8rem !important; }
         .card-rincian { max-height: 480px; overflow-y: auto; }
 
+        /* UPDATE: Penyesuaian Komponen Khusus Tampilan Mobile (HP) */
         @media (max-width: 991.98px) {
             .card-rincian { max-height: none; overflow-y: visible; }
-            .modal-body { padding: 1rem !important; }
-            .search-box-elegant { flex-direction: column; border-radius: 1rem; padding: 0.8rem; gap: 0.5rem; }
+            .modal-body { padding: 1.25rem 0.75rem !important; }
+            
+            /* Form input pencarian bertumpuk rapi di HP */
+            .search-box-elegant { flex-direction: column; border-radius: 1.25rem; padding: 0.75rem; gap: 0.4rem; }
             .search-box-elegant .vr { display: none; }
-            .search-box-elegant select, .search-box-elegant input { border-radius: 0.5rem !important; background: #f8f9fa !important; padding: 0.75rem 1rem !important;}
-            .search-box-elegant button { width: 100%; margin: 0.2rem 0 !important; }
+            .search-box-elegant select, .search-box-elegant input { 
+                border-radius: 0.75rem !important; 
+                background-color: #f1f3f5 !important; 
+                padding: 0.65rem 1rem !important;
+                width: 100% !important;
+            }
+            .search-box-elegant button { width: 100%; margin: 0.1rem 0 !important; padding: 0.65rem !important; border-radius: 0.75rem !important; }
+            
+            .hero-section { padding-top: 3.5rem !important; padding-bottom: 3.5rem !important; }
+            .footer-col-section { text-align: center; }
+            .footer-col-section ul li { justify-content: center; text-align: center; }
         }
 
         /* Micro-Interactions: Animasi Fade-In-Up */
-        .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(25px); }
+        .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        
-        /* Gradient khusus untuk header tabel */
-        .bg-gradient-primary { background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%); }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     
-    <nav class="navbar navbar-dark shadow-sm py-3 sticky-top bg-gradient-primary">
+    <nav class="navbar navbar-dark shadow-sm py-3 sticky-top bg-animated-gradient">
         <div class="container d-flex flex-wrap justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
-                <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 40px; height: auto; margin-right: 12px;">
+                <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 38px; height: auto; margin-right: 12px;">
                 <div class="d-flex flex-column lh-1">
                     <span class="fs-5 fs-md-4 fw-bold text-white">KIACEH</span>
                     <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
@@ -111,8 +147,10 @@
         </div>
     </nav>
 
+    <div class="animated-header-border"></div>
+
     <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas">
-        <div class="offcanvas-header shadow-sm bg-gradient-primary">
+        <div class="offcanvas-header shadow-sm bg-animated-gradient">
             <h5 class="offcanvas-title fw-bold text-white poppins-font">Menu Navigasi</h5>
             <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas"></button>
         </div>
@@ -132,15 +170,15 @@
         </div>
     </div>
 
-    <section class="hero-section text-center py-5 text-white position-relative bg-gradient-primary shadow-sm" style="overflow: hidden;">
-        <div class="container position-relative z-1 mt-2 mb-3 fade-in-up">
-            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.75rem, 4vw, 2.5rem);">Sistem Informasi Sengketa</h1>
-            <p class="text-white-50 mb-5 fs-6 fw-normal">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
+    <section class="hero-section text-center py-5 text-white position-relative bg-animated-gradient shadow-sm">
+        <div class="container position-relative z-1 mt-1 mb-2 fade-in-up">
+            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.6rem, 4vw, 2.3rem);">Sistem Informasi Sengketa</h1>
+            <p class="text-white-50 mb-4 fs-6 fw-normal px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
-            <div class="row justify-content-center">
+            <div class="row justify-content-center px-2">
                 <div class="col-12 col-md-10 col-lg-8">
                     <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
-                        <select id="statusFilter" class="form-select border-0 bg-transparent text-secondary py-2 px-3" style="cursor: pointer; flex: 0 0 auto; width: auto;" onchange="filterTable()">
+                        <select id="statusFilter" class="form-select border-0 bg-transparent py-2 px-3" style="cursor: pointer; flex: 0 0 auto; width: auto;" onchange="filterTable()">
                             <option value="">Semua Status</option>
                             <option value="selesai">Selesai</option>
                             <option value="dalam proses">Dalam Proses</option>
@@ -148,7 +186,7 @@
                         
                         <div class="vr my-2 bg-secondary opacity-25"></div>
                         
-                        <input type="text" id="searchInput" class="form-control border-0 px-3 bg-transparent py-2" placeholder="Cari Nama Pemohon atau Termohon..." oninput="filterTable()">
+                        <input type="text" id="searchInput" class="form-control border-0 px-3 bg-transparent py-2" placeholder="Cari nama pemohon / termohon..." oninput="filterTable()">
                         
                         <button class="btn btn-primary rounded-pill px-4 fw-bold mx-1 shadow-sm d-flex align-items-center justify-content-center" onclick="filterTable()"><i class="bi bi-search me-1"></i> Cari</button>
                         <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary shadow-sm" title="Hapus Pencarian" onclick="clearSearch()"><i class="bi bi-backspace-fill text-danger"></i></button>
@@ -158,7 +196,7 @@
         </div>
     </section>
 
-    <main class="container mt-5 flex-grow-1 mb-5 pb-4">
+    <main class="container mt-4 mt-md-5 flex-grow-1 mb-5 pb-3">
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -168,7 +206,7 @@
     </main>
 
     <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed" 
-            style="bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;" 
+            style="bottom: 25px; right: 25px; width: 46px; height: 46px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;" 
             onclick="scrollToTop()" title="Kembali ke Atas">
         <i class="bi bi-chevron-up fs-4 text-white"></i>
     </button>
@@ -181,12 +219,12 @@
                     <h5 class="modal-title fw-bold fs-5 text-center text-dark w-100" id="detailModalTitle">Detail Perkara</h5>
                     <div id="detailModalSubtitle" class="w-100"></div>
                 </div>
-                <div class="modal-body position-relative bg-light px-4 py-4">
+                <div class="modal-body position-relative bg-light px-3 px-md-4 py-4">
                     <div id="detailLoading" style="display: none;" class="text-center py-5"><div class="spinner-border text-info" role="status"></div></div>
                     <div id="detailContent" class="fade-in-up"></div>
                 </div>
-                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 65px;">
-                    <button type="button" class="btn btn-secondary px-5 rounded-pill fw-bold shadow-sm" onclick="closeDetailModal()">Tutup Jendela</button>
+                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 60px;">
+                    <button type="button" class="btn btn-secondary btn-sm px-5 rounded-pill fw-bold shadow-sm" onclick="closeDetailModal()">Tutup</button>
                     <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;" id="modalLastUpdated">
                         DIPERBARUI: -
                     </div>
@@ -195,43 +233,41 @@
         </div>
     </div>
 
-    <footer class="bg-dark text-white pt-5 pb-3 mt-auto border-top border-5 border-info">
-        <div class="container fade-in-up">
-            <div class="row gy-4">
-                <div class="col-lg-5 col-md-12 pe-lg-5">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" style="width: 45px; margin-right: 15px;">
+    <footer class="bg-dark text-white pt-4 pb-3 mt-auto border-top border-4 border-info">
+        <div class="container fade-in-up" style="font-size: 0.82rem;">
+            <div class="row gy-3 footer-col-section">
+                <div class="col-lg-5 col-md-12">
+                    <div class="d-flex align-items-center mb-2 justify-content-center justify-content-lg-start">
+                        <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" style="width: 30px; margin-right: 12px;">
                         <div>
-                            <h5 class="mb-0 fw-bold poppins-font">KIACEH</h5>
-                            <small class="text-white-50 fw-semibold" style="letter-spacing: 0.5px;">Komisi Informasi Aceh</small>
+                            <h6 class="mb-0 fw-bold poppins-font text-white" style="font-size: 0.95rem;">KIACEH</h6>
+                            <span class="text-white-50 fw-semibold d-block" style="font-size: 0.68rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
                         </div>
                     </div>
-                    <p class="text-white-50" style="font-size: 0.9rem; line-height: 1.6;">Menjamin keterbukaan informasi publik di Provinsi Aceh demi terwujudnya tata kelola pemerintahan yang baik, bersih, dan transparan.</p>
-                    <p class="text-white-50 mb-0" style="font-size: 0.85rem;"><i class="bi bi-geo-alt-fill text-info me-2 fs-6"></i>Kantor Komisi Informasi Aceh, Banda Aceh</p>
+                    <p class="text-white-50 mb-2 lh-base px-1 px-lg-0">Portal Transparansi Penyelesaian Sengketa Informasi Publik di Provinsi Aceh demi tata kelola pemerintahan yang bersih.</p>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <h6 class="fw-bold text-uppercase mb-4 poppins-font" style="letter-spacing: 1px; color: #0099ff;">Pusat Layanan</h6>
-                    <ul class="list-unstyled text-white-50" style="font-size: 0.9rem;">
-                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-clock-fill fs-5 me-3 text-info"></i> Senin - Jumat<br>08.00 - 16.30 WIB</li>
-                        <li class="mb-3 d-flex align-items-center"><i class="bi bi-telephone-fill fs-5 me-3 text-info"></i> Layanan Pengaduan<br>(0651) 123456</li>
-                        <li class="mb-2 d-flex align-items-center"><i class="bi bi-envelope-at-fill fs-5 me-3 text-info"></i> sekretariat@kia.acehprov.go.id</li>
+                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info" style="letter-spacing: 0.5px; font-size: 0.85rem;">Kontak Layanan</h6>
+                    <ul class="list-unstyled text-white-50 lh-base mb-0">
+                        <li class="mb-1"><i class="bi bi-clock text-info me-2"></i>Senin - Jumat | 08.00 - 16.30 WIB</li>
+                        <li class="mb-1"><i class="bi bi-telephone text-info me-2"></i>(0651) 123456</li>
+                        <li><i class="bi bi-envelope text-info me-2"></i>sekretariat@kia.acehprov.go.id</li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="fw-bold text-uppercase mb-4 poppins-font" style="letter-spacing: 1px; color: #0099ff;">Tautan & Media</h6>
-                    <div class="d-flex flex-column gap-2 mb-4">
-                        <a href="https://kia.acehprov.go.id" target="_blank" class="text-white-50 text-decoration-none hover-info transition-hover"><i class="bi bi-chevron-right me-1 text-info" style="font-size: 0.7rem;"></i> Website Utama KI Aceh</a>
-                        <a href="login.html" class="text-white-50 text-decoration-none hover-info transition-hover"><i class="bi bi-chevron-right me-1 text-info" style="font-size: 0.7rem;"></i> Portal Admin Sengketa</a>
+                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info" style="letter-spacing: 0.5px; font-size: 0.85rem;">Tautan Resmi</h6>
+                    <div class="d-flex flex-column gap-1 mb-2">
+                        <a href="https://kia.acehprov.go.id" target="_blank" class="text-white-50 text-decoration-none transition-hover"><i class="bi bi-link-45deg text-info me-1"></i>Website Utama KI Aceh</a>
                     </div>
-                    <div class="d-flex gap-3 mt-2">
-                        <a href="#" class="social-icon-btn"><i class="bi bi-instagram fs-5"></i></a>
-                        <a href="#" class="social-icon-btn"><i class="bi bi-facebook fs-5"></i></a>
-                        <a href="#" class="social-icon-btn"><i class="bi bi-youtube fs-5"></i></a>
+                    <div class="d-flex gap-2 justify-content-center justify-content-lg-start mt-2">
+                        <a href="#" class="social-icon-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-icon-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon-btn"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
             </div>
-            <hr class="border-secondary mt-5 mb-3 opacity-25">
-            <div class="text-center text-white-50" style="font-size: 0.8rem;">
+            <hr class="border-secondary mt-3 mb-2 opacity-25">
+            <div class="text-center text-white-50 fw-normal" style="font-size: 0.75rem;">
                 &copy; 2026 <strong>Komisi Informasi Aceh</strong>. Hak Cipta Dilindungi.
             </div>
         </div>
@@ -262,8 +298,7 @@
                 
                 const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
                 
-                // UPDATE: Tabel Fade-In, Header Gradien & Kolom "No."
-                let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-hover mb-0 align-middle"><thead class="text-white poppins-font" style="background: linear-gradient(135deg, #002b5e 0%, #0099ff 100%);"><tr>`;
+                let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-hover mb-0 align-middle"><thead class="text-white poppins-font bg-animated-gradient"><tr>`;
                 
                 tableHtml += `<th class="py-3 px-4 text-center" style="width: 50px;">No.</th>`;
                 sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3">${h || '-'}</th>`; });
@@ -277,7 +312,6 @@
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
                         if(i !== skipIdx) {
                             let cellData = row[i] || '-';
-                            // BONUS UI: Badge Status Otomatis di dalam tabel
                             if (sheetHeadersPerkara[i].toLowerCase().includes('status sengketa')) {
                                 if (cellData.toLowerCase().includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
                                 else if (cellData.toLowerCase().includes('proses')) cellData = `<span class="badge bg-warning text-dark shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
@@ -294,7 +328,6 @@
             }
         }
 
-        // UPDATE: Filter berdasarkan Teks (Pencarian) DAN Status (Dropdown)
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const statusVal = document.getElementById('statusFilter').value.toLowerCase();
@@ -309,7 +342,6 @@
                 const cells = row.getElementsByTagName('td');
                 if(cells.length <= 1) return;
                 
-                // Helper fungsi untuk mengambil teks, ditambah offset 1 karena ada kolom "No." di depan
                 const getCellText = (rawIdx) => {
                     if (rawIdx === -1) return '';
                     let actualIdx = rawIdx > skipIdx ? rawIdx - 1 : rawIdx;
@@ -379,8 +411,9 @@
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 document.getElementById('detailModalTitle').innerHTML = titleText;
                 
+                // UPDATE UX Mobile: Menjamin keselarasan pembungkus badge (flex-wrap) di layar HP
                 document.getElementById('detailModalSubtitle').innerHTML = `
-                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-3 px-2">
                         <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-hash text-muted"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
                         <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-calendar3 text-muted"></i> Tgl: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
