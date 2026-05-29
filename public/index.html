@@ -46,7 +46,17 @@
         /* Search Box Premium & Filter Select */
         .search-box-elegant { border-radius: 3rem; overflow: hidden; padding: 0.35rem; }
         .search-box-elegant input { box-shadow: none !important; font-size: 0.95rem; }
-        .search-box-elegant select { font-size: 0.85rem; font-weight: 600; box-shadow: none !important; color: #495057; }
+        
+        /* UPDATE: Teks dropdown diperkecil dan jarak (padding-right) dilebarkan agar tidak menimpa panah */
+        .search-box-elegant select { 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            box-shadow: none !important; 
+            color: #495057; 
+            padding-right: 2.5rem !important; 
+            width: 160px; /* Jatah ruang cukup di layar laptop */
+            cursor: pointer;
+        }
         
         /* Tabel & Hover Effects */
         .table-elegant-wrapper {
@@ -109,20 +119,42 @@
         .fs-7 { font-size: 0.8rem !important; }
         .card-rincian { max-height: 480px; overflow-y: auto; }
 
-        /* Penyesuaian Komponen Khusus Tampilan Mobile (HP) */
+        /* UPDATE: Penyesuaian UI Khusus Tampilan Mobile (HP) */
         @media (max-width: 991.98px) {
             .card-rincian { max-height: none; overflow-y: visible; }
             .modal-body { padding: 1.25rem 0.75rem !important; }
             
-            .search-box-elegant { flex-direction: column; border-radius: 1.25rem; padding: 0.75rem; gap: 0.4rem; }
+            /* UI kotak pencarian dibuat terpisah dan melayang untuk layar sentuh HP */
+            .search-box-elegant { 
+                flex-direction: column; 
+                background: transparent !important; 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                gap: 0.6rem; 
+            }
             .search-box-elegant .vr { display: none; }
             .search-box-elegant select, .search-box-elegant input { 
-                border-radius: 0.75rem !important; 
-                background-color: #f1f3f5 !important; 
-                padding: 0.65rem 1rem !important;
+                border-radius: 1rem !important; 
+                background-color: #ffffff !important; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+                padding: 0.8rem 1.2rem !important;
                 width: 100% !important;
             }
-            .search-box-elegant button { width: 100%; margin: 0.1rem 0 !important; padding: 0.65rem !important; border-radius: 0.75rem !important; }
+            .search-box-elegant .btn-primary { 
+                width: 100%; 
+                margin: 0 !important; 
+                padding: 0.8rem !important; 
+                border-radius: 1rem !important;
+                box-shadow: 0 4px 15px rgba(0,153,255,0.3) !important;
+            }
+            .search-box-elegant .btn-light { 
+                width: 100%; 
+                margin: 0 !important; 
+                padding: 0.6rem !important; 
+                border-radius: 1rem !important;
+                background-color: white !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+            }
             
             .hero-section { padding-top: 3.5rem !important; padding-bottom: 3.5rem !important; }
             .footer-col-section { text-align: center; }
@@ -147,8 +179,7 @@
                     </div>
                 </a>
                 
-                <div class="d-flex align-items-center gap-2 gap-md-3">
-                    <a href="login.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold px-3 px-md-4 rounded-pill shadow-sm">Login</a>
+                <div class="d-flex align-items-center gap-2">
                     <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas">
                         <div class="animated-icon" id="navIcon">
                             <span></span><span></span><span></span>
@@ -167,6 +198,11 @@
         </div>
         <div class="offcanvas-body d-flex flex-column p-4 bg-white">
             <ul class="navbar-nav flex-grow-1 pe-3 mt-2">
+                <li class="nav-item mb-4 mt-1 px-1 border-bottom pb-4">
+                    <a href="login.html" target="_blank" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); border: none;">
+                        <i class="bi bi-box-arrow-in-right me-2 fs-5"></i> Login Admin
+                    </a>
+                </li>
                 <li class="nav-item mb-2">
                     <a class="nav-link text-dark fw-bold fs-6 d-flex align-items-center offcanvas-menu-link" href="index.html">
                         <i class="bi bi-house-door-fill me-3 fs-4" style="color: #0099ff;"></i> Beranda
@@ -189,7 +225,7 @@
             <div class="row justify-content-center px-2">
                 <div class="col-12 col-md-10 col-lg-8">
                     <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
-                        <select id="statusFilter" class="form-select border-0 bg-transparent py-2 px-3" style="cursor: pointer; flex: 0 0 auto; width: auto;" onchange="filterTable()">
+                        <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-5" style="cursor: pointer; flex: 0 0 auto;" onchange="filterTable()">
                             <option value="">Semua Status</option>
                             <option value="selesai">Selesai</option>
                             <option value="dalam proses">Dalam Proses</option>
@@ -321,31 +357,27 @@
             }
         }
 
-        // PERBAIKAN: Deklarasi global di fungsi agar tidak scope error
         function renderTable() {
             const container = document.getElementById('publicDataContainer');
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
             
-            // Menggunakan table-bordered untuk garis pembatas tiap kolom sel
             let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-bordered table-hover mb-0 align-middle"><thead class="table-soft-header poppins-font"><tr>`;
             
             tableHtml += `<th class="py-3 px-3 text-center align-middle" style="width: 50px;">No.</th>`;
             sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
 
-            // DEKLARASIKAN VARIABEL DI SINI MENGHINDARI ERROR UNDEFINED
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
 
             if (filteredData.length === 0) {
                 tableHtml += `<tr><td colspan="${sheetHeadersPerkara.length + 1}" class="text-center py-5 text-muted fw-bold"><i class="bi bi-search fs-3 d-block mb-2 text-secondary"></i>Tidak ada data yang sesuai dengan pencarian.</td></tr>`;
             } else {
-                // Algoritma Pemotongan Data per Halaman (15 Baris)
                 const pageData = filteredData.slice(startIndex, endIndex);
 
                 pageData.forEach((row, index) => {
                     if (!row || row.length === 0) return; 
-                    const absoluteIndex = startIndex + index + 1; // Menjaga urutan nomor asli hasil filter
+                    const absoluteIndex = startIndex + index + 1; 
                     tableHtml += `<tr>`;
                     tableHtml += `<td class="px-3 py-3 text-center fw-bold text-secondary">${absoluteIndex}</td>`;
                     
@@ -365,7 +397,6 @@
             
             tableHtml += `</tbody></table></div></div>`;
 
-            // Membuat Navigasi Pagination
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
             if (totalPages > 1) {
                 tableHtml += `
@@ -379,7 +410,6 @@
                                 <a class="page-link fw-bold px-3 py-2" href="javascript:void(0)" onclick="changePage(${currentPage - 1})">Sebelumnya</a>
                             </li>`;
 
-                // Logika pembatasan tombol halaman agar tidak meluap di HP (Max 5 kotak)
                 let startPage = Math.max(1, currentPage - 2);
                 let endPage = Math.min(totalPages, startPage + 4);
                 if (endPage - startPage < 4) { startPage = Math.max(1, endPage - 4); }
@@ -401,14 +431,12 @@
             container.innerHTML = tableHtml;
         }
 
-        // Fungsi berpindah halaman
         function changePage(page) {
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
             
-            // Gulung otomatis ke bagian atas tabel agar pengguna fokus ke data baru
             const searchBox = document.getElementById('publicDataContainer');
             if (searchBox) {
                 const y = searchBox.getBoundingClientRect().top + window.pageYOffset - 120;
@@ -416,7 +444,7 @@
             }
         }
 
-        // Fungsi penyaringan (pencarian teks dan status) pada array data mentah
+        // UPDATE: Algoritma Pencarian & Filter Dropdown (Telah dibersihkan dari fungsi duplikat)
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const statusVal = document.getElementById('statusFilter').value.toLowerCase();
@@ -426,7 +454,7 @@
             const idxStatus = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
 
             filteredData = perkaraData.filter(row => {
-                const getCellText = (idx) => (idx !== -1 && row[idx]) ? row[idx].toLowerCase() : '';
+                const getCellText = (idx) => (idx !== -1 && row[idx]) ? (`${row[idx]}`).toLowerCase() : '';
 
                 const pemohon = getCellText(idxPem);
                 const termohon = getCellText(idxTerm);
@@ -438,7 +466,6 @@
                 return matchText && matchStatus;
             });
 
-            // Reset ke halaman pertama setiap kali melakukan pencarian
             currentPage = 1;
             renderTable();
         }
