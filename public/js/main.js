@@ -268,7 +268,7 @@ function lihatDetail(id) {
             latestUpdatedDate = updateData[pRowIndex][0];
         }
         if (document.getElementById('modalLastUpdated')) {
-            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestUpdatedDate;
+            document.getElementById('modalLastUpdated').innerText = "Diperbarui tanggal: " + latestUpdatedDate;
         }
 
         const idxPermohonan = sheetHeadersDetail.findIndex(h => (`${h}`).toLowerCase().trim() === 'isi permohonan');
