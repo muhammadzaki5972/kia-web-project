@@ -211,7 +211,6 @@
         }
         function clearSearch() { document.getElementById('searchInput').value = ''; filterTable(); }
 
-        // UPDATE: Logika Pembuatan Modal 3 Kolom
         function lihatDetail(id) {
             new bootstrap.Modal(document.getElementById('detailModal')).show();
             document.getElementById('detailLoading').style.display = 'block'; document.getElementById('detailContent').innerHTML = '';
@@ -223,12 +222,16 @@
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 
-                // Helper pencarian kolom
+                // Helper pencarian kolom yang sudah disempurnakan (Perbaikan Tgl Register)
                 const getField = (f) => {
                     let fieldVal = '-', labelText = f;
                     const findIdx = (headers) => headers.findIndex(h => { 
                         const val = (`${h}`).toLowerCase().trim(); 
-                        return val === f || (f === 'sidang terakhir' && val === 'sidang') || (f === 'no reg' && val === 'rincian informasi') || (f === 'isi permohonan' && val === 'rincian permohonan'); 
+                        return val === f || 
+                               (f === 'sidang terakhir' && val === 'sidang') || 
+                               (f === 'no reg' && val === 'rincian informasi') || 
+                               (f === 'isi permohonan' && val === 'rincian permohonan') ||
+                               (f === 'tgl register' && val === 'tanggal register'); // <-- Perbaikan deteksi
                     });
 
                     let idx = findIdx(detailHeaders);
@@ -237,7 +240,8 @@
 
                     if(idx !== -1) {
                         if(f === 'no reg') labelText = 'No Register'; 
-                        if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
+                        if(f === 'tgl register') labelText = 'Tgl Register';
+                        
                         if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
@@ -247,38 +251,52 @@
                     return null;
                 };
 
-                // Susun Judul dan Selamatkan data "No Reg & Tgl Register" di bawah judul
+                // Susun Judul dan data "No Reg & Tgl Register" yang sudah sinkron
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
                 const titleText = pRow ? `${pRow[getIndexPem] || 'Pemohon'} <span class="text-danger">vs</span> ${pRow[getIndexTerm] || 'Termohon'}` : 'Detail Perkara';
-                const subTitleText = `<br><span class="badge bg-secondary mt-2 fs-6 fw-normal shadow-sm">No Reg: ${dataNoReg ? dataNoReg.val : '-'} | Tgl Register: ${dataTglReg ? dataTglReg.val : '-'}</span>`;
+                const subTitleText = `<br><span class="badge bg-secondary mt-2 fs-6 fw-normal shadow-sm">No Reg: ${dataNoReg ? dataNoReg.val : '-'} &nbsp;|&nbsp; Tgl Register: ${dataTglReg ? dataTglReg.val : '-'}</span>`;
                 document.getElementById('detailModalTitle').innerHTML = titleText + subTitleText;
 
-                // Definisi 3 Bagian Sesuai Permintaan
                 const col1Fields = ["status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
                 const col2Fields = ["ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti"];
                 const col3Fields = ["isu sengketa", "isi permohonan"];
 
-                // Mulai HTML dengan Row align-items-stretch agar tinggi tiap kolom otomatis sama
                 let htmlContent = '<div class="row align-items-stretch">';
 
-                // Bagian 1 (Kiri) - Agenda & Jadwal (Text Center & Middle Align)
+                // Bagian 1 (Kiri) - Agenda & Jadwal (Text Center & Visualisasi Status Sengketa)
                 let htmlCol1 = `<div class="col-lg-4 mb-3 mb-lg-0"><div class="card shadow-sm border-0 rounded-3 h-100"><div class="card-header bg-white border-bottom fw-bold text-center" style="color: #002b5e; font-size: 0.95rem;">Agenda & Jadwal</div><div class="card-body d-flex flex-column justify-content-center text-center py-4">`;
                 col1Fields.forEach(f => {
                     const data = getField(f);
-                    if(data) htmlCol1 += `<div class="mb-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${data.label}</div><div class="text-dark" style="font-size: 0.9rem;">${data.val}</div></div>`;
+                    if(data) {
+                        let displayVal = data.val;
+                        
+                        // Perbaikan UI: Pewarnaan khusus untuk Status Sengketa
+                        if (f === 'status sengketa') {
+                            const statusStr = displayVal.toLowerCase();
+                            if (statusStr.includes('selesai')) {
+                                displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 fs-6 rounded-pill">${displayVal}</span>`;
+                            } else if (statusStr.includes('dalam proses')) {
+                                displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 fs-6 rounded-pill">${displayVal}</span>`;
+                            } else if (displayVal !== '-') {
+                                displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 fs-6 rounded-pill">${displayVal}</span>`;
+                            }
+                        }
+
+                        htmlCol1 += `<div class="mb-3"><div class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">${data.label}</div><div class="text-dark" style="font-size: 0.9rem;">${displayVal}</div></div>`;
+                    }
                 });
                 htmlCol1 += `</div></div></div>`;
 
-                // Bagian 2 (Tengah) - Perangkat Persidangan (Text Center & Middle Align)
+                // Bagian 2 (Tengah) - Perangkat Persidangan
                 let htmlCol2 = `<div class="col-lg-4 mb-3 mb-lg-0"><div class="card shadow-sm border-0 rounded-3 h-100"><div class="card-header bg-white border-bottom fw-bold text-center" style="color: #002b5e; font-size: 0.95rem;">Perangkat Persidangan</div><div class="card-body d-flex flex-column justify-content-center text-center py-4">`;
                 col2Fields.forEach(f => {
                     const data = getField(f);
-                    if(data) htmlCol2 += `<div class="mb-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${data.label}</div><div class="text-dark" style="font-size: 0.9rem;">${data.val}</div></div>`;
+                    if(data) htmlCol2 += `<div class="mb-3"><div class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">${data.label}</div><div class="text-dark" style="font-size: 0.9rem;">${data.val}</div></div>`;
                 });
                 htmlCol2 += `</div></div></div>`;
 
-                // Bagian 3 (Kanan) - Rincian Sengketa (Rata Kiri + Scrollable karena isi teks bisa paragraf)
+                // Bagian 3 (Kanan) - Rincian Sengketa
                 let htmlCol3 = `<div class="col-lg-4 mb-3 mb-lg-0"><div class="card shadow-sm border-0 rounded-3 h-100"><div class="card-header bg-white border-bottom fw-bold text-center" style="color: #002b5e; font-size: 0.95rem;">Rincian Sengketa</div><div class="card-body py-4" style="max-height: 480px; overflow-y: auto;">`;
                 let foundCol3 = false;
                 col3Fields.forEach(f => {
@@ -291,7 +309,7 @@
                 if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-5" style="font-size: 0.9rem;">Belum ada rincian data</div>`;
                 htmlCol3 += `</div></div></div>`;
 
-                // Gabungkan 3 bagian kolom
+                // Gabungkan
                 htmlContent += htmlCol1 + htmlCol2 + htmlCol3 + '</div>';
 
                 const pRowIndex = perkaraData.findIndex(r => r[0] === id);
