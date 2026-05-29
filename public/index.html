@@ -52,7 +52,7 @@
         .table-elegant-wrapper {
             border-radius: 0.75rem;
             overflow: hidden; 
-            border: 1px solid #dee2e6; /* Border pembungkus luar */
+            border: 1px solid #dee2e6;
             background: white;
         }
         .table-responsive::-webkit-scrollbar { height: 8px; }
@@ -63,7 +63,7 @@
         tbody tr { transition: all 0.25s ease; cursor: default; }
         tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.06); background-color: #ffffff !important; z-index: 10; position: relative; }
 
-        /* UPDATE: Soft Header Tabel Custom */
+        /* Soft Header Tabel Custom */
         .table-soft-header th {
             background-color: #f0f7ff !important;
             color: #002b5e !important;
@@ -71,7 +71,7 @@
             border-bottom: 2px solid #b8daff !important;
         }
 
-        /* UPDATE: Kustomisasi Warna Pagination */
+        /* Kustomisasi Warna Pagination */
         .pagination .page-link { color: #002b5e; border-color: #dee2e6; }
         .pagination .page-item.active .page-link { background-color: #0099ff; border-color: #0099ff; color: white; }
         .pagination .page-item.disabled .page-link { color: #8e9ca9; background-color: #f8f9fa; }
@@ -321,7 +321,7 @@
             }
         }
 
-        // UPDATE 2, 3 & 4: Rendering Tabel dengan Soft Header, Garis Perkolom, dan Pagination (Max 15)
+        // PERBAIKAN: Deklarasi global di fungsi agar tidak scope error
         function renderTable() {
             const container = document.getElementById('publicDataContainer');
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
@@ -333,12 +333,14 @@
             sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
 
+            // DEKLARASIKAN VARIABEL DI SINI MENGHINDARI ERROR UNDEFINED
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+
             if (filteredData.length === 0) {
                 tableHtml += `<tr><td colspan="${sheetHeadersPerkara.length + 1}" class="text-center py-5 text-muted fw-bold"><i class="bi bi-search fs-3 d-block mb-2 text-secondary"></i>Tidak ada data yang sesuai dengan pencarian.</td></tr>`;
             } else {
                 // Algoritma Pemotongan Data per Halaman (15 Baris)
-                const startIndex = (currentPage - 1) * rowsPerPage;
-                const endIndex = startIndex + rowsPerPage;
                 const pageData = filteredData.slice(startIndex, endIndex);
 
                 pageData.forEach((row, index) => {
