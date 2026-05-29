@@ -15,6 +15,53 @@ function parseDate(dateStr) {
     return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : '';
 }
 
+// UPDATE: Fungsi untuk mengontrol Dropdown Isu Sengketa & Input Manual (Other)
+window.toggleIsuLainnya = (id) => {
+    const selectEl = document.getElementById(`${id}_select`);
+    const otherEl = document.getElementById(`${id}_other`);
+    const hiddenEl = document.getElementById(id);
+    
+    if(selectEl.value === 'Other') {
+        otherEl.classList.remove('d-none');
+        hiddenEl.value = otherEl.value;
+        otherEl.focus();
+    } else {
+        otherEl.classList.add('d-none');
+        hiddenEl.value = selectEl.value;
+    }
+};
+
+window.updateIsuLainnya = (id) => {
+    const otherEl = document.getElementById(`${id}_other`);
+    const hiddenEl = document.getElementById(id);
+    hiddenEl.value = otherEl.value;
+};
+
+// UPDATE: Helper untuk me-load data Isu Sengketa saat klik "Edit"
+function syncIsuSengketaForEdit(idPrefix, index, val) {
+    const selectEl = document.getElementById(`${idPrefix}_${index}_select`);
+    const otherEl = document.getElementById(`${idPrefix}_${index}_other`);
+    const hiddenEl = document.getElementById(`${idPrefix}_${index}`);
+    
+    if (selectEl && otherEl && hiddenEl) {
+        hiddenEl.value = val;
+        const options = ["Regulasi", "Kinerja", "Anggaran", "HGU", "AMDAL", "Lingkungan"];
+        if (options.includes(val)) {
+            selectEl.value = val;
+            otherEl.classList.add('d-none');
+            otherEl.value = '';
+        } else if (val && val !== '-' && val !== '') {
+            selectEl.value = 'Other';
+            otherEl.value = val;
+            otherEl.classList.remove('d-none');
+        } else {
+            selectEl.value = '';
+            otherEl.classList.add('d-none');
+            otherEl.value = '';
+        }
+    }
+}
+
 function renderInput(headerText, idPrefix, index, isFirstDetail) {
     let label = headerText;
     if ((`${headerText}`).toLowerCase().trim() === 'sidang') label = 'Sidang Terakhir';
@@ -26,13 +73,34 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
 
     if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
         return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><div id="${id}_quill" style="height: 150px; background: white;"></div><input type="hidden" id="${id}"></div>`;
-    } else if (lower === 'status sengketa') {
-        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><select class="form-select status-dropdown" id="${id}" required><option value="" disabled selected>-- Pilih Status --</option><option value="Dalam Proses">Dalam Proses</option><option value="Selesai">Selesai</option></select>${hint}</div>`;
+    } 
+    // UPDATE: Render Input Khusus Isu Sengketa (Dropdown + Other)
+    else if (lower === 'isu sengketa') {
+        return `
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">${label}</label>
+                <select class="form-select shadow-sm" id="${id}_select" onchange="toggleIsuLainnya('${id}')">
+                    <option value="" disabled selected>-- Pilih Isu Sengketa --</option>
+                    <option value="Regulasi">Regulasi</option>
+                    <option value="Kinerja">Kinerja</option>
+                    <option value="Anggaran">Anggaran</option>
+                    <option value="HGU">HGU</option>
+                    <option value="AMDAL">AMDAL</option>
+                    <option value="Lingkungan">Lingkungan</option>
+                    <option value="Other">Other (Isi Manual)</option>
+                </select>
+                <input type="text" class="form-control mt-2 shadow-sm d-none" id="${id}_other" placeholder="Ketik Isu Sengketa..." oninput="updateIsuLainnya('${id}')">
+                <input type="hidden" id="${id}">
+                ${hint}
+            </div>`;
+    } 
+    else if (lower === 'status sengketa') {
+        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><select class="form-select status-dropdown shadow-sm" id="${id}" required><option value="" disabled selected>-- Pilih Status --</option><option value="Dalam Proses">Dalam Proses</option><option value="Selesai">Selesai</option></select>${hint}</div>`;
     } else if (lower === 'agenda sidang selanjutnya') {
         return `
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">${label}</label>
-                <select class="form-select" id="${id}" required>
+                <select class="form-select shadow-sm" id="${id}" required>
                     <option value="" disabled selected>-- Pilih Agenda --</option>
                     <option value="-">Tidak Ada / Selesai</option>
                     <option value="Pemeriksaan Awal 1">Pemeriksaan Awal 1</option>
@@ -55,9 +123,9 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 ${hint}
             </div>`;
     } else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir') {
-        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control" id="${id}">${hint}</div>`;
+        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control shadow-sm" id="${id}">${hint}</div>`;
     } else {
-        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="text" class="form-control" id="${id}" placeholder="Isi ${label}">${hint}</div>`;
+        return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="text" class="form-control shadow-sm" id="${id}" placeholder="Isi ${label}">${hint}</div>`;
     }
 }
 
@@ -72,23 +140,58 @@ function initQuill(headers, idPrefix) {
     });
 }
 
+// UPDATE: Logika Penguncian Dinamis (Link, No Putusan, Tgl Putusan)
 function attachStatusLogic() {
-    let statusIds = [], linkIds = [];
-    sheetHeadersPerkara.forEach((h, i) => { if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); if((`${h}`).toLowerCase().trim() === 'link putusan') linkIds.push(`inputPerkara_${i}`); });
-    sheetHeadersDetail.forEach((h, i) => { if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); if((`${h}`).toLowerCase().trim() === 'link putusan') linkIds.push(`inputDetail_${i}`); });
+    let statusIds = [], targetIds = [];
+    
+    // Deteksi label yang wajib dikunci saat "Dalam Proses"
+    const isTargetHeader = (h) => {
+        const low = (`${h}`).toLowerCase().trim();
+        return low === 'link putusan' || low === 'nomor putusan' || low === 'tgl diputuskan' || low === 'tgl putusan' || low === 'tanggal putusan';
+    };
+
+    sheetHeadersPerkara.forEach((h, i) => { 
+        if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputPerkara_${i}`); 
+        if(isTargetHeader(h)) targetIds.push(`inputPerkara_${i}`); 
+    });
+    sheetHeadersDetail.forEach((h, i) => { 
+        if((`${h}`).toLowerCase().trim() === 'status sengketa') statusIds.push(`inputDetail_${i}`); 
+        if(isTargetHeader(h)) targetIds.push(`inputDetail_${i}`); 
+    });
 
     window.applyStatusLogic = () => {
         statusIds.forEach(sId => {
             const s = document.getElementById(sId);
             if(!s) return;
-            linkIds.forEach(lId => {
-                const l = document.getElementById(lId);
-                if(!l) return;
-                if(s.value === 'Dalam Proses') { l.value = '-'; l.setAttribute('readonly', true); } else { l.removeAttribute('readonly'); }
+            targetIds.forEach(tId => {
+                const t = document.getElementById(tId);
+                if(!t) return;
+                
+                if(s.value === 'Dalam Proses') { 
+                    // Jika belum selesai, tidak mungkin ada putusan. Kunci dan isi "-"
+                    t.setAttribute('readonly', true);
+                    t.style.backgroundColor = '#e9ecef'; // Efek visual abu-abu tanda terkunci
+                    if (t.type === 'date') { 
+                        t.value = ''; 
+                        t.disabled = true; // Khusus format tanggal, nonaktifkan penuh 
+                    } else { 
+                        t.value = '-'; 
+                    }
+                } else if (s.value === 'Selesai') { 
+                    // Jika selesai, buka kunci agar admin dapat mengisi data Putusan
+                    t.removeAttribute('readonly'); 
+                    t.style.backgroundColor = '';
+                    t.disabled = false;
+                    if(t.value === '-') t.value = '';
+                }
             });
         });
     };
-    statusIds.forEach(sId => { const el = document.getElementById(sId); if(el) el.addEventListener('change', window.applyStatusLogic); });
+    
+    statusIds.forEach(sId => { 
+        const el = document.getElementById(sId); 
+        if(el) el.addEventListener('change', window.applyStatusLogic); 
+    });
 }
 
 async function loadData() {
@@ -195,7 +298,13 @@ if(btnConfirmUpdate) {
 
 function bukaModalTambah() {
     isEditMode = false; editId = null; document.getElementById('formTambahData').reset();
-    Object.values(quillInstances).forEach(q => q.setContents([])); document.getElementById('inputDetail_0').removeAttribute('readonly'); 
+    Object.values(quillInstances).forEach(q => q.setContents([])); 
+    document.getElementById('inputDetail_0').removeAttribute('readonly'); 
+    
+    // Reset Isu Sengketa dropdowns
+    document.querySelectorAll('select[id$="_select"]').forEach(s => s.value = '');
+    document.querySelectorAll('input[id$="_other"]').forEach(o => { o.value = ''; o.classList.add('d-none'); });
+
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
     document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru"; document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
     document.getElementById('btnSubmit').className = "btn btn-success w-100 mt-4 py-2 fw-bold"; document.getElementById('btnSubmit').innerText = "Simpan Data Baru";
@@ -210,11 +319,17 @@ function bukaModalEdit(id) {
         const el = document.getElementById(`inputPerkara_${i}`); const val = rowP[i] || '';
         if(quillInstances[`inputPerkara_${i}`]) { quillInstances[`inputPerkara_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
         else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
+        
+        // Panggil helper untuk parsing data ke dropdown Isu Sengketa
+        if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputPerkara', i, val);
     });
     sheetHeadersDetail.forEach((h, i) => {
         const el = document.getElementById(`inputDetail_${i}`); const val = rowD[i] || '';
         if(quillInstances[`inputDetail_${i}`]) { quillInstances[`inputDetail_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
         else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
+        
+        // Panggil helper untuk parsing data ke dropdown Isu Sengketa
+        if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputDetail', i, val);
     });
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
@@ -268,7 +383,7 @@ function lihatDetail(id) {
             latestUpdatedDate = updateData[pRowIndex][0];
         }
         if (document.getElementById('modalLastUpdated')) {
-            document.getElementById('modalLastUpdated').innerText = "Diperbarui tanggal: " + latestUpdatedDate;
+            document.getElementById('modalLastUpdated').innerText = "Data terakhir diperbarui tanggal: " + latestUpdatedDate;
         }
 
         const idxPermohonan = sheetHeadersDetail.findIndex(h => (`${h}`).toLowerCase().trim() === 'isi permohonan');
