@@ -123,48 +123,50 @@
         @media (max-width: 991.98px) {
             .hero-section { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
             
-            /* 1 & 2. Form Pencarian Satu Baris, No Rounded Corner */
+            /* Penyesuaian Kolom Pencarian HP dalam 1 Baris Horizontal */
             .search-box-elegant { 
-                flex-direction: row !important; /* Paksa Satu Baris */
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
                 background: #ffffff !important; 
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; 
                 padding: 0 !important; 
                 gap: 0 !important; 
-                border-radius: 0 !important; /* Hapus Rounded Corner */
+                border-radius: 0 !important; 
                 width: 100%;
                 display: flex !important;
+                align-items: stretch !important;
             }
             .search-box-elegant .vr { display: none !important; }
             .search-box-elegant select { 
-                flex: 0 0 35% !important; /* 35% Area */
-                width: 35% !important;
+                flex: 0 0 32% !important; 
+                width: 32% !important;
                 border-radius: 0 !important; 
                 background-color: #f8f9fa !important; 
-                padding: 0.75rem 0.2rem 0.75rem 0.5rem !important;
+                padding: 0.5rem 0.2rem 0.5rem 0.4rem !important;
                 font-size: 0.75rem !important;
                 border: none !important;
                 border-right: 1px solid #dee2e6 !important;
             }
             .search-box-elegant input { 
-                flex: 1 1 auto !important; /* Penuhi sisa area */
-                width: auto !important;
+                flex: 1 1 auto !important;
+                width: 10% !important; /* Nilai kecil, flex-grow yang akan melebarkannya */
                 border-radius: 0 !important; 
                 background-color: #ffffff !important; 
-                padding: 0.75rem 0.5rem !important;
-                font-size: 0.8rem !important;
+                padding: 0.5rem 0.5rem !important;
+                font-size: 0.75rem !important;
                 border: none !important;
             }
             .search-box-elegant button.btn-primary { 
                 flex: 0 0 auto !important; 
                 margin: 0 !important; 
-                padding: 0.75rem 0.8rem !important; 
+                padding: 0.5rem 0.7rem !important; 
                 border-radius: 0 !important; 
                 box-shadow: none !important;
             }
             .search-box-elegant button.btn-light { 
                 flex: 0 0 auto !important; 
                 margin: 0 !important; 
-                padding: 0.75rem 0.8rem !important; 
+                padding: 0.5rem 0.7rem !important; 
                 border-radius: 0 !important;
                 background-color: #f1f3f5 !important;
                 border: none !important;
@@ -172,15 +174,13 @@
                 box-shadow: none !important;
             }
 
-            /* 3. Perkecil Text dan Header Jendela Pop-Up */
             .modal-header { padding: 0.7rem 1rem !important; }
             #detailModalTitle { font-size: 1.05rem !important; }
             #detailModalSubtitle .badge { font-size: 0.7rem !important; padding: 0.35rem 0.6rem !important; }
             
-            /* 4. Solusi Bug Blank Space di Mobile */
             .modal-body { padding: 1rem 0.75rem !important; }
-            .modal-body .row { display: block !important; } /* Matikan flex stretch paksa */
-            .modal-body .card.h-100 { height: auto !important; margin-bottom: 1rem !important; } /* Bebaskan kolom kartu menumpuk */
+            .modal-body .row { display: block !important; }
+            .modal-body .card.h-100 { height: auto !important; margin-bottom: 1rem !important; }
             .card-rincian { max-height: none; overflow-y: visible; }
 
             .footer-col-section { text-align: center; }
@@ -254,7 +254,7 @@
                         <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-5" onchange="filterTable()">
                             <option value="">Semua Status</option>
                             <option value="selesai">Selesai</option>
-                            <option value="dalam proses">Dalam Proses</option>
+                            <option value="dalam proses">Proses</option>
                         </select>
                         
                         <div class="vr my-2 bg-secondary opacity-25"></div>
