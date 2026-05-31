@@ -49,13 +49,16 @@
         /* Search Box Premium & Filter Select */
         .search-box-elegant { border-radius: 3rem; overflow: hidden; padding: 0.35rem; }
         .search-box-elegant input { box-shadow: none !important; font-size: 0.95rem; }
+        
         .search-box-elegant select { 
             font-size: 0.85rem; 
             font-weight: 600; 
             box-shadow: none !important; 
             color: #495057; 
-            padding-right: 2.5rem !important; 
-            width: 160px; 
+            padding-right: 2rem !important; /* Panah didekatkan ke teks */
+            padding-left: 1rem !important;
+            width: auto !important; 
+            flex: 0 0 auto !important; /* KUNCI: Mencegah flexbox meregangkan dropdown di Desktop */
             cursor: pointer;
         }
         
@@ -142,11 +145,10 @@
             
             .search-box-elegant select { 
                 flex: 0 0 auto !important; 
-                min-width: 115px !important;
-                max-width: 42% !important;
+                width: auto !important; 
                 border-radius: 0 !important; 
                 background-color: #f8f9fa !important; 
-                padding: 0.5rem 0.2rem 0.5rem 0.5rem !important;
+                padding: 0.5rem 1.8rem 0.5rem 0.5rem !important; 
                 font-size: 0.75rem !important;
                 border: none !important;
                 border-right: 1px solid #dee2e6 !important;
@@ -389,25 +391,19 @@
             }
         }
 
-        // =========================================================================
-        // ALGORITMA FILTER SILANG (CROSS-SHEET) YANG DIJAMIN BEKERJA
-        // =========================================================================
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const statusVal = document.getElementById('statusFilter').value.toLowerCase().trim();
             
-            // Cari index Pemohon & Termohon di tabel perkara
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
             
-            // Kolom H = index 7 (A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7)
             const idxStatusDetail = detailHeaders.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
             const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7; 
 
             filteredData = perkaraData.filter(row => {
-                const id = row[0]; // ID penghubung (No Registrasi)
+                const id = row[0]; 
                 
-                // 1. Pengecekan Teks (Fokus pada sheet Perkara)
                 let matchText = false;
                 if (query === '') {
                     matchText = true;
@@ -419,7 +415,6 @@
                     matchText = row.some(cell => cell && (`${cell}`).toLowerCase().includes(query));
                 }
 
-                // 2. Pengecekan Status (Fokus Menyelam ke Sheet Detail)
                 let matchStatus = false;
                 if (statusVal === '') {
                     matchStatus = true;
@@ -429,7 +424,6 @@
                         const status = (`${detailRow[statusColIndex]}`).toLowerCase();
                         matchStatus = status.includes(statusVal);
                     } else if (detailRow) {
-                        // Plan B: Jika urutan kolom berantakan, periksa semua isi baris detail
                         matchStatus = detailRow.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
                     }
                 }
