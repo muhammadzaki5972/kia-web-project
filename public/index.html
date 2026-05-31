@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
     
-    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
     
@@ -140,8 +137,6 @@
                 align-items: stretch !important;
             }
             .search-box-elegant .vr { display: none !important; }
-            
-            /* UPDATE: Lebar Select Dropdown disesuaikan agar teks tertampil optimal di HP */
             .search-box-elegant select { 
                 flex: 0 0 auto !important; 
                 min-width: 115px !important;
@@ -200,9 +195,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     
-    <!-- Wrapper Sticky Top untuk Navbar dan Garis Animasi -->
     <div class="sticky-top shadow-sm" style="z-index: 1030;">
-        <!-- Navbar -->
         <nav class="navbar navbar-dark py-3 bg-animated-gradient">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
                 <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
@@ -222,11 +215,9 @@
                 </div>
             </div>
         </nav>
-        <!-- Garis Pembatas Animasi Menempel/Freeze -->
         <div class="animated-header-border"></div>
     </div>
 
-    <!-- Offcanvas Menu -->
     <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas">
         <div class="offcanvas-header shadow-sm bg-animated-gradient">
             <h5 class="offcanvas-title fw-bold text-white poppins-font">Menu Navigasi</h5>
@@ -253,21 +244,17 @@
         </div>
     </div>
 
-    <!-- Hero Banner -->
     <section class="hero-section text-center py-5 text-white position-relative bg-animated-gradient shadow-sm">
         <div class="container position-relative z-1 mt-1 mb-2 fade-in-up">
             <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.6rem, 4vw, 2.3rem);">Sistem Informasi Sengketa</h1>
             <p class="text-white-50 mb-4 fs-6 fw-normal px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
-            <!-- Search Box & Filter Dropdown -->
             <div class="row justify-content-center px-2 px-md-0">
                 <div class="col-12 col-md-10 col-lg-8">
-                    <!-- Urutan 1. Select, 2. Input, 3. Btn Cari, 4. Btn Hapus -->
                     <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
                         <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-4" onchange="filterTable()">
                             <option value="">Semua Status</option>
                             <option value="selesai">Selesai</option>
-                            <!-- UPDATE: Value dirubah jadi 'proses' agar akurat menangkap data "Proses" maupun "Dalam Proses" -->
                             <option value="proses">Dalam Proses</option>
                         </select>
                         
@@ -287,7 +274,6 @@
         </div>
     </section>
 
-    <!-- Main Content -->
     <main class="container mt-4 mt-md-5 flex-grow-1 mb-5 pb-3">
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
@@ -297,14 +283,12 @@
         </div>
     </main>
 
-    <!-- Tombol Scroll to Top -->
     <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed" 
             style="bottom: 25px; right: 25px; width: 46px; height: 46px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;" 
             onclick="scrollToTop()" title="Kembali ke Atas">
         <i class="bi bi-chevron-up fs-4 text-white"></i>
     </button>
 
-    <!-- Modal Detail Perkara -->
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -327,7 +311,6 @@
         </div>
     </div>
 
-    <!-- Footer Ringkas & Elegan -->
     <footer class="bg-dark text-white pt-4 pb-3 mt-auto border-top border-4 border-info">
         <div class="container fade-in-up" style="font-size: 0.82rem;">
             <div class="row gy-3 footer-col-section">
@@ -368,7 +351,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
@@ -432,7 +414,8 @@
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
                         if(i !== skipIdx) {
                             let cellData = row[i] || '-';
-                            if (sheetHeadersPerkara[i].toLowerCase().includes('status sengketa')) {
+                            // PEMBARUAN: Hanya mencari kata 'status', jadi lebih fleksibel
+                            if (sheetHeadersPerkara[i].toLowerCase().includes('status')) {
                                 if (cellData.toLowerCase().includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
                                 else if (cellData.toLowerCase().includes('proses')) cellData = `<span class="badge bg-warning text-dark shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
                             }
@@ -492,23 +475,40 @@
             }
         }
 
+        // ==========================================
+        // PEMBARUAN: Algoritma Filter Fallback Cerdas
+        // ==========================================
         function filterTable() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const statusVal = document.getElementById('statusFilter').value.toLowerCase();
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const statusVal = document.getElementById('statusFilter').value.toLowerCase().trim();
             
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
-            const idxStatus = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
+            const idxStatus = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('status'));
 
             filteredData = perkaraData.filter(row => {
-                const getCellText = (idx) => (idx !== -1 && row[idx]) ? (`${row[idx]}`).toLowerCase() : '';
+                let matchText = false;
+                if (query === '') {
+                    matchText = true;
+                } else if (idxPem !== -1 || idxTerm !== -1) {
+                    const pemohon = (idxPem !== -1 && row[idxPem]) ? (`${row[idxPem]}`).toLowerCase() : '';
+                    const termohon = (idxTerm !== -1 && row[idxTerm]) ? (`${row[idxTerm]}`).toLowerCase() : '';
+                    matchText = pemohon.includes(query) || termohon.includes(query);
+                } else {
+                    // Jika kolom Pemohon/Termohon tidak ditemukan, cari di semua sel
+                    matchText = row.some(cell => cell && (`${cell}`).toLowerCase().includes(query));
+                }
 
-                const pemohon = getCellText(idxPem);
-                const termohon = getCellText(idxTerm);
-                const status = getCellText(idxStatus);
-                
-                const matchText = pemohon.includes(query) || termohon.includes(query);
-                const matchStatus = statusVal === '' || status.includes(statusVal);
+                let matchStatus = false;
+                if (statusVal === '') {
+                    matchStatus = true;
+                } else if (idxStatus !== -1) {
+                    const status = row[idxStatus] ? (`${row[idxStatus]}`).toLowerCase() : '';
+                    matchStatus = status.includes(statusVal);
+                } else {
+                    // Jika kolom Status tidak ditemukan, cari di semua sel di baris ini
+                    matchStatus = row.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
+                }
                 
                 return matchText && matchStatus;
             });
@@ -540,6 +540,7 @@
                     const findIdx = (headers) => headers.findIndex(h => { 
                         const val = (`${h}`).toLowerCase().trim(); 
                         return val === f || 
+                               (f === 'status sengketa' && val.includes('status')) || // Cukup cari kata status 
                                (f === 'sidang terakhir' && val === 'sidang') || 
                                (f === 'no reg' && val === 'rincian informasi') || 
                                (f === 'isi permohonan' && val === 'rincian permohonan') ||
@@ -581,7 +582,6 @@
 
                 let htmlContent = '<div class="row">';
 
-                // UPDATE: Hapus "justify-content-center" agar konten Agenda & Jadwal sejajar di Atas (Top)
                 let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check text-info me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column text-center py-4 px-3">`;
                 col1Fields.forEach(f => {
                     const data = getField(f);
@@ -598,7 +598,6 @@
                 });
                 htmlCol1 += `</div></div></div>`;
 
-                // UPDATE: Hapus "justify-content-center" agar konten Perangkat Persidangan sejajar di Atas (Top)
                 let htmlCol2 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-people text-info me-2"></i>Perangkat Persidangan</div><div class="card-body d-flex flex-column text-center py-4 px-3">`;
                 col2Fields.forEach(f => {
                     const data = getField(f);
