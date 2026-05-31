@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
     
+    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
     
@@ -350,6 +353,7 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
@@ -386,24 +390,49 @@
         }
 
         // =========================================================================
-        // SUPER ALGORITMA: Filter Global Bebas Kolom (DIJAMIN 100% BEKERJA)
+        // ALGORITMA FILTER SILANG (CROSS-SHEET) YANG DIJAMIN BEKERJA
         // =========================================================================
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const statusVal = document.getElementById('statusFilter').value.toLowerCase().trim();
             
-            filteredData = perkaraData.filter(row => {
-                
-                // 1. Pemindai Kolom Teks - Cek di seluruh sel tanpa peduli nama header
-                const matchText = query === '' || row.some(cell => cell && (`${cell}`).toLowerCase().includes(query));
+            // Cari index Pemohon & Termohon di tabel perkara
+            const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
+            const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+            
+            // Kolom H = index 7 (A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7)
+            const idxStatusDetail = detailHeaders.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
+            const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7; 
 
-                // 2. Pemindai Dropdown Status - Cek di seluruh sel tanpa peduli nama header
-                const matchStatus = statusVal === '' || row.some(cell => {
-                    if (!cell) return false;
-                    const cellStr = (`${cell}`).toLowerCase();
-                    // Jika kata 'selesai' atau 'proses' ada di sel manapun, maka valid
-                    return cellStr.includes(statusVal); 
-                });
+            filteredData = perkaraData.filter(row => {
+                const id = row[0]; // ID penghubung (No Registrasi)
+                
+                // 1. Pengecekan Teks (Fokus pada sheet Perkara)
+                let matchText = false;
+                if (query === '') {
+                    matchText = true;
+                } else if (idxPem !== -1 || idxTerm !== -1) {
+                    const pemohon = (idxPem !== -1 && row[idxPem]) ? (`${row[idxPem]}`).toLowerCase() : '';
+                    const termohon = (idxTerm !== -1 && row[idxTerm]) ? (`${row[idxTerm]}`).toLowerCase() : '';
+                    matchText = pemohon.includes(query) || termohon.includes(query);
+                } else {
+                    matchText = row.some(cell => cell && (`${cell}`).toLowerCase().includes(query));
+                }
+
+                // 2. Pengecekan Status (Fokus Menyelam ke Sheet Detail)
+                let matchStatus = false;
+                if (statusVal === '') {
+                    matchStatus = true;
+                } else {
+                    const detailRow = detailData.find(d => d[0] === id);
+                    if (detailRow && detailRow[statusColIndex]) {
+                        const status = (`${detailRow[statusColIndex]}`).toLowerCase();
+                        matchStatus = status.includes(statusVal);
+                    } else if (detailRow) {
+                        // Plan B: Jika urutan kolom berantakan, periksa semua isi baris detail
+                        matchStatus = detailRow.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
+                    }
+                }
                 
                 return matchText && matchStatus;
             });
@@ -447,7 +476,6 @@
                             let cellData = row[i] || '-';
                             const cellLower = cellData.toLowerCase().trim();
                             
-                            // PEMBARUAN: Ubah menjadi badge cantik secara cerdas tanpa peduli nama header
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
                             if (isStatusColumn || cellLower === 'selesai' || cellLower === 'dalam proses' || cellLower === 'proses') {
                                 if (cellLower.includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
@@ -526,7 +554,7 @@
                     const findIdx = (headers) => headers.findIndex(h => { 
                         const val = (`${h}`).toLowerCase().trim(); 
                         return val === f || 
-                               (f === 'status sengketa' && val.includes('status')) ||
+                               (f === 'status sengketa' && val.includes('status')) || 
                                (f === 'sidang terakhir' && val === 'sidang') || 
                                (f === 'no reg' && val === 'rincian informasi') || 
                                (f === 'isi permohonan' && val === 'rincian permohonan') ||
