@@ -117,17 +117,27 @@
         }
         .social-icon-btn:hover { transform: translateY(-3px); background: white; color: #0099ff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* Tipografi Modal & Rincian (UPDATE RAPAT & KECIL) */
+        /* =========================================================
+           TIPOGRAFI & GAYA BUNGKUSAN (WRAPPERS) DI POP-UP DETAIL
+           ========================================================= */
         .info-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; font-weight: 700; margin-bottom: 0.15rem; }
         .info-value { font-size: 0.85rem; color: #1a1d20; font-weight: 600; line-height: 1.25; }
         .fs-7 { font-size: 0.8rem !important; }
         .card-rincian { max-height: 480px; overflow-y: auto; }
 
-        /* CSS Highlighting Khusus Status Sidang */
+        /* Desain Highlight Warna Teks */
         .text-highlight-gray .info-label { color: #8e9ca9 !important; }
         .text-highlight-gray .info-value { color: #8e9ca9 !important; font-weight: 500; }
         .text-highlight-green .info-label { color: #28a745 !important; }
         .text-highlight-green .info-value { color: #198754 !important; font-weight: 700; }
+
+        /* Bungkusan Pembeda (Group Wrappers) untuk Agenda dan Perangkat */
+        .group-wrapper-gray { background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+        .group-wrapper-green { background: #f0fdf4; border: 1px solid #c3e6cb; border-radius: 0.5rem; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+        .group-wrapper-standard { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        
+        /* Merapikan jarak elemen terakhir di dalam kotak wrapper */
+        .group-wrapper-gray .mb-2:last-child, .group-wrapper-green .mb-2:last-child, .group-wrapper-standard .mb-2:last-child { margin-bottom: 0 !important; }
 
         /* =========================================================
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
@@ -571,7 +581,7 @@
                         if(f === 'no reg') labelText = 'No Register'; 
                         if(f === 'tgl register') labelText = 'Tgl Register';
                         
-                        if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
+                        if(f.includes('tgl') || f.includes('tanggal') || f === headerO) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
                         if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan <i class="bi bi-box-arrow-up-right"></i></a>`;
@@ -588,66 +598,74 @@
                 
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center gap-2 mt-3 px-2">
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-hash text-muted"></i>No Register: ${dataNoReg ? dataNoReg.val : '-'}</span>
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-calendar3 text-muted"></i> Tgl Register: ${dataTglReg ? dataTglReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-hash text-muted"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-calendar3 text-muted"></i> Tgl: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
 
-                // UPDATE: Baris "Sidang Terakhir" Dihapus.
-                const col1Fields = ["status sengketa"];
-                if (headerO) col1Fields.push(headerO);
-                if (headerP) col1Fields.push(headerP);
-                col1Fields.push("tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan");
-                
-                const col2Fields = ["ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti"];
-                const col3Fields = ["isu sengketa", "isi permohonan"];
+                // ==========================================================
+                // FUNGSI UNTUK MERENDER BUNGKUSAN/KOTAK (GROUP WRAPPER)
+                // ==========================================================
+                const renderGroup = (fields, wrapClass) => {
+                    let html = '';
+                    let hasContent = false;
+                    fields.forEach(f => {
+                        if(!f) return;
+                        const data = getField(f);
+                        if(data) {
+                            hasContent = true;
+                            let displayVal = data.val;
+                            let textClass = "";
+                            const fLower = f.toLowerCase().trim();
 
-                let htmlContent = '<div class="row">';
+                            if (fLower === headerO || fLower === headerP || fLower.includes('sebelumnya')) {
+                                textClass = "text-highlight-gray";
+                            } else if (fLower.includes('selanjutnya')) {
+                                textClass = "text-highlight-green";
+                            }
 
+                            if (fLower === 'status sengketa') {
+                                const statusStr = displayVal.toLowerCase();
+                                if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                                else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                                else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                            }
+                            
+                            html += `<div class="mb-2 ${textClass}"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
+                        }
+                    });
+                    if(hasContent && wrapClass) return `<div class="${wrapClass}">${html}</div>`;
+                    else if (hasContent) return html; // Jika tanpa wrapper
+                    return '';
+                };
+
+                let htmlContent = '<div class="row align-items-stretch">'; // Agar tinggi kartu sejajar
+
+                // KOLOM 1: Agenda & Jadwal
                 let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check text-info me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column text-center py-3 px-3">`;
-                col1Fields.forEach(f => {
-                    const data = getField(f);
-                    if(data) {
-                        let displayVal = data.val;
-                        let customClass = "";
-                        const fLower = f.toLowerCase().trim();
-
-                        // UPDATE: Highlighting Spesifik
-                        if (fLower === headerO || fLower === headerP || fLower.includes('sebelumnya')) {
-                            customClass = "text-highlight-gray";
-                        } else if (fLower.includes('selanjutnya')) {
-                            customClass = "text-highlight-green";
-                        }
-
-                        if (fLower === 'status sengketa') {
-                            const statusStr = displayVal.toLowerCase();
-                            if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                        }
-                        // Menggunakan mb-2 untuk merapatkan baris
-                        htmlCol1 += `<div class="mb-2 ${customClass}"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
-                    }
-                });
+                htmlCol1 += renderGroup(["status sengketa"], "");
+                htmlCol1 += renderGroup([headerO, headerP], "group-wrapper-gray");
+                htmlCol1 += renderGroup(["tgl sidang selanjutnya", "agenda sidang selanjutnya"], "group-wrapper-green");
+                htmlCol1 += renderGroup(["nomor putusan", "tgl diputuskan", "link putusan"], "group-wrapper-standard");
                 htmlCol1 += `</div></div></div>`;
 
+                // KOLOM 2: Perangkat Persidangan
                 let htmlCol2 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-people text-info me-2"></i>Perangkat Persidangan</div><div class="card-body d-flex flex-column text-center py-3 px-3">`;
-                col2Fields.forEach(f => {
-                    const data = getField(f);
-                    // Menggunakan mb-2 untuk merapatkan baris
-                    if(data) htmlCol2 += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${data.val}</div></div>`;
-                });
+                htmlCol2 += renderGroup(["ketua majelis", "anggota 1", "anggota 2"], "group-wrapper-standard");
+                htmlCol2 += renderGroup(["mediator"], "group-wrapper-standard");
+                htmlCol2 += renderGroup(["panitera pengganti"], "group-wrapper-standard");
                 htmlCol2 += `</div></div></div>`;
 
-                let htmlCol3 = `<div class="col-lg-4 mb-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-file-earmark-text text-info me-2"></i>Rincian Sengketa</div><div class="card-body card-rincian py-4 px-4">`;
+                // KOLOM 3: Rincian Sengketa (Diatur sejajar ke Atas/Kiri dengan Flex-Start & w-100)
+                let htmlCol3 = `<div class="col-lg-4 mb-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-file-earmark-text text-info me-2"></i>Rincian Sengketa</div><div class="card-body card-rincian py-4 px-4 d-flex flex-column justify-content-start align-items-start w-100">`;
                 let foundCol3 = false;
-                col3Fields.forEach(f => {
+                ["isu sengketa", "isi permohonan"].forEach(f => {
                     const data = getField(f);
                     if(data && data.val !== '-') {
                         foundCol3 = true;
-                        htmlCol3 += `<div class="mb-4"><div class="info-label text-start" style="border-bottom: 1px dashed #dee2e6; padding-bottom: 6px; margin-bottom: 8px;">${data.label}</div><div class="info-value text-start fw-normal lh-base">${data.val}</div></div>`;
+                        htmlCol3 += `<div class="mb-3 w-100"><div class="info-label text-start" style="border-bottom: 1px dashed #dee2e6; padding-bottom: 6px; margin-bottom: 8px;">${data.label}</div><div class="info-value text-start fw-normal lh-base">${data.val}</div></div>`;
                     }
                 });
-                if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
+                if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4 w-100"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
                 htmlCol3 += `</div></div></div>`;
 
                 htmlContent += htmlCol1 + htmlCol2 + htmlCol3 + '</div>';
