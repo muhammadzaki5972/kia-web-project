@@ -93,12 +93,14 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     } 
     else if (lower === 'status sengketa') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><select class="form-select status-dropdown shadow-sm" id="${id}" required><option value="" disabled selected>-- Pilih Status --</option><option value="Dalam Proses">Dalam Proses</option><option value="Selesai">Selesai</option></select>${hint}</div>`;
-    } else if (lower === 'agenda sidang selanjutnya') {
+    } 
+    // UPDATE: Membaca index ke-15 (Kolom P) dari sheet detail untuk dijadikan Dropdown yang sama dengan Agenda
+    else if (lower === 'agenda sidang selanjutnya' || (idPrefix === 'inputDetail' && index === 15)) {
         return `
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">${label}</label>
-                <select class="form-select shadow-sm" id="${id}" required>
-                    <option value="" disabled selected>-- Pilih Agenda --</option>
+                <select class="form-select shadow-sm" id="${id}">
+                    <option value="" disabled selected>-- Pilih Opsi --</option>
                     <option value="-">Tidak Ada / Selesai</option>
                     <option value="Pemeriksaan Awal 1">Pemeriksaan Awal 1</option>
                     <option value="Pemeriksaan Awal 2">Pemeriksaan Awal 2</option>
@@ -119,7 +121,9 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 </select>
                 ${hint}
             </div>`;
-    } else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir') {
+    } 
+    // UPDATE: Membaca index ke-14 (Kolom O) dari sheet detail untuk dijadikan Date Picker (Kalender)
+    else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir' || (idPrefix === 'inputDetail' && index === 14)) {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control shadow-sm" id="${id}">${hint}</div>`;
     } else {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="text" class="form-control shadow-sm" id="${id}" placeholder="Isi ${label}">${hint}</div>`;
@@ -137,17 +141,14 @@ function initQuill(headers, idPrefix) {
     });
 }
 
-// UPDATE: Logika Penguncian Dinamis (Putusan & Persidangan)
 function attachStatusLogic() {
     let statusIds = [], putusanTargetIds = [], sidangTargetIds = [];
     
-    // Deteksi label Atribut Putusan
     const isPutusanHeader = (h) => {
         const low = (`${h}`).toLowerCase().trim();
         return low === 'link putusan' || low === 'nomor putusan' || low === 'tgl diputuskan' || low === 'tgl putusan' || low === 'tanggal putusan';
     };
 
-    // Deteksi label Atribut Persidangan
     const isSidangHeader = (h) => {
         const low = (`${h}`).toLowerCase().trim();
         return low === 'sidang' || low === 'sidang terakhir' || low === 'tgl sidang selanjutnya' || low === 'tanggal sidang selanjutnya' || low === 'agenda sidang selanjutnya';
@@ -164,17 +165,15 @@ function attachStatusLogic() {
         if(isSidangHeader(h)) sidangTargetIds.push(`inputDetail_${i}`);
     });
 
-    // Helper Fungsi Pengunci
     const lockField = (t, valIfText) => {
         if(!t) return;
         t.setAttribute('readonly', true);
-        t.style.backgroundColor = '#e9ecef'; // Efek visual terkunci
+        t.style.backgroundColor = '#e9ecef';
         
         if (t.tagName === 'SELECT') {
             t.disabled = true;
-            t.value = valIfText; // Mengeset nilai ke '-'
+            t.value = valIfText; 
         } else {
-            // Trik khusus untuk Date Input: ubah sementara ke text agar bisa menampung '-'
             if (t.type === 'date' || t.dataset.wasDate === 'true') {
                 t.dataset.wasDate = 'true';
                 t.type = 'text';
@@ -184,19 +183,16 @@ function attachStatusLogic() {
         }
     };
 
-    // Helper Fungsi Pembuka Kunci
     const unlockField = (t) => {
         if(!t) return;
         t.removeAttribute('readonly');
         t.style.backgroundColor = '';
         t.disabled = false;
         
-        // Kembalikan tipe ke date jika sebelumnya diubah secara paksa
         if (t.dataset.wasDate === 'true') {
             t.type = 'date';
         }
         
-        // Bersihkan tanda strip otomatis saat dibuka
         if (t.value === '-') t.value = '';
     };
 
@@ -206,11 +202,9 @@ function attachStatusLogic() {
             if(!s) return;
             
             if(s.value === 'Dalam Proses') { 
-                // Jika masih berproses, Putusan KUNCI & Sidang DIBUKA
                 putusanTargetIds.forEach(tId => lockField(document.getElementById(tId), '-'));
                 sidangTargetIds.forEach(tId => unlockField(document.getElementById(tId)));
             } else if (s.value === 'Selesai') { 
-                // Jika sudah selesai, Putusan DIBUKA & Sidang KUNCI
                 putusanTargetIds.forEach(tId => unlockField(document.getElementById(tId)));
                 sidangTargetIds.forEach(tId => lockField(document.getElementById(tId), '-'));
             }
@@ -333,7 +327,6 @@ function bukaModalTambah() {
     document.querySelectorAll('select[id$="_select"]').forEach(s => s.value = '');
     document.querySelectorAll('input[id$="_other"]').forEach(o => { o.value = ''; o.classList.add('d-none'); });
 
-    // Panggil logika kunci status
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
     
     document.getElementById('modalFormTitle').innerText = "Silahkan isi Sengketa Baru"; document.getElementById('modalFormHeader').className = "modal-header bg-success text-white";
@@ -362,7 +355,6 @@ function bukaModalEdit(id) {
 
     document.getElementById('inputDetail_0').setAttribute('readonly', true); 
     
-    // Terapkan penyesuaian dinamis setelah data di-load
     if(typeof window.applyStatusLogic === 'function') window.applyStatusLogic();
     
     document.getElementById('modalFormTitle').innerText = `Edit Data Perkara: ${id}`; document.getElementById('modalFormHeader').className = "modal-header bg-warning text-dark";
@@ -383,7 +375,15 @@ function lihatDetail(id) {
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
-        const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa", "sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan"];
+        
+        // UPDATE: Ekstraksi kolom O dan P secara dinamis untuk ditampilkan di Admin pop-up 
+        const headerO = sheetHeadersDetail[14] ? sheetHeadersDetail[14].toLowerCase().trim() : null;
+        const headerP = sheetHeadersDetail[15] ? sheetHeadersDetail[15].toLowerCase().trim() : null;
+        
+        const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa"];
+        if(headerO) leftFields.push(headerO);
+        if(headerP) leftFields.push(headerP);
+        leftFields.push("sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan");
         
         let leftHtml = '<div class="col-md-6">';
 
@@ -398,7 +398,7 @@ function lihatDetail(id) {
             if(idx !== -1) {
                 if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
 
-                if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang')) {
+                if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
                     if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                 }
 
