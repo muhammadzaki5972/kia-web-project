@@ -17,11 +17,9 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
-// PERBAIKAN 1: Ekstraksi row[0] agar ID cocok & Hapus/Edit kembali berfungsi
 async function findRowIndex(sheetName, id) {
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${sheetName}!A:A` });
     const rows = res.data.values || [];
-    // Data sheets berbentuk array of arrays [['ID-01'], ['ID-02']]. Gunakan index ke-[0] untuk mengecek text-nya.
     const index = rows.findIndex(row => row[0] && String(row[0]).trim() === String(id).trim());
     return index !== -1 ? index + 1 : null; 
 }
@@ -30,7 +28,8 @@ app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:G' }), 
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:O' })
+        // UPDATE: Diperluas ke Kolom P (A:P)
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:P' })
     ]);
     
     let resUpdate = { data: { values: [] } };
@@ -48,23 +47,20 @@ app.get('/api/data', async (req, res) => {
 app.post('/api/data', async (req, res) => {
   const { barisPerkara, barisDetail, tanggalUpdate } = req.body; 
   try {
-    // PERBAIKAN 2: Simpan DataPerkara DULU untuk mendeteksi dia jatuh di baris ke berapa
     const appendPerkara = await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:G', 
         valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] },
     });
 
-    // Ambil info letak sel data baru (contoh kembaliannya: "DataPerkara!A15:G15") -> Dapatkan angka "15"
     const updatedRange = appendPerkara.data.updates.updatedRange;
     const match = updatedRange ? updatedRange.match(/!A(\d+)/) : null;
     const targetRow = match ? match[1] : null;
 
     if (targetRow) {
-        // Karena letak barisnya sudah pasti, gunakan fungsi "update" (bukan append) ke sheet detail dan update_data
-        // agar sinkronisasi baris terkunci sempurna (100% mencegah baris melenceng/bergeser ke atas/bawah)
         await Promise.all([
+            // UPDATE: Menyesuaikan penulisan ke Kolom P (A:P)
             sheets.spreadsheets.values.update({
-                spreadsheetId: SPREADSHEET_ID, range: `detail!A${targetRow}:O${targetRow}`, 
+                spreadsheetId: SPREADSHEET_ID, range: `detail!A${targetRow}:P${targetRow}`, 
                 valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
             }),
             sheets.spreadsheets.values.update({
@@ -73,10 +69,10 @@ app.post('/api/data', async (req, res) => {
             })
         ]);
     } else {
-        // Fallback jika Google Sheets gagal mengembalikan nomor Range
         await Promise.all([
+            // UPDATE: Menyesuaikan penulisan ke Kolom P (A:P)
             sheets.spreadsheets.values.append({
-                spreadsheetId: SPREADSHEET_ID, range: 'detail!A:O', 
+                spreadsheetId: SPREADSHEET_ID, range: 'detail!A:P', 
                 valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
             }),
             sheets.spreadsheets.values.append({
@@ -102,8 +98,9 @@ app.put('/api/data', async (req, res) => {
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] }
         }));
         
+        // UPDATE: Menyesuaikan update data ke Kolom P (A:P)
         if(idxDetail) updates.push(sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:O${idxDetail}`, 
+            spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:P${idxDetail}`, 
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
         }));
 
@@ -125,8 +122,6 @@ app.delete('/api/data', async (req, res) => {
         
         const meta = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
         
-        // PERBAIKAN 3: Penggunaan "?." (Optional Chaining) 
-        // Melindungi Server agar tidak Error 500/Crash apabila ada salah satu nama sheet yang di-rename tak sengaja
         const sheetIdPerkara = meta.data.sheets.find(s => s.properties.title === 'DataPerkara')?.properties?.sheetId;
         const sheetIdDetail = meta.data.sheets.find(s => s.properties.title === 'detail')?.properties?.sheetId;
         const sheetUpdate = meta.data.sheets.find(s => s.properties.title === 'update_data');
