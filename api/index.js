@@ -28,8 +28,8 @@ app.get('/api/data', async (req, res) => {
   try {
     const [resPerkara, resDetail] = await Promise.all([
         sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'DataPerkara!A:G' }), 
-        // UPDATE: Diperluas ke Kolom P (A:P)
-        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:P' })
+        // UPDATE: Diperluas ke Kolom Q (A:Q) untuk memuat data Analytics/Clickstream
+        sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: 'detail!A:Q' })
     ]);
     
     let resUpdate = { data: { values: [] } };
@@ -58,7 +58,6 @@ app.post('/api/data', async (req, res) => {
 
     if (targetRow) {
         await Promise.all([
-            // UPDATE: Menyesuaikan penulisan ke Kolom P (A:P)
             sheets.spreadsheets.values.update({
                 spreadsheetId: SPREADSHEET_ID, range: `detail!A${targetRow}:P${targetRow}`, 
                 valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
@@ -70,7 +69,6 @@ app.post('/api/data', async (req, res) => {
         ]);
     } else {
         await Promise.all([
-            // UPDATE: Menyesuaikan penulisan ke Kolom P (A:P)
             sheets.spreadsheets.values.append({
                 spreadsheetId: SPREADSHEET_ID, range: 'detail!A:P', 
                 valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] },
@@ -98,7 +96,6 @@ app.put('/api/data', async (req, res) => {
             valueInputOption: 'USER_ENTERED', resource: { values: [barisPerkara] }
         }));
         
-        // UPDATE: Menyesuaikan update data ke Kolom P (A:P)
         if(idxDetail) updates.push(sheets.spreadsheets.values.update({
             spreadsheetId: SPREADSHEET_ID, range: `detail!A${idxDetail}:P${idxDetail}`, 
             valueInputOption: 'USER_ENTERED', resource: { values: [barisDetail] }
@@ -142,6 +139,41 @@ app.delete('/api/data', async (req, res) => {
         }
         res.json({ message: 'Data dihapus' });
     } catch (e) { res.status(500).json({error: e.message}); }
+});
+
+// UPDATE: ENDPOINT WEB ANALYTICS CLICKSTREAM
+app.patch('/api/view/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const idxDetail = await findRowIndex('detail', id);
+        if (idxDetail) {
+            // Membaca jumlah tayangan saat ini dari Kolom Q
+            const getRes = await sheets.spreadsheets.values.get({ 
+                spreadsheetId: SPREADSHEET_ID, 
+                range: `detail!Q${idxDetail}:Q${idxDetail}` 
+            });
+            
+            let views = 0;
+            if (getRes.data.values && getRes.data.values[0] && getRes.data.values[0][0]) {
+                views = parseInt(getRes.data.values[0][0]) || 0;
+            }
+            
+            // Tambah 1 klik
+            views += 1;
+            
+            // Menyimpan kembali tayangan terbaru ke Kolom Q
+            await sheets.spreadsheets.values.update({
+                spreadsheetId: SPREADSHEET_ID, 
+                range: `detail!Q${idxDetail}:Q${idxDetail}`, 
+                valueInputOption: 'USER_ENTERED', 
+                resource: { values: [[views]] }
+            });
+            
+            res.json({ success: true, views });
+        } else {
+            res.status(404).json({ error: 'Data tidak ditemukan' });
+        }
+    } catch (error) { res.status(500).json({error: error.message}); }
 });
 
 module.exports = app;
