@@ -115,7 +115,7 @@
         .social-icon-btn:hover { transform: translateY(-3px); background: white; color: #0099ff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         /* =========================================================
-           TAMPILAN MODAL DETAIL (BUNGKUSAN & PEMISAH BARU)
+           TAMPILAN MODAL DETAIL (BUNGKUSAN & PEMISAH)
            ========================================================= */
         .info-group-wrapper {
             background-color: #ffffff;
@@ -199,14 +199,30 @@
                 box-shadow: none !important;
             }
 
-            .modal-header { padding: 0.7rem 1rem !important; }
+            .modal-header { padding: 0.8rem 1rem !important; }
             #detailModalTitle { font-size: 1.05rem !important; }
-            #detailModalSubtitle .badge { font-size: 0.7rem !important; padding: 0.35rem 0.6rem !important; }
+            
+            /* CSS KHUSUS HP: Compact Badge (Reg & Tgl) */
+            #detailModalSubtitle .d-flex { gap: 0.35rem !important; margin-top: 0.5rem !important; }
+            #detailModalSubtitle .badge { 
+                font-size: 0.6rem !important; 
+                padding: 0.35rem 0.6rem !important; 
+                letter-spacing: 0.2px;
+            }
+            #detailModalSubtitle .badge i { font-size: 0.65rem !important; }
             
             .modal-body { padding: 1rem 0.75rem !important; }
             .modal-body .row { display: block !important; }
             .modal-body .card.h-100 { height: auto !important; margin-bottom: 1rem !important; }
             .card-rincian { max-height: none; overflow-y: visible; }
+
+            /* CSS KHUSUS HP: Footer, Tombol Tutup & Posisi Teks */
+            .modal-footer { padding-bottom: 1.8rem !important; } 
+            .modal-close-btn { 
+                padding: 0.35rem 1.8rem !important; 
+                font-size: 0.8rem !important; 
+                margin-bottom: 0.6rem !important; /* Dorong tombol ke atas agar tak numpuk */
+            }
 
             .footer-col-section { text-align: center; }
             .footer-col-section ul li { justify-content: center; text-align: center; }
@@ -324,19 +340,21 @@
                     <div id="detailLoading" style="display: none;" class="text-center py-5"><div class="spinner-border text-info" role="status"></div></div>
                     <div id="detailContent"></div>
                 </div>
-                <div class="modal-footer position-relative d-flex justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 60px;">
+                
+                <div class="modal-footer position-relative d-flex flex-column justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 65px;">
+                    <button type="button" class="btn btn-secondary btn-sm px-5 rounded-pill fw-bold shadow-sm modal-close-btn mb-1 mb-md-0" style="z-index: 2;" onclick="closeDetailModal()">Tutup</button>
                     
-                    <div class="position-absolute start-0 bottom-0 ms-3 mb-2 text-muted fw-bold d-flex align-items-center" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                        <i class="bi bi-bar-chart-line-fill text-primary me-1" style="font-size: 0.75rem;"></i> 
-                        <span id="modalViewCount">Dilihat: - kali</span>
-                    </div>
-
-                    <button type="button" class="btn btn-secondary btn-sm px-5 rounded-pill fw-bold shadow-sm" onclick="closeDetailModal()">Tutup</button>
-                    
-                    <div class="position-absolute end-0 bottom-0 me-3 mb-2 text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;" id="modalLastUpdated">
-                        DIPERBARUI: -
+                    <div class="position-absolute w-100 px-3 d-flex justify-content-between bottom-0 pb-2" style="z-index: 1;">
+                        <div class="text-muted fw-bold d-flex align-items-center" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                            <i class="bi bi-bar-chart-line-fill text-primary me-1" style="font-size: 0.75rem;"></i> 
+                            <span id="modalViewCount">Dilihat: - kali</span>
+                        </div>
+                        <div class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;" id="modalLastUpdated">
+                            DIPERBARUI: -
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -619,10 +637,11 @@
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 document.getElementById('detailModalTitle').innerHTML = titleText;
                 
+                // UPDATE: Desain Reg dan Tgl lebih dinamis untuk mobile
                 document.getElementById('detailModalSubtitle').innerHTML = `
-                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-3 px-2">
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-hash text-muted"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
-                        <span class="badge bg-white text-dark border shadow-sm fs-7 fw-bold px-3 py-2 rounded-pill"><i class="bi bi-calendar3 text-muted"></i> Tgl: ${dataTglReg ? dataTglReg.val : '-'}</span>
+                    <div class="d-flex flex-wrap justify-content-center px-2">
+                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg No: ${dataNoReg ? dataNoReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-calendar3 text-muted me-1"></i> Tgl Reg: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
 
                 const col1Groups = [
@@ -713,25 +732,21 @@
 
                 htmlContent += htmlCol1 + htmlCol2 + htmlCol3 + '</div>';
 
-                // UPDATE: Eksekusi Web Analytics Client-Side & UI
                 const dRowIndex = detailData.findIndex(r => r[0] === id);
                 let currentViews = 0;
                 
-                // Ambil nilai dari Kolom Q (Index 16) yang sudah di-load ke memory
                 if (dRowIndex !== -1 && detailData[dRowIndex][16]) {
                     currentViews = parseInt(detailData[dRowIndex][16]) || 0;
                 }
                 
-                // Secara instan tambah 1 di tampilan lokal
                 currentViews += 1;
                 if (dRowIndex !== -1) detailData[dRowIndex][16] = currentViews;
                 
                 const viewCountEl = document.getElementById('modalViewCount');
                 if (viewCountEl) viewCountEl.innerText = `Dilihat: ${currentViews} kali`;
 
-                // Kirim sinyal ke Backend API rahasia secara otomatis di latar belakang
                 fetch(`/api/view/${encodeURIComponent(id)}`, { method: 'PATCH' })
-                    .catch(err => console.log('Analytics Error:', err)); // Sembunyikan error jika gagal
+                    .catch(err => console.log('Analytics Error:', err));
 
                 const pRowIndex = perkaraData.findIndex(r => r[0] === id);
                 let latestUpdatedDate = '-';
