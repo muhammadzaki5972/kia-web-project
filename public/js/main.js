@@ -1,7 +1,7 @@
 if (window.location.pathname.includes('admin.html') && !sessionStorage.getItem('isLoggedIn')) { window.location.href = 'login.html'; }
 function logout() { sessionStorage.removeItem('isLoggedIn'); window.location.href = 'login.html'; }
 
-let sheetHeadersPerkara = [], sheetHeadersDetail = [], detailData = [], perkaraData = [], updateData = [], quillInstances = {}, isEditMode = false, editId = null;
+let sheetHeadersPerkara = [], sheetHeadersDetail = [], detailData = [], perkaraData = [], updateData = [], isEditMode = false, editId = null;
 
 function parseDate(dateStr) {
     if (!dateStr || dateStr === '-') return '';
@@ -69,8 +69,9 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     const lower = (`${label}`).toLowerCase().trim();
     const hint = isFirstDetail ? `<small class="text-danger d-block mt-1">Otomatis sinkron</small>` : '';
 
+    // UPDATE: PENGGUNAAN TEXTAREA UNTUK SUMMERNOTE BS5
     if (lower === 'rincian permohonan' || lower === 'isi permohonan') {
-        return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><div id="${id}_quill" style="height: 150px; background: white;"></div><input type="hidden" id="${id}"></div>`;
+        return `<div class="col-12 mb-3"><label class="form-label fw-bold">${label}</label><textarea id="${id}" class="form-control summernote-editor"></textarea></div>`;
     } 
     else if (lower === 'isu sengketa') {
         return `
@@ -94,7 +95,6 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     else if (lower === 'status sengketa') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><select class="form-select status-dropdown shadow-sm" id="${id}" required><option value="" disabled selected>-- Pilih Status --</option><option value="Dalam Proses">Dalam Proses</option><option value="Selesai">Selesai</option></select>${hint}</div>`;
     } 
-    // UPDATE: Membaca index ke-15 (Kolom P) dari sheet detail untuk dijadikan Dropdown yang sama dengan Agenda
     else if (lower === 'agenda sidang selanjutnya' || (idPrefix === 'inputDetail' && index === 15)) {
         return `
             <div class="col-md-6 mb-3">
@@ -122,7 +122,6 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 ${hint}
             </div>`;
     } 
-    // UPDATE: Membaca index ke-14 (Kolom O) dari sheet detail untuk dijadikan Date Picker (Kalender)
     else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir' || (idPrefix === 'inputDetail' && index === 14)) {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control shadow-sm" id="${id}">${hint}</div>`;
     } else {
@@ -130,13 +129,28 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     }
 }
 
-function initQuill(headers, idPrefix) {
+// UPDATE: INISIALISASI SUMMERNOTE
+function initSummernote(headers, idPrefix) {
     headers.forEach((h, i) => {
         const lowerH = (`${h}`).toLowerCase().trim();
         if (lowerH === 'rincian permohonan' || lowerH === 'isi permohonan') {
-            const id = `${idPrefix}_${i}`;
-            quillInstances[id] = new Quill(`#${id}_quill`, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{'list':'ordered'},{'list':'bullet'}]] } });
-            quillInstances[id].on('text-change', () => { document.getElementById(id).value = quillInstances[id].root.innerHTML; });
+            const id = `#${idPrefix}_${i}`;
+            if (typeof $ !== 'undefined' && $(id).length) {
+                $(id).summernote({
+                    height: 150,
+                    placeholder: 'Ketik isi permohonan di sini...',
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ],
+                    callbacks: {
+                        onChange: function(contents, $editable) {
+                            $(id).val(contents); // Sinkronisasi realtime ke textarea
+                        }
+                    }
+                });
+            }
         }
     });
 }
@@ -239,7 +253,10 @@ async function loadData() {
         formHtml += `</div></div>`;
         formContainer.innerHTML = formHtml;
 
-        initQuill(sheetHeadersPerkara, 'inputPerkara'); initQuill(sheetHeadersDetail, 'inputDetail'); attachStatusLogic();
+        // PANGGIL INITIALIZER SUMMERNOTE
+        initSummernote(sheetHeadersPerkara, 'inputPerkara'); 
+        initSummernote(sheetHeadersDetail, 'inputDetail'); 
+        attachStatusLogic();
 
         if(document.getElementById('inputPerkara_0')) { document.getElementById('inputPerkara_0').addEventListener('input', (e) => { const d = document.getElementById('inputDetail_0'); if(d) d.value = e.target.value; }); }
 
@@ -321,7 +338,15 @@ if(btnConfirmUpdate) {
 
 function bukaModalTambah() {
     isEditMode = false; editId = null; document.getElementById('formTambahData').reset();
-    Object.values(quillInstances).forEach(q => q.setContents([])); 
+    
+    // UPDATE: CLEAR SUMMERNOTE CONTENT
+    if (typeof $ !== 'undefined') {
+        $('.summernote-editor').each(function() {
+            $(this).summernote('code', '');
+            $(this).val('');
+        });
+    }
+
     document.getElementById('inputDetail_0').removeAttribute('readonly'); 
     
     document.querySelectorAll('select[id$="_select"]').forEach(s => s.value = '');
@@ -340,16 +365,33 @@ function bukaModalEdit(id) {
     
     sheetHeadersPerkara.forEach((h, i) => {
         const el = document.getElementById(`inputPerkara_${i}`); const val = rowP[i] || '';
-        if(quillInstances[`inputPerkara_${i}`]) { quillInstances[`inputPerkara_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
-        else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
-        
+        if (el) {
+            // SET VALUE SUMMERNOTE ATAU INPUT BIASA
+            if ($(el).hasClass('summernote-editor')) { 
+                $(el).summernote('code', val); 
+                $(el).val(val);
+            } else if (el.type === 'date') {
+                el.value = parseDate(val);
+            } else {
+                el.value = val;
+            }
+        }
         if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputPerkara', i, val);
     });
+    
     sheetHeadersDetail.forEach((h, i) => {
         const el = document.getElementById(`inputDetail_${i}`); const val = rowD[i] || '';
-        if(quillInstances[`inputDetail_${i}`]) { quillInstances[`inputDetail_${i}`].clipboard.dangerouslyPasteHTML(val); el.value = val; } 
-        else if (el) { if (el.type === 'date') el.value = parseDate(val); else el.value = val; }
-        
+        if (el) {
+            // SET VALUE SUMMERNOTE ATAU INPUT BIASA
+            if ($(el).hasClass('summernote-editor')) { 
+                $(el).summernote('code', val); 
+                $(el).val(val);
+            } else if (el.type === 'date') {
+                el.value = parseDate(val);
+            } else {
+                el.value = val;
+            }
+        }
         if ((`${h}`).toLowerCase().trim() === 'isu sengketa') syncIsuSengketaForEdit('inputDetail', i, val);
     });
 
@@ -375,18 +417,15 @@ function lihatDetail(id) {
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
-        
-        // UPDATE: Ekstraksi kolom O dan P secara dinamis untuk ditampilkan di Admin pop-up 
         const headerO = sheetHeadersDetail[14] ? sheetHeadersDetail[14].toLowerCase().trim() : null;
         const headerP = sheetHeadersDetail[15] ? sheetHeadersDetail[15].toLowerCase().trim() : null;
         
         const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa"];
         if(headerO) leftFields.push(headerO);
         if(headerP) leftFields.push(headerP);
-        leftFields.push("sidang terakhir", "tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan");
+        leftFields.push("tgl sidang selanjutnya", "agenda sidang selanjutnya", "nomor putusan", "tgl diputuskan", "link putusan");
         
         let leftHtml = '<div class="col-md-6">';
-
         leftFields.forEach(f => {
             let fieldVal = '-', labelText = '';
             const findIdx = (headers) => headers.findIndex(h => { const val = (`${h}`).toLowerCase().trim(); return val === f || (f === 'no reg' && val === 'rincian informasi') || (f === 'sidang terakhir' && val === 'sidang'); });
@@ -397,11 +436,9 @@ function lihatDetail(id) {
 
             if(idx !== -1) {
                 if(f === 'no reg') labelText = 'No Reg'; if(f === 'sidang terakhir') labelText = 'Sidang Terakhir';
-
                 if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
                     if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                 }
-
                 if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan ↗</a>`;
                 leftHtml += `<div class="card shadow-sm border-0 mb-2"><div class="card-body py-1 px-3"><div class="text-muted fw-bold d-block" style="font-size: 0.75rem;">${labelText}</div><div class="text-dark" style="font-size: 0.85rem;">${fieldVal}</div></div></div>`;
             }
