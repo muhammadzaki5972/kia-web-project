@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
     
+    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
     
@@ -76,10 +79,10 @@
 
         /* Soft Header Tabel Custom */
         .table-soft-header th {
-            background-color: #75b2f7 !important;
+            background-color: #f0f7ff !important;
             color: #002b5e !important;
             font-weight: 600;
-            border-bottom: 2px solid #5da5f1 !important;
+            border-bottom: 2px solid #b8daff !important;
         }
 
         /* Kustomisasi Warna Pagination */
@@ -127,7 +130,6 @@
             width: 100%;
         }
         
-        /* Highlight Warna Box */
         .info-box-gray { background-color: #f4f6f8; border-color: #e2e8f0; }
         .info-box-gray .info-label { color: #6c757d !important; }
         .info-box-gray .info-value { color: #495057 !important; }
@@ -136,11 +138,21 @@
         .info-box-green .info-label { color: #198754 !important; }
         .info-box-green .info-value { color: #146c43 !important; }
 
-        /* Ukuran Font Kompak & Rapi */
         .info-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; color: #8e9ca9; font-weight: 700; margin-bottom: 0.15rem; }
         .info-value { font-size: 0.82rem; color: #1a1d20; font-weight: 600; line-height: 1.25; }
         .fs-7 { font-size: 0.75rem !important; }
         .card-rincian { max-height: 480px; overflow-y: auto; }
+
+        /* UPDATE: ELASTISITAS JUDUL MODAL (ANTI OVERFLOW) */
+        #detailModalTitle {
+            font-size: clamp(0.95rem, 3.5vw, 1.25rem) !important;
+            line-height: 1.4 !important;
+            word-wrap: break-word;
+            white-space: normal;
+            padding-left: 10px;
+            padding-right: 10px;
+            width: 90%;
+        }
 
         /* =========================================================
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
@@ -155,7 +167,7 @@
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; 
                 padding: 0 !important; 
                 gap: 0 !important; 
-                border-radius: 10px !important; 
+                border-radius: 0 !important; 
                 width: 100%;
                 display: flex !important;
                 align-items: stretch !important;
@@ -200,7 +212,6 @@
             }
 
             .modal-header { padding: 0.8rem 1rem !important; }
-            #detailModalTitle { font-size: 1.05rem !important; }
             
             /* CSS KHUSUS HP: Compact Badge (Reg & Tgl) */
             #detailModalSubtitle .d-flex { gap: 0.35rem !important; margin-top: 0.5rem !important; }
@@ -221,7 +232,7 @@
             .modal-close-btn { 
                 padding: 0.35rem 1.8rem !important; 
                 font-size: 0.8rem !important; 
-                margin-bottom: 0.6rem !important; /* Dorong tombol ke atas agar tak numpuk */
+                margin-bottom: 0.6rem !important; 
             }
 
             .footer-col-section { text-align: center; }
@@ -333,7 +344,10 @@
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 z-1">
                     <button type="button" class="btn-close position-absolute end-0 top-0 mt-3 me-3 shadow-none" onclick="closeDetailModal()"></button>
-                    <h5 class="modal-title fw-bold fs-5 text-center text-dark w-100" id="detailModalTitle">Detail Perkara</h5>
+                    
+                    <!-- UPDATE JUDUL DIPERKETAT AGAR TIDAK LEBAR DI HP -->
+                    <h5 class="modal-title fw-bold text-center text-dark mx-auto" id="detailModalTitle">Detail Perkara</h5>
+                    
                     <div id="detailModalSubtitle" class="w-100"></div>
                 </div>
                 <div class="modal-body position-relative bg-light px-3 px-md-4 py-4">
@@ -399,6 +413,7 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
@@ -637,11 +652,10 @@
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 document.getElementById('detailModalTitle').innerHTML = titleText;
                 
-                // UPDATE: Desain Reg dan Tgl lebih dinamis untuk mobile
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
-                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg No: ${dataNoReg ? dataNoReg.val : '-'}</span>
-                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-calendar3 text-muted me-1"></i> Tgl Reg: ${dataTglReg ? dataTglReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
+                        <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-calendar3 text-muted me-1"></i> Tgl: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
 
                 const col1Groups = [
