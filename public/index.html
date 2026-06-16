@@ -18,7 +18,7 @@
         body { font-family: 'Inter', sans-serif; background-color: #f4f7f6 !important; }
         h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .hero-title, .poppins-font { font-family: 'Poppins', sans-serif; }
 
-        /* Animasi Loop Gradient (Header Utama Dipertahankan) */
+        /* Animasi Loop Gradient (Dipertahankan Hanya untuk Header Utama) */
         @keyframes gradientLoop {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -44,43 +44,73 @@
         }
 
         /* =========================================================
-           SLIDER BACKGROUND HERO DENGAN BLUR & OVERLAY
+           UPDATE: SLIDESHOW BACKGROUND HERO & OVERLAY TO TOP
            ========================================================= */
-        .hero-section { 
-            position: relative; 
-            overflow: hidden; 
-            padding-top: 5rem !important; 
-            padding-bottom: 5rem !important;
+        .hero-section {
+            position: relative;
+            overflow: hidden;
             background-color: #001f42;
         }
-        .hero-slider-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+        .hero-slideshow-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
         }
         .hero-slide {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            opacity: 0; transition: opacity 1.2s ease-in-out;
-            filter: blur(6px); transform: scale(1.06); 
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: imageSlideshow 25s infinite ease-in-out;
         }
-        .hero-slide.active { opacity: 1; }
-        .hero-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(0, 20, 43, 0.88), rgba(0, 57, 115, 0.82));
+        /* 5 Contoh Gambar Berlisensi Free License */
+        .hero-slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1400'); animation-delay: 0s; }
+        .hero-slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400'); animation-delay: 5s; }
+        .hero-slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400'); animation-delay: 10s; }
+        .hero-slide:nth-child(4) { background-image: url('https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=1400'); animation-delay: 15s; }
+        .hero-slide:nth-child(5) { background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1400'); animation-delay: 20s; }
+
+        @keyframes imageSlideshow {
+            0% { opacity: 0; }
+            8% { opacity: 1; }
+            20% { opacity: 1; }
+            28% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        /* Linear Gradient - Transparency (To Top) Overlay */
+        .hero-transparency-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
+            background: linear-gradient(to top, rgba(0, 31, 66, 0.98) 0%, rgba(0, 31, 66, 0.7) 50%, rgba(0, 31, 66, 0.4) 100%);
         }
 
-        /* Animasi Typewriter Cursor */
-        .cursor {
+        /* =========================================================
+           UPDATE: ANIMASI TYPEWRITTER (KONTROL PENUH RESONSIVE)
+           ========================================================= */
+        .typewriter-container {
             display: inline-block;
-            width: 3px;
-            background-color: #ffffff;
-            margin-left: 3px;
-            animation: blink 0.9s step-end infinite;
-            vertical-align: middle;
+            margin: 0 auto;
         }
-        @keyframes blink {
-            from, to { background-color: transparent }
-            50% { background-color: #ffffff; }
+        .typewriter-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid #c2f351;
+            width: 0;
+            font-size: clamp(1.1rem, 4.2vw, 2.3rem) !important;
+            animation: typingEffect 4.5s steps(25, end) infinite alternate, blinkCursor 0.75s step-end infinite;
+        }
+        @keyframes typingEffect {
+            0% { width: 0; }
+            45% { width: 100%; }
+            90% { width: 100%; }
+            100% { width: 100%; }
+        }
+        @keyframes blinkCursor {
+            from, to { border-color: transparent; }
+            50% { border-color: #c2f351; }
         }
 
         /* Search Box Premium & Filter Select */
@@ -114,6 +144,7 @@
         tbody tr { transition: all 0.25s ease; cursor: default; }
         tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.06); background-color: #ffffff !important; z-index: 10; position: relative; }
 
+        /* Soft Header Tabel Custom */
         .table-soft-header th {
             background-color: #f0f7ff !important;
             color: #002b5e !important;
@@ -121,17 +152,12 @@
             border-bottom: 2px solid #b8daff !important;
         }
 
+        /* Kustomisasi Warna Pagination */
         .pagination .page-link { color: #002b5e; border-color: #dee2e6; }
         .pagination .page-item.active .page-link { background-color: #0099ff; border-color: #0099ff; color: white; }
         .pagination .page-item.disabled .page-link { color: #8e9ca9; background-color: #f8f9fa; }
 
-        .social-icon-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: all 0.3s ease; color: white; font-size: 0.9rem;
-        }
-        .social-icon-btn:hover { transform: translateY(-3px); background: white; color: #0099ff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
-        /* Detail Modal Styling */
+        /* TAMPILAN MODAL DETAIL (BUNGKUSAN & PEMISAH) */
         .info-group-wrapper {
             background-color: #ffffff;
             border: 1px solid #e9ecef;
@@ -141,6 +167,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
             width: 100%;
         }
+        
         .info-box-gray { background-color: #f4f6f8; border-color: #e2e8f0; }
         .info-box-gray .info-label { color: #6c757d !important; }
         .info-box-gray .info-value { color: #495057 !important; }
@@ -168,7 +195,7 @@
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
            ========================================================= */
         @media (max-width: 991.98px) {
-            .hero-section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+            .hero-section { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
             
             .search-box-elegant { 
                 flex-direction: row !important;
@@ -222,8 +249,14 @@
             }
 
             .modal-header { padding: 0.8rem 1rem !important; }
+            
             #detailModalSubtitle .d-flex { gap: 0.35rem !important; margin-top: 0.5rem !important; }
-            #detailModalSubtitle .badge { font-size: 0.6rem !important; padding: 0.35rem 0.6rem !important; }
+            #detailModalSubtitle .badge { 
+                font-size: 0.6rem !important; 
+                padding: 0.35rem 0.6rem !important; 
+                letter-spacing: 0.2px;
+            }
+            #detailModalSubtitle .badge i { font-size: 0.65rem !important; }
             
             .modal-body { padding: 1rem 0.75rem !important; }
             .modal-body .row { display: block !important; }
@@ -231,7 +264,11 @@
             .card-rincian { max-height: none; overflow-y: visible; }
 
             .modal-footer { padding-bottom: 1.8rem !important; } 
-            .modal-close-btn { padding: 0.35rem 1.8rem !important; font-size: 0.8rem !important; margin-bottom: 0.6rem !important; }
+            .modal-close-btn { 
+                padding: 0.35rem 1.8rem !important; 
+                font-size: 0.8rem !important; 
+                margin-bottom: 0.6rem !important; 
+            }
 
             .footer-col-section { text-align: center; }
             .footer-col-section ul li { justify-content: center; text-align: center; }
@@ -244,34 +281,41 @@
 <body class="d-flex flex-column min-vh-100">
     
     <div class="sticky-top shadow-sm" style="z-index: 1030;">
-        <nav class="navbar navbar-dark py-3 bg-animated-gradient justify-content-center">
-            <div class="container d-flex justify-content-center align-items-center text-center">
+        <nav class="navbar navbar-dark py-3 bg-animated-gradient">
+            <div class="container d-flex flex-wrap justify-content-between align-items-center">
                 <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
                     <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 38px; height: auto; margin-right: 12px;">
-                    <div class="d-flex flex-column lh-1 text-start">
+                    <div class="d-flex flex-column lh-1">
                         <span class="fs-5 fs-md-4 fw-bold text-white">KIACEH</span>
                         <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
                     </div>
                 </a>
-            </div>
+                
+                </div>
         </nav>
         <div class="animated-header-border"></div>
     </div>
 
-    <section class="hero-section text-center text-white position-relative shadow-sm">
-        <div class="hero-slider-container">
-            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=1200');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=1200');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200');"></div>
+    <section class="hero-section text-center py-5 text-white position-relative shadow-sm">
+        
+        <div class="hero-slideshow-container">
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
         </div>
-        <div class="hero-overlay"></div>
+        
+        <div class="hero-transparency-overlay"></div>
 
         <div class="container position-relative z-3 mt-1 mb-2 fade-in-up">
-            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.6rem, 4vw, 2.4rem); min-height: 3.6rem;">
-                <span id="typewriter-text"></span><span class="cursor"></span>
-            </h1>
+            
+            <div class="d-block mb-2 text-center">
+                <div class="typewriter-container">
+                    <h1 class="fw-bold hero-title typewriter-text mb-0">Sistem Informasi Sengketa</h1>
+                </div>
+            </div>
+            
             <p class="text-white-50 mb-4 fs-6 fw-normal px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
             <div class="row justify-content-center px-2 px-md-0">
@@ -387,39 +431,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
+        
         let filteredData = [];
         let currentPage = 1;
         const rowsPerPage = 15;
-
-        // INI: Fungsi Slide Otomatis 5 Detik Latar Belakang
-        function initHeroSlider() {
-            const slides = document.querySelectorAll('.hero-slide');
-            if(slides.length === 0) return;
-            let currentSlide = 0;
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 5000);
-        }
-
-        // INI: Fungsi Animasi Typewriter Judul Utama
-        function initTypewriter() {
-            const txt = "Sistem Informasi Sengketa";
-            let i = 0;
-            const speed = 110; 
-            const el = document.getElementById("typewriter-text");
-            if(!el) return;
-            el.innerHTML = "";
-            function type() {
-                if (i < txt.length) {
-                    el.innerHTML += txt.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
 
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
@@ -454,11 +469,13 @@
             
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+            
             const idxStatusDetail = detailHeaders.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
             const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7; 
 
             filteredData = perkaraData.filter(row => {
                 const id = row[0]; 
+                
                 let matchText = false;
                 if (query === '') {
                     matchText = true;
@@ -482,8 +499,10 @@
                         matchStatus = detailRow.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
                     }
                 }
+                
                 return matchText && matchStatus;
             });
+
             currentPage = 1;
             renderTable();
         }
@@ -499,6 +518,7 @@
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
             
             let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-bordered table-hover mb-0 align-middle"><thead class="table-soft-header poppins-font"><tr>`;
+            
             tableHtml += `<th class="py-3 px-3 text-center align-middle" style="width: 50px;">No.</th>`;
             sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
@@ -510,6 +530,7 @@
                 tableHtml += `<tr><td colspan="${sheetHeadersPerkara.length + 1}" class="text-center py-5 text-muted fw-bold"><i class="bi bi-search fs-3 d-block mb-2 text-secondary"></i>Tidak ada data yang sesuai dengan pencarian.</td></tr>`;
             } else {
                 const pageData = filteredData.slice(startIndex, endIndex);
+
                 pageData.forEach((row, index) => {
                     if (!row || row.length === 0) return; 
                     const absoluteIndex = startIndex + index + 1; 
@@ -520,6 +541,7 @@
                         if(i !== skipIdx) {
                             let cellData = row[i] || '-';
                             const cellLower = cellData.toLowerCase().trim();
+                            
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
                             if (isStatusColumn || cellLower === 'selesai' || cellLower === 'dalam proses' || cellLower === 'proses') {
                                 if (cellLower.includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
@@ -531,6 +553,7 @@
                     tableHtml += `<td class="px-3 py-3 text-center"><button class="btn btn-info btn-sm text-dark fw-bold shadow-sm py-1 px-3 rounded-pill d-flex align-items-center justify-content-center mx-auto hover-lift" onclick="lihatDetail('${row[0] || ''}')"><i class="bi bi-eye-fill me-1"></i> Lihat</button></td></tr>`;
                 });
             }
+            
             tableHtml += `</tbody></table></div></div>`;
 
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -563,6 +586,7 @@
                     </nav>
                 </div>`;
             }
+
             container.innerHTML = tableHtml;
         }
 
@@ -571,6 +595,7 @@
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
+            
             const searchBox = document.getElementById('publicDataContainer');
             if (searchBox) {
                 const y = searchBox.getBoundingClientRect().top + window.pageYOffset - 120;
@@ -584,11 +609,12 @@
             document.getElementById('detailModalSubtitle').innerHTML = '';
 
             const pRow = perkaraData.find(r => r[0] === id);
-            const getIndexPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
-            const getIndexTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+            const getIndexPem = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('pemohon'));
+            const getIndexTerm = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('termohon'));
             
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
+                
                 const headerO = detailHeaders[14] ? detailHeaders[14].toLowerCase().trim() : 'tgl sidang sebelumnya';
                 const headerP = detailHeaders[15] ? detailHeaders[15].toLowerCase().trim() : 'agenda sidang sebelumnya';
 
@@ -597,10 +623,15 @@
                     const findIdx = (headers) => headers.findIndex(h => { 
                         if(!h) return false;
                         const val = (`${h}`).toLowerCase().trim(); 
-                        return val === f || (f === 'status sengketa' && val.includes('status')) || (f === 'no reg' && val === 'rincian informasi') || (f === 'isi permohonan' && val === 'rincian permohonan') || (f === 'tgl register' && val === 'tanggal register'); 
+                        return val === f || 
+                               (f === 'status sengketa' && val.includes('status')) || 
+                               (f === 'no reg' && val === 'rincian informasi') || 
+                               (f === 'isi permohonan' && val === 'rincian permohonan') ||
+                               (f === 'tgl register' && val === 'tanggal register'); 
                     });
 
                     let idx = findIdx(detailHeaders);
+                    
                     if(idx !== -1) { 
                         fieldVal = row ? (row[idx] || '-') : '-'; 
                         labelText = detailHeaders[idx]; 
@@ -619,6 +650,7 @@
                     if(idx !== -1 || forceDetailIdx !== -1) {
                         if(f === 'no reg') labelText = 'No Register'; 
                         if(f === 'tgl register') labelText = 'Tgl Register';
+                        
                         if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
@@ -630,9 +662,10 @@
 
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
-                const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 
+                const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
                 document.getElementById('detailModalTitle').innerHTML = titleText;
+                
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
                         <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
@@ -658,6 +691,7 @@
                 ];
 
                 let htmlContent = '<div class="row">';
+
                 let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check text-info me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column justify-content-start text-center py-3 px-3">`;
                 col1Groups.forEach(grp => {
                     let groupHtml = `<div class="info-group-wrapper ${grp.class}">`;
@@ -668,12 +702,14 @@
                             hasValidField = true;
                             let displayVal = data.val;
                             const fLower = fObj.key.toLowerCase().trim();
+
                             if (fLower === 'status sengketa') {
                                 const statusStr = displayVal.toLowerCase();
                                 if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                 else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                 else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                             }
+                            
                             groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
                         }
                     });
@@ -718,6 +754,7 @@
                     groupHtml += `</div>`;
                     if(hasValidField) htmlCol3 += groupHtml;
                 });
+                
                 if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
                 htmlCol3 += `</div></div></div>`;
 
@@ -725,16 +762,19 @@
 
                 const dRowIndex = detailData.findIndex(r => r[0] === id);
                 let currentViews = 0;
+                
                 if (dRowIndex !== -1 && detailData[dRowIndex][16]) {
                     currentViews = parseInt(detailData[dRowIndex][16]) || 0;
                 }
+                
                 currentViews += 1;
                 if (dRowIndex !== -1) detailData[dRowIndex][16] = currentViews;
                 
                 const viewCountEl = document.getElementById('modalViewCount');
                 if (viewCountEl) viewCountEl.innerText = `Dilihat: ${currentViews} kali`;
 
-                fetch(`/api/view/${encodeURIComponent(id)}`, { method: 'PATCH' }).catch(err => console.log(err));
+                fetch(`/api/view/${encodeURIComponent(id)}`, { method: 'PATCH' })
+                    .catch(err => console.log('Analytics Error:', err));
 
                 const pRowIndex = perkaraData.findIndex(r => r[0] === id);
                 let latestUpdatedDate = '-';
@@ -747,13 +787,7 @@
         }
 
         function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
-        
-        // PANGGIL INI SAAT DOM READY UNTUK MENJALANKAN SLIDER & TYPEWRITTER
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPublicData();
-            initHeroSlider();
-            initTypewriter();
-        });
+        document.addEventListener('DOMContentLoaded', loadPublicData);
 
         const btnScrollTop = document.getElementById('btnScrollTop');
         window.addEventListener('scroll', () => {
@@ -761,6 +795,8 @@
             else btnScrollTop.style.display = "none";
         });
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // UPDATE: Script event listener Hamburger Menu / Offcanvas yang sudah tidak dipakai telah dibersihkan seutuhnya.
     </script>
 </body>
 </html>
