@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
     
-    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
     
@@ -21,7 +18,7 @@
         body { font-family: 'Inter', sans-serif; background-color: #f4f7f6 !important; }
         h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .hero-title, .poppins-font { font-family: 'Poppins', sans-serif; }
 
-        /* Animasi Loop Gradient */
+        /* Animasi Loop Gradient (Header Utama Dipertahankan) */
         @keyframes gradientLoop {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -44,6 +41,46 @@
         @keyframes borderMove {
             0% { background-position: 0% 0%; }
             100% { background-position: 300% 0%; }
+        }
+
+        /* =========================================================
+           SLIDER BACKGROUND HERO DENGAN BLUR & OVERLAY
+           ========================================================= */
+        .hero-section { 
+            position: relative; 
+            overflow: hidden; 
+            padding-top: 5rem !important; 
+            padding-bottom: 5rem !important;
+            background-color: #001f42;
+        }
+        .hero-slider-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+        }
+        .hero-slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 1.2s ease-in-out;
+            filter: blur(6px); transform: scale(1.06); 
+        }
+        .hero-slide.active { opacity: 1; }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0, 20, 43, 0.88), rgba(0, 57, 115, 0.82));
+            z-index: 1;
+        }
+
+        /* Animasi Typewriter Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: #ffffff;
+            margin-left: 3px;
+            animation: blink 0.9s step-end infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: #ffffff; }
         }
 
         /* Search Box Premium & Filter Select */
@@ -77,7 +114,6 @@
         tbody tr { transition: all 0.25s ease; cursor: default; }
         tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.06); background-color: #ffffff !important; z-index: 10; position: relative; }
 
-        /* Soft Header Tabel Custom */
         .table-soft-header th {
             background-color: #f0f7ff !important;
             color: #002b5e !important;
@@ -85,41 +121,17 @@
             border-bottom: 2px solid #b8daff !important;
         }
 
-        /* Kustomisasi Warna Pagination */
         .pagination .page-link { color: #002b5e; border-color: #dee2e6; }
         .pagination .page-item.active .page-link { background-color: #0099ff; border-color: #0099ff; color: white; }
         .pagination .page-item.disabled .page-link { color: #8e9ca9; background-color: #f8f9fa; }
 
-        /* Animasi Hamburger Icon */
-        .animated-icon {
-            width: 26px; height: 20px; position: relative; margin: 0px;
-            transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
-        }
-        .animated-icon span {
-            display: block; position: absolute; height: 3px; width: 100%;
-            background: #fff; border-radius: 9px; opacity: 1; left: 0;
-            transform: rotate(0deg); transition: .25s ease-in-out;
-        }
-        .animated-icon span:nth-child(1) { top: 0px; }
-        .animated-icon span:nth-child(2) { top: 8px; }
-        .animated-icon span:nth-child(3) { top: 16px; }
-        .animated-icon.open span:nth-child(1) { top: 8px; transform: rotate(135deg); }
-        .animated-icon.open span:nth-child(2) { opacity: 0; left: -60px; }
-        .animated-icon.open span:nth-child(3) { top: 8px; transform: rotate(-135deg); }
-
-        .custom-offcanvas { max-width: 320px; border-left: none; box-shadow: -5px 0 25px rgba(0,0,0,0.15); }
-        .offcanvas-menu-link { transition: all 0.3s ease; border-radius: 0.5rem; padding: 12px 15px; }
-        .offcanvas-menu-link:hover { background-color: #f0f7ff; transform: translateX(6px); }
-        
         .social-icon-btn {
             display: inline-flex; align-items: center; justify-content: center;
             width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: all 0.3s ease; color: white; font-size: 0.9rem;
         }
         .social-icon-btn:hover { transform: translateY(-3px); background: white; color: #0099ff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* =========================================================
-           TAMPILAN MODAL DETAIL (BUNGKUSAN & PEMISAH)
-           ========================================================= */
+        /* Detail Modal Styling */
         .info-group-wrapper {
             background-color: #ffffff;
             border: 1px solid #e9ecef;
@@ -129,7 +141,6 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
             width: 100%;
         }
-        
         .info-box-gray { background-color: #f4f6f8; border-color: #e2e8f0; }
         .info-box-gray .info-label { color: #6c757d !important; }
         .info-box-gray .info-value { color: #495057 !important; }
@@ -143,7 +154,6 @@
         .fs-7 { font-size: 0.75rem !important; }
         .card-rincian { max-height: 480px; overflow-y: auto; }
 
-        /* UPDATE: ELASTISITAS JUDUL MODAL (ANTI OVERFLOW) */
         #detailModalTitle {
             font-size: clamp(0.95rem, 3.5vw, 1.25rem) !important;
             line-height: 1.4 !important;
@@ -158,7 +168,7 @@
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
            ========================================================= */
         @media (max-width: 991.98px) {
-            .hero-section { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+            .hero-section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
             
             .search-box-elegant { 
                 flex-direction: row !important;
@@ -212,28 +222,16 @@
             }
 
             .modal-header { padding: 0.8rem 1rem !important; }
-            
-            /* CSS KHUSUS HP: Compact Badge (Reg & Tgl) */
             #detailModalSubtitle .d-flex { gap: 0.35rem !important; margin-top: 0.5rem !important; }
-            #detailModalSubtitle .badge { 
-                font-size: 0.6rem !important; 
-                padding: 0.35rem 0.6rem !important; 
-                letter-spacing: 0.2px;
-            }
-            #detailModalSubtitle .badge i { font-size: 0.65rem !important; }
+            #detailModalSubtitle .badge { font-size: 0.6rem !important; padding: 0.35rem 0.6rem !important; }
             
             .modal-body { padding: 1rem 0.75rem !important; }
             .modal-body .row { display: block !important; }
             .modal-body .card.h-100 { height: auto !important; margin-bottom: 1rem !important; }
             .card-rincian { max-height: none; overflow-y: visible; }
 
-            /* CSS KHUSUS HP: Footer, Tombol Tutup & Posisi Teks */
             .modal-footer { padding-bottom: 1.8rem !important; } 
-            .modal-close-btn { 
-                padding: 0.35rem 1.8rem !important; 
-                font-size: 0.8rem !important; 
-                margin-bottom: 0.6rem !important; 
-            }
+            .modal-close-btn { padding: 0.35rem 1.8rem !important; font-size: 0.8rem !important; margin-bottom: 0.6rem !important; }
 
             .footer-col-section { text-align: center; }
             .footer-col-section ul li { justify-content: center; text-align: center; }
@@ -246,57 +244,34 @@
 <body class="d-flex flex-column min-vh-100">
     
     <div class="sticky-top shadow-sm" style="z-index: 1030;">
-        <nav class="navbar navbar-dark py-3 bg-animated-gradient">
-            <div class="container d-flex flex-wrap justify-content-between align-items-center">
+        <nav class="navbar navbar-dark py-3 bg-animated-gradient justify-content-center">
+            <div class="container d-flex justify-content-center align-items-center text-center">
                 <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
                     <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 38px; height: auto; margin-right: 12px;">
-                    <div class="d-flex flex-column lh-1">
+                    <div class="d-flex flex-column lh-1 text-start">
                         <span class="fs-5 fs-md-4 fw-bold text-white">KIACEH</span>
                         <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
                     </div>
                 </a>
-                
-                <div class="d-flex align-items-center gap-2">
-                    <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas">
-                        <div class="animated-icon" id="navIcon">
-                            <span></span><span></span><span></span>
-                        </div>
-                    </button>
-                </div>
             </div>
         </nav>
         <div class="animated-header-border"></div>
     </div>
 
-    <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="menuOffcanvas">
-        <div class="offcanvas-header shadow-sm bg-animated-gradient">
-            <h5 class="offcanvas-title fw-bold text-white poppins-font">Menu Navigasi</h5>
-            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas"></button>
+    <section class="hero-section text-center text-white position-relative shadow-sm">
+        <div class="hero-slider-container">
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=1200');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=1200');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200');"></div>
         </div>
-        <div class="offcanvas-body d-flex flex-column p-4 bg-white">
-            <ul class="navbar-nav flex-grow-1 pe-3 mt-2">
-                <li class="nav-item mb-4 mt-1 px-1 border-bottom pb-4">
-                    <a href="login.html" target="_blank" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); border: none;">
-                        <i class="bi bi-box-arrow-in-right me-2 fs-5"></i> Login Admin
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark fw-bold fs-6 d-flex align-items-center offcanvas-menu-link" href="index.html">
-                        <i class="bi bi-house-door-fill me-3 fs-4" style="color: #0099ff;"></i> Beranda
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark fw-bold fs-6 d-flex align-items-center offcanvas-menu-link" href="https://kia.acehprov.go.id" target="_blank">
-                        <i class="bi bi-globe me-3 fs-4 text-info"></i> Ke Website Utama
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+        <div class="hero-overlay"></div>
 
-    <section class="hero-section text-center py-5 text-white position-relative bg-animated-gradient shadow-sm">
-        <div class="container position-relative z-1 mt-1 mb-2 fade-in-up">
-            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.6rem, 4vw, 2.3rem);">Sistem Informasi Sengketa</h1>
+        <div class="container position-relative z-3 mt-1 mb-2 fade-in-up">
+            <h1 class="fw-bold hero-title mb-2" style="font-size: clamp(1.6rem, 4vw, 2.4rem); min-height: 3.6rem;">
+                <span id="typewriter-text"></span><span class="cursor"></span>
+            </h1>
             <p class="text-white-50 mb-4 fs-6 fw-normal px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
             <div class="row justify-content-center px-2 px-md-0">
@@ -344,10 +319,7 @@
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 z-1">
                     <button type="button" class="btn-close position-absolute end-0 top-0 mt-3 me-3 shadow-none" onclick="closeDetailModal()"></button>
-                    
-                    <!-- UPDATE JUDUL DIPERKETAT AGAR TIDAK LEBAR DI HP -->
                     <h5 class="modal-title fw-bold text-center text-dark mx-auto" id="detailModalTitle">Detail Perkara</h5>
-                    
                     <div id="detailModalSubtitle" class="w-100"></div>
                 </div>
                 <div class="modal-body position-relative bg-light px-3 px-md-4 py-4">
@@ -368,7 +340,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -413,14 +384,42 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
-        
         let filteredData = [];
         let currentPage = 1;
         const rowsPerPage = 15;
+
+        // INI: Fungsi Slide Otomatis 5 Detik Latar Belakang
+        function initHeroSlider() {
+            const slides = document.querySelectorAll('.hero-slide');
+            if(slides.length === 0) return;
+            let currentSlide = 0;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 5000);
+        }
+
+        // INI: Fungsi Animasi Typewriter Judul Utama
+        function initTypewriter() {
+            const txt = "Sistem Informasi Sengketa";
+            let i = 0;
+            const speed = 110; 
+            const el = document.getElementById("typewriter-text");
+            if(!el) return;
+            el.innerHTML = "";
+            function type() {
+                if (i < txt.length) {
+                    el.innerHTML += txt.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
 
         async function loadPublicData() {
             const container = document.getElementById('publicDataContainer');
@@ -455,13 +454,11 @@
             
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
-            
             const idxStatusDetail = detailHeaders.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
             const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7; 
 
             filteredData = perkaraData.filter(row => {
                 const id = row[0]; 
-                
                 let matchText = false;
                 if (query === '') {
                     matchText = true;
@@ -485,10 +482,8 @@
                         matchStatus = detailRow.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
                     }
                 }
-                
                 return matchText && matchStatus;
             });
-
             currentPage = 1;
             renderTable();
         }
@@ -504,7 +499,6 @@
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
             
             let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-bordered table-hover mb-0 align-middle"><thead class="table-soft-header poppins-font"><tr>`;
-            
             tableHtml += `<th class="py-3 px-3 text-center align-middle" style="width: 50px;">No.</th>`;
             sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
@@ -516,7 +510,6 @@
                 tableHtml += `<tr><td colspan="${sheetHeadersPerkara.length + 1}" class="text-center py-5 text-muted fw-bold"><i class="bi bi-search fs-3 d-block mb-2 text-secondary"></i>Tidak ada data yang sesuai dengan pencarian.</td></tr>`;
             } else {
                 const pageData = filteredData.slice(startIndex, endIndex);
-
                 pageData.forEach((row, index) => {
                     if (!row || row.length === 0) return; 
                     const absoluteIndex = startIndex + index + 1; 
@@ -527,7 +520,6 @@
                         if(i !== skipIdx) {
                             let cellData = row[i] || '-';
                             const cellLower = cellData.toLowerCase().trim();
-                            
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
                             if (isStatusColumn || cellLower === 'selesai' || cellLower === 'dalam proses' || cellLower === 'proses') {
                                 if (cellLower.includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
@@ -539,7 +531,6 @@
                     tableHtml += `<td class="px-3 py-3 text-center"><button class="btn btn-info btn-sm text-dark fw-bold shadow-sm py-1 px-3 rounded-pill d-flex align-items-center justify-content-center mx-auto hover-lift" onclick="lihatDetail('${row[0] || ''}')"><i class="bi bi-eye-fill me-1"></i> Lihat</button></td></tr>`;
                 });
             }
-            
             tableHtml += `</tbody></table></div></div>`;
 
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -572,7 +563,6 @@
                     </nav>
                 </div>`;
             }
-
             container.innerHTML = tableHtml;
         }
 
@@ -581,7 +571,6 @@
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
-            
             const searchBox = document.getElementById('publicDataContainer');
             if (searchBox) {
                 const y = searchBox.getBoundingClientRect().top + window.pageYOffset - 120;
@@ -595,12 +584,11 @@
             document.getElementById('detailModalSubtitle').innerHTML = '';
 
             const pRow = perkaraData.find(r => r[0] === id);
-            const getIndexPem = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('pemohon'));
-            const getIndexTerm = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('termohon'));
+            const getIndexPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
+            const getIndexTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
             
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
-                
                 const headerO = detailHeaders[14] ? detailHeaders[14].toLowerCase().trim() : 'tgl sidang sebelumnya';
                 const headerP = detailHeaders[15] ? detailHeaders[15].toLowerCase().trim() : 'agenda sidang sebelumnya';
 
@@ -609,15 +597,10 @@
                     const findIdx = (headers) => headers.findIndex(h => { 
                         if(!h) return false;
                         const val = (`${h}`).toLowerCase().trim(); 
-                        return val === f || 
-                               (f === 'status sengketa' && val.includes('status')) || 
-                               (f === 'no reg' && val === 'rincian informasi') || 
-                               (f === 'isi permohonan' && val === 'rincian permohonan') ||
-                               (f === 'tgl register' && val === 'tanggal register'); 
+                        return val === f || (f === 'status sengketa' && val.includes('status')) || (f === 'no reg' && val === 'rincian informasi') || (f === 'isi permohonan' && val === 'rincian permohonan') || (f === 'tgl register' && val === 'tanggal register'); 
                     });
 
                     let idx = findIdx(detailHeaders);
-                    
                     if(idx !== -1) { 
                         fieldVal = row ? (row[idx] || '-') : '-'; 
                         labelText = detailHeaders[idx]; 
@@ -636,7 +619,6 @@
                     if(idx !== -1 || forceDetailIdx !== -1) {
                         if(f === 'no reg') labelText = 'No Register'; 
                         if(f === 'tgl register') labelText = 'Tgl Register';
-                        
                         if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
@@ -648,10 +630,9 @@
 
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
-                
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
-                document.getElementById('detailModalTitle').innerHTML = titleText;
                 
+                document.getElementById('detailModalTitle').innerHTML = titleText;
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
                         <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
@@ -677,7 +658,6 @@
                 ];
 
                 let htmlContent = '<div class="row">';
-
                 let htmlCol1 = `<div class="col-lg-4 mb-4 mb-lg-0"><div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-header bg-white border-bottom fw-bold text-center py-3 poppins-font" style="color: #002b5e; font-size: 1rem;"><i class="bi bi-calendar-check text-info me-2"></i>Agenda & Jadwal</div><div class="card-body d-flex flex-column justify-content-start text-center py-3 px-3">`;
                 col1Groups.forEach(grp => {
                     let groupHtml = `<div class="info-group-wrapper ${grp.class}">`;
@@ -688,14 +668,12 @@
                             hasValidField = true;
                             let displayVal = data.val;
                             const fLower = fObj.key.toLowerCase().trim();
-
                             if (fLower === 'status sengketa') {
                                 const statusStr = displayVal.toLowerCase();
                                 if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                 else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                 else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                             }
-                            
                             groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
                         }
                     });
@@ -740,7 +718,6 @@
                     groupHtml += `</div>`;
                     if(hasValidField) htmlCol3 += groupHtml;
                 });
-                
                 if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
                 htmlCol3 += `</div></div></div>`;
 
@@ -748,19 +725,16 @@
 
                 const dRowIndex = detailData.findIndex(r => r[0] === id);
                 let currentViews = 0;
-                
                 if (dRowIndex !== -1 && detailData[dRowIndex][16]) {
                     currentViews = parseInt(detailData[dRowIndex][16]) || 0;
                 }
-                
                 currentViews += 1;
                 if (dRowIndex !== -1) detailData[dRowIndex][16] = currentViews;
                 
                 const viewCountEl = document.getElementById('modalViewCount');
                 if (viewCountEl) viewCountEl.innerText = `Dilihat: ${currentViews} kali`;
 
-                fetch(`/api/view/${encodeURIComponent(id)}`, { method: 'PATCH' })
-                    .catch(err => console.log('Analytics Error:', err));
+                fetch(`/api/view/${encodeURIComponent(id)}`, { method: 'PATCH' }).catch(err => console.log(err));
 
                 const pRowIndex = perkaraData.findIndex(r => r[0] === id);
                 let latestUpdatedDate = '-';
@@ -773,7 +747,13 @@
         }
 
         function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
-        document.addEventListener('DOMContentLoaded', loadPublicData);
+        
+        // PANGGIL INI SAAT DOM READY UNTUK MENJALANKAN SLIDER & TYPEWRITTER
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPublicData();
+            initHeroSlider();
+            initTypewriter();
+        });
 
         const btnScrollTop = document.getElementById('btnScrollTop');
         window.addEventListener('scroll', () => {
@@ -781,11 +761,6 @@
             else btnScrollTop.style.display = "none";
         });
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-        const myOffcanvas = document.getElementById('menuOffcanvas');
-        const navIcon = document.getElementById('navIcon');
-        myOffcanvas.addEventListener('show.bs.offcanvas', () => navIcon.classList.add('open'));
-        myOffcanvas.addEventListener('hide.bs.offcanvas', () => navIcon.classList.remove('open'));
     </script>
 </body>
 </html>
