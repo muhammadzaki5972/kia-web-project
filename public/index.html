@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
     
+    <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
     
@@ -44,23 +47,23 @@
         }
 
         /* =========================================================
-           UPDATE: TINGGI STATIS 400px UNTUK SLIDESHOW & HERO SECTION
+           TINGGI STATIS 400px UNTUK SLIDESHOW & HERO SECTION
            ========================================================= */
         .hero-section {
             position: relative;
-            height: 400px; /* Ukuran Tinggi Statis */
+            height: 400px;
             background-color: #001f42;
         }
         .hero-slideshow-container {
             position: absolute;
             top: 0; left: 0; width: 100%; 
-            height: 400px; /* Ukuran Tinggi Statis */
+            height: 400px;
             z-index: 0;
         }
         .hero-slide {
             position: absolute;
             top: 0; left: 0; width: 100%; 
-            height: 400px; /* Ukuran Tinggi Statis */
+            height: 400px;
             background-size: cover;
             background-position: center;
             opacity: 0;
@@ -82,18 +85,22 @@
         }
 
         /* =========================================================
-           UPDATE: LINEAR GRADIENT BLUR (TO TOP) OPACITY 0% OVERLAY
+           UPDATE: LINEAR GRADIENT BLUR #F4F7F6 (TO TOP) OPACITY 0%
            ========================================================= */
         .hero-transparency-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
-            /* Fading ke Opacity 0% di bagian paling atas */
-            background: linear-gradient(to top, rgba(0, 31, 66, 0.98) 0%, rgba(0, 31, 66, 0.5) 60%, rgba(0, 31, 66, 0) 100%);
+            /* Fading dari warna background body (#f4f7f6) ke Opacity 0% di bagian atas */
+            background: linear-gradient(to top, #f4f7f6 0%, rgba(244, 247, 246, 0.6) 45%, rgba(244, 247, 246, 0) 100%);
             /* Efek Blur Glassmorphism transparan */
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
+
+        /* UPDATE: Shadow tebal pada teks Hero agar tetap kontras & terbaca di atas overlay super terang (#F4F7F6) */
+        .hero-title { text-shadow: 0 4px 15px rgba(0,0,0,0.85); }
+        .hero-subtitle { text-shadow: 0 2px 8px rgba(0,0,0,0.9); font-weight: 500 !important; }
 
         /* Animasi Typewriter */
         .typewriter-container {
@@ -164,7 +171,7 @@
         .pagination .page-item.active .page-link { background-color: #0099ff; border-color: #0099ff; color: white; }
         .pagination .page-item.disabled .page-link { color: #8e9ca9; background-color: #f8f9fa; }
 
-        /* TAMPILAN MODAL DETAIL (BUNGKUSAN & PEMISAH) */
+        /* TAMPILAN MODAL DETAIL */
         .info-group-wrapper {
             background-color: #ffffff;
             border: 1px solid #e9ecef;
@@ -199,12 +206,12 @@
         }
 
         /* =========================================================
-           UPDATE: POSISI TABEL MENINDIH (GAMBAR SLIDE DI BELAKANG TABEL)
+           UPDATE: POSISI TABEL DIRAPATKAN MENYENTUH KOTAK PENCARIAN
            ========================================================= */
         main.main-content-wrapper {
-            margin-top: -75px !important; /* Menarik tabel naik menindih background hero */
+            margin-top: -140px !important; /* Tarikan ekstrim ke atas di Desktop untuk menutup celah */
             position: relative;
-            z-index: 10; /* Menjamin tabel berada di lapisan terdepan */
+            z-index: 10;
         }
 
         /* =========================================================
@@ -214,7 +221,7 @@
             .hero-section { padding-top: 2rem !important; height: 400px !important; }
             
             main.main-content-wrapper {
-                margin-top: -45px !important; /* Sesuaikan kerapatan naik di layar HP */
+                margin-top: -110px !important; /* Penyesuaian tarikan ke atas khusus layar HP */
             }
 
             .search-box-elegant { 
@@ -315,8 +322,10 @@
         <div class="animated-header-border"></div>
     </div>
 
+    <!-- HERO SECTION -->
     <section class="hero-section text-center py-5 text-white position-relative shadow-sm">
         
+        <!-- Wadah Gambar Slideshow Statis -->
         <div class="hero-slideshow-container">
             <div class="hero-slide"></div>
             <div class="hero-slide"></div>
@@ -325,16 +334,18 @@
             <div class="hero-slide"></div>
         </div>
         
+        <!-- Lapisan Blur Glassmorphism & Transparansi 0% Menuju Atas (Seamless ke warna #f4f7f6) -->
         <div class="hero-transparency-overlay"></div>
 
-        <div class="container position-relative z-3 mt-1 mb-2 fade-in-up">
+        <!-- UPDATE: Z-Index Ekstra (20) agar kotak pencarian tidak terkubur oleh tarikan Tabel -->
+        <div class="container position-relative mt-1 mb-2 fade-in-up" style="z-index: 20;">
             <div class="d-block mb-2 text-center">
                 <div class="typewriter-container">
                     <h1 class="fw-bold hero-title typewriter-text mb-0">Sistem Informasi Sengketa</h1>
                 </div>
             </div>
             
-            <p class="text-white-50 mb-4 fs-6 fw-normal px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
+            <p class="text-white-50 hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
             <div class="row justify-content-center px-2 px-md-0">
                 <div class="col-12 col-md-10 col-lg-8">
@@ -361,6 +372,7 @@
         </div>
     </section>
 
+    <!-- MAIN CONTENT WRAPPER -->
     <main class="container main-content-wrapper flex-grow-1 mb-5 pb-3">
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
@@ -446,6 +458,7 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
