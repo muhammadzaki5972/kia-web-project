@@ -44,32 +44,29 @@
         }
 
         /* =========================================================
-           UPDATE: FORMAT GAMBAR SLIDE STATIS 400px & GRADIENT BLUR
+           UPDATE: TINGGI STATIS 400px UNTUK SLIDESHOW & HERO SECTION
            ========================================================= */
         .hero-section {
             position: relative;
-            overflow: hidden;
+            height: 400px; /* Ukuran Tinggi Statis */
             background-color: #001f42;
-            height: 400px; /* Menentukan tinggi area hero secara statis */
-            display: flex;
-            align-items: center; /* Menjaga konten tetap di tengah secara vertikal */
-            justify-content: center;
         }
         .hero-slideshow-container {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 400px;
+            top: 0; left: 0; width: 100%; 
+            height: 400px; /* Ukuran Tinggi Statis */
             z-index: 0;
         }
         .hero-slide {
             position: absolute;
             top: 0; left: 0; width: 100%; 
-            height: 400px; /* UPDATE: Tinggi statis sesuai instruksi */
+            height: 400px; /* Ukuran Tinggi Statis */
             background-size: cover;
             background-position: center;
             opacity: 0;
             animation: imageSlideshow 25s infinite ease-in-out;
         }
-        /* 5 Gambar Slideshow Bebas Lisensi */
+        /* 5 Gambar Berlisensi Free License */
         .hero-slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1400'); animation-delay: 0s; }
         .hero-slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400'); animation-delay: 5s; }
         .hero-slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400'); animation-delay: 10s; }
@@ -83,18 +80,22 @@
             28% { opacity: 0; }
             100% { opacity: 0; }
         }
-        
-        /* UPDATE: Linear Gradient Blur (To Top) Overlay */
+
+        /* =========================================================
+           UPDATE: LINEAR GRADIENT BLUR (TO TOP) OPACITY 0% OVERLAY
+           ========================================================= */
         .hero-transparency-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 400px;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
-            background: linear-gradient(to top, rgba(0, 31, 66, 0.98) 0%, rgba(0, 31, 66, 0.6) 60%, rgba(0, 31, 66, 0.1) 100%);
-            backdrop-filter: blur(6px); /* Menciptakan efek blur pada gambar latar belakang */
-            -webkit-backdrop-filter: blur(6px);
+            /* Fading ke Opacity 0% di bagian paling atas */
+            background: linear-gradient(to top, rgba(0, 31, 66, 0.98) 0%, rgba(0, 31, 66, 0.5) 60%, rgba(0, 31, 66, 0) 100%);
+            /* Efek Blur Glassmorphism transparan */
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
-        /* ANIMASI TYPEWRITTER */
+        /* Animasi Typewriter */
         .typewriter-container {
             display: inline-block;
             margin: 0 auto;
@@ -198,11 +199,24 @@
         }
 
         /* =========================================================
+           UPDATE: POSISI TABEL MENINDIH (GAMBAR SLIDE DI BELAKANG TABEL)
+           ========================================================= */
+        main.main-content-wrapper {
+            margin-top: -75px !important; /* Menarik tabel naik menindih background hero */
+            position: relative;
+            z-index: 10; /* Menjamin tabel berada di lapisan terdepan */
+        }
+
+        /* =========================================================
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
            ========================================================= */
         @media (max-width: 991.98px) {
-            .hero-section { height: 400px !important; } /* Memaksa tinggi tetap konsisten di Mobile */
+            .hero-section { padding-top: 2rem !important; height: 400px !important; }
             
+            main.main-content-wrapper {
+                margin-top: -45px !important; /* Sesuaikan kerapatan naik di layar HP */
+            }
+
             .search-box-elegant { 
                 flex-direction: row !important;
                 flex-wrap: nowrap !important;
@@ -301,7 +315,7 @@
         <div class="animated-header-border"></div>
     </div>
 
-    <section class="hero-section text-center text-white position-relative shadow-sm">
+    <section class="hero-section text-center py-5 text-white position-relative shadow-sm">
         
         <div class="hero-slideshow-container">
             <div class="hero-slide"></div>
@@ -313,8 +327,7 @@
         
         <div class="hero-transparency-overlay"></div>
 
-        <div class="container position-relative z-3 fade-in-up">
-            
+        <div class="container position-relative z-3 mt-1 mb-2 fade-in-up">
             <div class="d-block mb-2 text-center">
                 <div class="typewriter-container">
                     <h1 class="fw-bold hero-title typewriter-text mb-0">Sistem Informasi Sengketa</h1>
@@ -348,7 +361,7 @@
         </div>
     </section>
 
-    <main class="container mt-4 mt-md-5 flex-grow-1 mb-5 pb-3">
+    <main class="container main-content-wrapper flex-grow-1 mb-5 pb-3">
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
