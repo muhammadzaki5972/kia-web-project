@@ -85,7 +85,7 @@
         }
 
         /* =========================================================
-           UPDATE: LINEAR GRADIENT BLUR #F4F7F6 (TO TOP) OPACITY 0%
+           LINEAR GRADIENT BLUR #F4F7F6 (TO TOP) OPACITY 0%
            ========================================================= */
         .hero-transparency-overlay {
             position: absolute;
@@ -98,9 +98,20 @@
             -webkit-backdrop-filter: blur(4px);
         }
 
-        /* UPDATE: Shadow tebal pada teks Hero agar tetap kontras & terbaca di atas overlay super terang (#F4F7F6) */
+        /* Shadow tebal pada teks Hero agar tetap kontras & terbaca di atas overlay super terang (#F4F7F6) */
         .hero-title { text-shadow: 0 4px 15px rgba(0,0,0,0.85); }
-        .hero-subtitle { text-shadow: 0 2px 8px rgba(0,0,0,0.9); font-weight: 500 !important; }
+        
+        /* UPDATE: Warna #07b587 dan border teks (outline) putih 4-arah */
+        .hero-subtitle { 
+            color: #07b587 !important; 
+            font-weight: 700 !important; /* Dipertebal agar menonjol */
+            text-shadow: 
+                -1.2px -1.2px 0 #fff,  
+                 1.2px -1.2px 0 #fff,
+                -1.2px  1.2px 0 #fff,
+                 1.2px  1.2px 0 #fff,
+                 0px    4px   10px rgba(0,0,0,0.2); /* Soft shadow luar agar makin kontras */
+        }
 
         /* Animasi Typewriter */
         .typewriter-container {
@@ -206,7 +217,7 @@
         }
 
         /* =========================================================
-           UPDATE: POSISI TABEL DIRAPATKAN MENYENTUH KOTAK PENCARIAN
+           POSISI TABEL DIRAPATKAN MENYENTUH KOTAK PENCARIAN
            ========================================================= */
         main.main-content-wrapper {
             margin-top: -140px !important; /* Tarikan ekstrim ke atas di Desktop untuk menutup celah */
@@ -322,8 +333,8 @@
         <div class="animated-header-border"></div>
     </div>
 
-    <!-- HERO SECTION -->
-    <section class="hero-section text-center py-5 text-white position-relative shadow-sm">
+    <!-- UPDATE: HERO SECTION TANPA CLASS 'shadow-sm' AGAR MENYATU SEMPURNA DENGAN BACKGROUND -->
+    <section class="hero-section text-center py-5 text-white position-relative">
         
         <!-- Wadah Gambar Slideshow Statis -->
         <div class="hero-slideshow-container">
@@ -337,7 +348,7 @@
         <!-- Lapisan Blur Glassmorphism & Transparansi 0% Menuju Atas (Seamless ke warna #f4f7f6) -->
         <div class="hero-transparency-overlay"></div>
 
-        <!-- UPDATE: Z-Index Ekstra (20) agar kotak pencarian tidak terkubur oleh tarikan Tabel -->
+        <!-- Z-Index Ekstra (20) agar kotak pencarian tidak terkubur oleh tarikan Tabel -->
         <div class="container position-relative mt-1 mb-2 fade-in-up" style="z-index: 20;">
             <div class="d-block mb-2 text-center">
                 <div class="typewriter-container">
@@ -345,7 +356,8 @@
                 </div>
             </div>
             
-            <p class="text-white-50 hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
+            <!-- UPDATE: Class 'text-white-50' dihapus agar CSS Custom warna & border border diaplikasikan -->
+            <p class="hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
             
             <div class="row justify-content-center px-2 px-md-0">
                 <div class="col-12 col-md-10 col-lg-8">
