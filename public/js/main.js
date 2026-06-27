@@ -261,8 +261,10 @@ async function loadData() {
         updateData = data.update ? data.update.slice(1) : [];
         
         const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
-        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) thead.innerHTML += `<th>${h}</th>`; });
-        thead.innerHTML += `<th>Detail</th><th>Aksi</th>`;
+        let theadHtml = '';
+        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) theadHtml += `<th>${h}</th>`; });
+        theadHtml += `<th>Detail</th><th>Aksi</th>`;
+        thead.innerHTML = theadHtml;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => formHtml += renderInput(h, 'inputPerkara', i, false));
