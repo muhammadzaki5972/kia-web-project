@@ -270,8 +270,9 @@ async function loadData() {
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) formHtml += renderInput(h, 'inputPerkara', i, false); });
+        const skipViewCountIdx = sheetHeadersDetail.findIndex(h => (`${h}`).toLowerCase().trim() === 'view count');
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
-        sheetHeadersDetail.forEach((h, i) => formHtml += renderInput(h, 'inputDetail', i, i === 0));
+        sheetHeadersDetail.forEach((h, i) => { if (i !== skipViewCountIdx) formHtml += renderInput(h, 'inputDetail', i, i === 0); });
         formHtml += `</div></div>`;
         formContainer.innerHTML = formHtml;
 
