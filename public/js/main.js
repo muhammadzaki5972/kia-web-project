@@ -271,8 +271,9 @@ async function loadData() {
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
         sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) formHtml += renderInput(h, 'inputPerkara', i, false); });
         const skipViewCountIdx = sheetHeadersDetail.findIndex(h => (`${h}`).toLowerCase().trim() === 'view count');
+        const skipIsuIdx = sheetHeadersDetail.findIndex(h => (`${h}`).toLowerCase().trim() === 'isu sengketa');
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
-        sheetHeadersDetail.forEach((h, i) => { if (i !== skipViewCountIdx) formHtml += renderInput(h, 'inputDetail', i, i === 0); });
+        sheetHeadersDetail.forEach((h, i) => { if (i !== skipViewCountIdx && i !== skipIsuIdx) formHtml += renderInput(h, 'inputDetail', i, i === 0); });
         formHtml += `</div></div>`;
         formContainer.innerHTML = formHtml;
 
@@ -347,9 +348,11 @@ if(btnConfirmUpdate) {
             barisPerkara.push(el ? el.value : '-');
         });
         let barisDetail = []; 
-        sheetHeadersDetail.forEach((_, i) => {
+        sheetHeadersDetail.forEach((h, i) => {
             const el = document.getElementById(`inputDetail_${i}`);
-            barisDetail.push(el ? el.value : '-');
+            let val = el ? el.value : '-';
+            if ((`${h}`).toLowerCase().trim() === 'isu sengketa' && barisPerkara[4]) val = barisPerkara[4];
+            barisDetail.push(val);
         });
         
         try {
