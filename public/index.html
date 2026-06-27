@@ -830,7 +830,11 @@
         }
 
         function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
-        document.addEventListener('DOMContentLoaded', loadPublicData);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPublicData);
+        } else {
+            loadPublicData();
+        }
 
         const btnScrollTop = document.getElementById('btnScrollTop');
         window.addEventListener('scroll', () => {
