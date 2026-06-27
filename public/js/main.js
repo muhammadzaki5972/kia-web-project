@@ -261,8 +261,10 @@ async function loadData() {
         updateData = data.update ? data.update.slice(1) : [];
         
         const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
+        const skipKetIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'keterangan tambahan');
+        
         let theadHtml = '';
-        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) theadHtml += `<th>${h}</th>`; });
+        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) theadHtml += `<th>${h}</th>`; });
         theadHtml += `<th>Detail</th><th>Aksi</th>`;
         thead.innerHTML = theadHtml;
 
@@ -283,9 +285,9 @@ async function loadData() {
         let allRowsHtml = '';
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
-            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
+            for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx && i !== skipKetIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
             rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row[0]}')">Lihat</button></td>`;
-            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
+            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm mt-1 mt-md-0" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
             allRowsHtml += rowHtml;
         });
         tbody.innerHTML = allRowsHtml;
