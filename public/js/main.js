@@ -252,7 +252,7 @@ function attachStatusLogic() {
 async function loadData() {
     const thead = document.getElementById('tableHeader'), tbody = document.getElementById('dataTable'), formContainer = document.getElementById('dynamicFormContainer');
     try {
-        const res = await fetch('/api/data'); const data = await res.json();
+        const res = await fetch(`/api/data?t=${new Date().getTime()}`, { cache: 'no-store' }); const data = await res.json();
         thead.innerHTML = ''; tbody.innerHTML = ''; formContainer.innerHTML = '';
         if (!data.perkara || data.perkara.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">Data kosong.</td></tr>'; return; }
         
