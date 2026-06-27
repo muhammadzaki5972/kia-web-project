@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/auth', authRoutes);
 
 // Header statis (sesuaikan jika perlu)
-const PERKARA_HEADERS = ["No Reg", "Pemohon", "Termohon", "Status Sengketa", "Isu Sengketa", "Detail", "Keterangan Tambahan"];
+const PERKARA_HEADERS = ["No Reg", "Tgl Register", "Pemohon", "Termohon", "Isu Sengketa", "Detail", "Keterangan Tambahan"];
 const DETAIL_HEADERS = [
   "No Reg", "Tgl Register", "Ketua Majelis", "Anggota 1", "Anggota 2", "Mediator", "Panitera Pengganti", 
   "Status Sengketa", "Isu Sengketa", "Nomor Putusan", "Tgl Diputuskan", "Link Putusan", "Isi Permohonan", 

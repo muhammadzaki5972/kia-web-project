@@ -590,11 +590,12 @@
         function renderTable() {
             const container = document.getElementById('publicDataContainer');
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
+            const skipKetIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'keterangan tambahan');
             
             let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-bordered table-hover mb-0 align-middle"><thead class="table-soft-header poppins-font"><tr>`;
             
             tableHtml += `<th class="py-3 px-3 text-center align-middle" style="width: 50px;">No.</th>`;
-            sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
+            sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
 
             const startIndex = (currentPage - 1) * rowsPerPage;
@@ -609,12 +610,12 @@
                     if (!row || row.length === 0) return; 
                     const absoluteIndex = startIndex + index + 1; 
                     tableHtml += `<tr>`;
-                    tableHtml += `<td class="px-3 py-3 text-center fw-bold text-secondary">${absoluteIndex}</td>`;
+                    tableHtml += `<td class="text-center py-3 fw-bold text-secondary">${absoluteIndex}</td>`;
                     
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                        if(i !== skipIdx) {
+                        if(i !== skipIdx && i !== skipKetIdx) {
                             let cellData = row[i] || '-';
-                            const cellLower = cellData.toLowerCase().trim();
+                            const cellLower = (`${cellData}`).toLowerCase().trim();
                             
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
                             if (isStatusColumn || cellLower === 'selesai' || cellLower === 'dalam proses' || cellLower === 'proses') {
