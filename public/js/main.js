@@ -269,7 +269,7 @@ async function loadData() {
         thead.innerHTML = theadHtml;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
-        sheetHeadersPerkara.forEach((h, i) => formHtml += renderInput(h, 'inputPerkara', i, false));
+        sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) formHtml += renderInput(h, 'inputPerkara', i, false); });
         formHtml += `</div></div><div class="card shadow-sm"><div class="card-header bg-info text-white fw-bold">Data Lengkap</div><div class="card-body row">`;
         sheetHeadersDetail.forEach((h, i) => formHtml += renderInput(h, 'inputDetail', i, i === 0));
         formHtml += `</div></div>`;
@@ -340,8 +340,16 @@ if(btnConfirmUpdate) {
         const originalText = btnSubmit.innerText;
         btnSubmit.innerText = "Memproses..."; btnSubmit.disabled = true;
         
-        let barisPerkara = []; sheetHeadersPerkara.forEach((_, i) => barisPerkara.push(document.getElementById(`inputPerkara_${i}`).value || ''));
-        let barisDetail = []; sheetHeadersDetail.forEach((_, i) => barisDetail.push(document.getElementById(`inputDetail_${i}`).value || ''));
+        let barisPerkara = []; 
+        sheetHeadersPerkara.forEach((_, i) => {
+            const el = document.getElementById(`inputPerkara_${i}`);
+            barisPerkara.push(el ? el.value : '-');
+        });
+        let barisDetail = []; 
+        sheetHeadersDetail.forEach((_, i) => {
+            const el = document.getElementById(`inputDetail_${i}`);
+            barisDetail.push(el ? el.value : '-');
+        });
         
         try {
             const res = await fetch(isEditMode ? `/api/data?id=${encodeURIComponent(editId)}` : '/api/data', {
