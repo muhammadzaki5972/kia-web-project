@@ -75,3 +75,8 @@ main.container {
 .note-editor.note-frame.fullscreen .note-editable {
     background: #fff !important;
 }
+
+/* Fix double dropdown arrows in Summernote Lite */
+.note-editor .dropdown-toggle::after {
+    display: none !important;
+}
