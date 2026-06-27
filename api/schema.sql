@@ -9,14 +9,14 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Tabel DataPerkara (ringkas)
 CREATE TABLE IF NOT EXISTS data_perkara (
-  id TEXT PRIMARY KEY,          -- No Reg / ID Perkara
-  pemohon TEXT,
-  termohon TEXT,
-  status_sengketa TEXT,
-  isu_sengketa TEXT,
-  col_f TEXT,                   -- Kolom F dinamis
-  col_g TEXT,                   -- Kolom G dinamis
-  created_at TEXT DEFAULT (datetime('now'))
+    id TEXT PRIMARY KEY,
+    tgl_register TEXT,
+    pemohon TEXT,
+    termohon TEXT,
+    isu_sengketa TEXT,
+    col_f TEXT,
+    col_g TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabel Detail (lengkap)
