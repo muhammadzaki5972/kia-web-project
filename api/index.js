@@ -109,6 +109,9 @@ app.post('/api/data', authMiddleware, async (req, res) => {
     res.status(201).json({ message: 'Data berhasil ditambahkan dan disinkronkan' });
   } catch (error) { 
     console.error(error);
+    if (error.message && error.message.includes('UNIQUE constraint failed')) {
+      return res.status(400).json({ error: 'Nomor Registrasi (No Reg) ini sudah ada di database. Silakan gunakan nomor yang berbeda.' });
+    }
     res.status(500).json({ error: error.message }); 
   }
 });
