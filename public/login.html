@@ -44,16 +44,35 @@
     </footer>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.querySelector('button[type="submit"]');
             
-            if(user === 'admin' && pass === 'admin123') {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                window.location.href = 'admin.html';
-            } else {
-                alert('Username atau Password salah!');
+            const originalText = btn.innerText;
+            btn.innerText = 'Memproses...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.href = 'admin.html';
+                } else {
+                    alert(data.error || 'Login gagal!');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         });
     </script>

@@ -1,5 +1,23 @@
-if (window.location.pathname.includes('admin.html') && !sessionStorage.getItem('isLoggedIn')) { window.location.href = 'login.html'; }
-function logout() { sessionStorage.removeItem('isLoggedIn'); window.location.href = 'login.html'; }
+async function checkAuth() {
+    if (window.location.pathname.includes('admin.html')) {
+        try {
+            const res = await fetch('/api/auth/me');
+            if (!res.ok) {
+                window.location.href = 'login.html';
+            }
+        } catch (e) {
+            window.location.href = 'login.html';
+        }
+    }
+}
+checkAuth();
+
+async function logout() { 
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+    } catch(e) {}
+    window.location.href = 'login.html'; 
+}
 
 let sheetHeadersPerkara = [], sheetHeadersDetail = [], detailData = [], perkaraData = [], updateData = [], isEditMode = false, editId = null;
 
