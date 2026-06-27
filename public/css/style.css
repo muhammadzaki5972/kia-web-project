@@ -66,3 +66,12 @@ main.container {
     color: #ffffff !important;
     border-color: #196791 !important;
 }
+
+/* Fix Summernote Fullscreen di dalam Bootstrap Modal */
+.note-editor.note-frame.fullscreen {
+    z-index: 9999 !important;
+    background: #fff !important;
+}
+.note-editor.note-frame.fullscreen .note-editable {
+    background: #fff !important;
+}
