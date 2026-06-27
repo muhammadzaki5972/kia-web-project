@@ -113,7 +113,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     else if (lower === 'status sengketa') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><select class="form-select status-dropdown shadow-sm" id="${id}" required><option value="" disabled selected>-- Pilih Status --</option><option value="Dalam Proses">Dalam Proses</option><option value="Selesai">Selesai</option></select>${hint}</div>`;
     } 
-    else if (lower === 'agenda sidang selanjutnya' || (idPrefix === 'inputDetail' && index === 15)) {
+    else if (lower.includes('agenda')) {
         return `
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">${label}</label>
@@ -140,7 +140,7 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
                 ${hint}
             </div>`;
     } 
-    else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir' || (idPrefix === 'inputDetail' && index === 14)) {
+    else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control shadow-sm" id="${id}">${hint}</div>`;
     } else {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="text" class="form-control shadow-sm" id="${id}" placeholder="Isi ${label}">${hint}</div>`;
