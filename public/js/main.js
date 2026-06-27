@@ -158,9 +158,16 @@ function initSummernote(headers, idPrefix) {
                     height: 150,
                     placeholder: 'Ketik isi permohonan di sini...',
                     toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
                         ['para', ['ul', 'ol', 'paragraph']],
-                        ['view', ['fullscreen', 'codeview']]
+                        ['height', ['height']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video', 'hr']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
                     ],
                     callbacks: {
                         onChange: function(contents, $editable) {
