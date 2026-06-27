@@ -278,13 +278,15 @@ async function loadData() {
 
         if(document.getElementById('inputPerkara_0')) { document.getElementById('inputPerkara_0').addEventListener('input', (e) => { const d = document.getElementById('inputDetail_0'); if(d) d.value = e.target.value; }); }
 
+        let allRowsHtml = '';
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
             rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row[0]}')">Lihat</button></td>`;
             rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
-            tbody.innerHTML += rowHtml;
+            allRowsHtml += rowHtml;
         });
+        tbody.innerHTML = allRowsHtml;
     } catch (e) { tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Error: ${e.message}</td></tr>`; }
 }
 
