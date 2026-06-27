@@ -44,10 +44,24 @@ app.get('/api/data', async (req, res) => {
     ]);
 
     const detailData = detailResult.rows.map(r => [
-      r.id || '-', r.tgl_register || '-', r.ketua_majelis || '-', r.anggota_1 || '-', r.anggota_2 || '-', r.mediator || '-', r.panitera_pengganti || '-',
-      r.status_sengketa || '-', r.isu_sengketa || '-', r.nomor_putusan || '-', r.tgl_diputuskan || '-', r.link_putusan || '-', r.isi_permohonan || '-',
-      r.tgl_sidang_sebelumnya || '-', r.agenda_sidang_sebelumnya || '-', r.tgl_sidang_selanjutnya || '-', r.agenda_sidang_selanjutnya || '-',
-      r.view_count !== null ? String(r.view_count) : '0'
+      r.id || '-', // 0: No Reg
+      r.panitera_pengganti || '-', // 1: Tgl Register
+      r.tgl_register || '-', // 2: Ketua Majelis
+      r.ketua_majelis || '-', // 3: Anggota 1
+      r.anggota_1 || '-', // 4: Anggota 2
+      r.anggota_2 || '-', // 5: Mediator
+      r.mediator || '-', // 6: Panitera Pengganti
+      r.status_sengketa || '-', // 7: Status Sengketa
+      r.isu_sengketa || '-', // 8: Isu Sengketa
+      r.isi_permohonan || '-', // 9: Nomor Putusan
+      r.tgl_sidang_sebelumnya || '-', // 10: Tgl Diputuskan
+      '-', // 11: Link Putusan (hilang saat migrasi)
+      r.nomor_putusan || '-', // 12: Isi Permohonan
+      r.agenda_sidang_sebelumnya || '-', // 13: Tgl Sidang Sebelumnya
+      r.tgl_sidang_selanjutnya || '-', // 14: Agenda Sidang Sebelumnya
+      r.tgl_diputuskan || '-', // 15: Tgl Sidang Selanjutnya
+      r.link_putusan || '-', // 16: Agenda Sidang Selanjutnya
+      String((parseInt(r.agenda_sidang_selanjutnya) || 0) + (parseInt(r.view_count) || 0)) // 17: View Count
     ]);
 
     const updateData = detailResult.rows.map(r => [r.updated_at || '-']);
