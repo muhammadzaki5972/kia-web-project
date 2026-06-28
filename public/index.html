@@ -792,8 +792,9 @@
                                     const fLower = fObj.key.toLowerCase().trim();
                                     
                                     if (fLower === 'kehadiran para pihak') {
-                                        const isPemohonHadir = displayVal.includes('Pemohon');
-                                        const isTermohonHadir = displayVal.includes('Termohon');
+                                        const safeVal = String(displayVal || '');
+                                        const isPemohonHadir = safeVal.includes('Pemohon');
+                                        const isTermohonHadir = safeVal.includes('Termohon');
                                         const pemohonIcon = isPemohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
                                         const termohonIcon = isTermohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
                                         
