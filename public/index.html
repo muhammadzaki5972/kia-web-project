@@ -690,8 +690,8 @@
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
                 
-                const headerO = detailHeaders[14] ? detailHeaders[14].toLowerCase().trim() : 'tgl sidang sebelumnya';
-                const headerP = detailHeaders[15] ? detailHeaders[15].toLowerCase().trim() : 'agenda sidang sebelumnya';
+                const headerO = detailHeaders[13] ? detailHeaders[13].toLowerCase().trim() : 'tgl sidang sebelumnya';
+                const headerP = detailHeaders[14] ? detailHeaders[14].toLowerCase().trim() : 'agenda sidang sebelumnya';
 
                 const getField = (f, forceDetailIdx = -1) => {
                     let fieldVal = '-', labelText = f;
@@ -749,7 +749,7 @@
 
                 const col1Groups = [
                     { class: "", fields: [{ key: "status sengketa" }] },
-                    { class: "info-box-gray", fields: [{ key: headerO, idx: 14 }, { key: headerP, idx: 15 }] }, 
+                    { class: "info-box-gray", fields: [{ key: headerO, idx: 13 }, { key: headerP, idx: 14 }] }, 
                     { class: "info-box-green", fields: [{ key: "tgl sidang selanjutnya" }, { key: "agenda sidang selanjutnya" }] },
                     { class: "", fields: [{ key: "nomor putusan" }, { key: "tgl diputuskan" }, { key: "link putusan" }] }
                 ];

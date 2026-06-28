@@ -460,8 +460,8 @@ function lihatDetail(id) {
 
     setTimeout(() => {
         const row = detailData.find(r => r[0] === id);
-        const headerO = sheetHeadersDetail[14] ? sheetHeadersDetail[14].toLowerCase().trim() : null;
-        const headerP = sheetHeadersDetail[15] ? sheetHeadersDetail[15].toLowerCase().trim() : null;
+        const headerO = sheetHeadersDetail[13] ? sheetHeadersDetail[13].toLowerCase().trim() : null;
+        const headerP = sheetHeadersDetail[14] ? sheetHeadersDetail[14].toLowerCase().trim() : null;
         
         const leftFields = ["no reg", "tgl register", "ketua majelis", "anggota 1", "anggota 2", "mediator", "panitera pengganti", "status sengketa"];
         if(headerO) leftFields.push(headerO);
