@@ -795,13 +795,14 @@
                                         const safeVal = String(displayVal || '');
                                         const isPemohonHadir = safeVal.includes('Pemohon');
                                         const isTermohonHadir = safeVal.includes('Termohon');
-                                        const pemohonIcon = isPemohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
-                                        const termohonIcon = isTermohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
+                                        const pemohonIcon = isPemohonHadir ? '<i class="bi bi-check-square-fill text-success fs-6"></i>' : '<i class="bi bi-square text-muted fs-6"></i>';
+                                        const termohonIcon = isTermohonHadir ? '<i class="bi bi-check-square-fill text-success fs-6"></i>' : '<i class="bi bi-square text-muted fs-6"></i>';
                                         
                                         displayVal = `
-                                        <div class="d-flex flex-column gap-1 align-items-center mt-2">
-                                            <div class="d-flex gap-2 align-items-center">${pemohonIcon} <span class="fs-6">Pemohon</span></div>
-                                            <div class="d-flex gap-2 align-items-center">${termohonIcon} <span class="fs-6">Termohon</span></div>
+                                        <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
+                                            <div class="d-flex gap-2 align-items-center">${pemohonIcon} <span style="font-size: 0.85rem;">Pemohon</span></div>
+                                            <div class="vr" style="height: 25px; width: 2px; background-color: #cbd5e1; opacity: 1;"></div>
+                                            <div class="d-flex gap-2 align-items-center">${termohonIcon} <span style="font-size: 0.85rem;">Termohon</span></div>
                                         </div>`;
                                     }
                                     
