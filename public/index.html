@@ -210,9 +210,10 @@
             font-size: clamp(0.95rem, 3.5vw, 1.25rem);
             line-height: 1.4 !important;
             white-space: nowrap;
-            padding-left: 10px;
-            padding-right: 10px;
-            width: 90%;
+            padding-left: 20px;
+            padding-right: 40px; /* Space for close button */
+            max-width: calc(100% - 60px);
+            margin: 0 auto;
         }
 
         /* =========================================================
@@ -745,8 +746,8 @@
                 
                 // Auto shrink text to fit one line
                 setTimeout(() => {
-                    const maxWidth = titleEl.parentElement.clientWidth - 80;
-                    let currentSize = parseFloat(window.getComputedStyle(titleEl).fontSize);
+                    const maxWidth = titleEl.parentElement.clientWidth - 100; // Extra safe margin for X button
+                    let currentSize = parseFloat(window.getComputedStyle(titleEl).fontSize) || 20;
                     while (titleEl.scrollWidth > maxWidth && currentSize > 8) {
                         currentSize -= 0.5;
                         titleEl.style.fontSize = currentSize + 'px';
