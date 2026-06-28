@@ -749,7 +749,10 @@
 
                 const col1Groups = [
                     { class: "", fields: [{ key: "status sengketa" }] },
-                    { class: "info-box-gray", fields: [{ key: headerO, idx: 13 }, { key: headerP, idx: 14 }] }, 
+                    { class: "info-box-gray", isCarousel: true, slides: [
+                        { fields: [{ key: headerO, idx: 13 }, { key: headerP, idx: 14 }] },
+                        { fields: [{ key: "kehadiran para pihak", idx: 18 }] }
+                    ] }, 
                     { class: "info-box-green", fields: [{ key: "tgl sidang selanjutnya" }, { key: "agenda sidang selanjutnya" }] },
                     { class: "", fields: [{ key: "nomor putusan" }, { key: "tgl diputuskan" }, { key: "link putusan" }] }
                 ];
@@ -771,23 +774,73 @@
                 col1Groups.forEach(grp => {
                     let groupHtml = `<div class="info-group-wrapper ${grp.class}">`;
                     let hasValidField = false;
-                    grp.fields.forEach(fObj => {
-                        const data = getField(fObj.key, fObj.idx);
-                        if (data) {
-                            hasValidField = true;
-                            let displayVal = data.val;
-                            const fLower = fObj.key.toLowerCase().trim();
-
-                            if (fLower === 'status sengketa') {
-                                const statusStr = displayVal.toLowerCase();
-                                if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                                else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                                else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
-                            }
+                    
+                    if (grp.isCarousel) {
+                        hasValidField = true;
+                        const carouselId = 'carouselInfoBox' + Math.random().toString(36).substr(2, 9);
+                        groupHtml += `<div id="${carouselId}" class="carousel slide" data-bs-ride="false">
+                            <div class="carousel-inner">`;
+                        
+                        grp.slides.forEach((slide, sIdx) => {
+                            const activeClass = sIdx === 0 ? 'active' : '';
+                            groupHtml += `<div class="carousel-item ${activeClass}"><div class="px-4">`;
                             
-                            groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
-                        }
-                    });
+                            slide.fields.forEach(fObj => {
+                                const data = getField(fObj.key, fObj.idx);
+                                if (data) {
+                                    let displayVal = data.val;
+                                    const fLower = fObj.key.toLowerCase().trim();
+                                    
+                                    if (fLower === 'kehadiran para pihak') {
+                                        const isPemohonHadir = displayVal.includes('Pemohon');
+                                        const isTermohonHadir = displayVal.includes('Termohon');
+                                        const pemohonIcon = isPemohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
+                                        const termohonIcon = isTermohonHadir ? '<i class="bi bi-check-square-fill text-success"></i>' : '<i class="bi bi-square text-muted"></i>';
+                                        
+                                        displayVal = `
+                                        <div class="d-flex flex-column gap-1 align-items-center mt-2">
+                                            <div class="d-flex gap-2 align-items-center">${pemohonIcon} <span class="fs-6">Pemohon</span></div>
+                                            <div class="d-flex gap-2 align-items-center">${termohonIcon} <span class="fs-6">Termohon</span></div>
+                                        </div>`;
+                                    }
+                                    
+                                    groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
+                                }
+                            });
+                            
+                            groupHtml += `</div></div>`;
+                        });
+                        
+                        groupHtml += `
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev" style="width: 25px;">
+                                <span class="carousel-control-prev-icon bg-secondary rounded-circle" style="width: 20px; height: 20px; background-size: 50%;" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next" style="width: 25px;">
+                                <span class="carousel-control-next-icon bg-secondary rounded-circle" style="width: 20px; height: 20px; background-size: 50%;" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>`;
+                    } else {
+                        grp.fields.forEach(fObj => {
+                            const data = getField(fObj.key, fObj.idx);
+                            if (data) {
+                                hasValidField = true;
+                                let displayVal = data.val;
+                                const fLower = fObj.key.toLowerCase().trim();
+
+                                if (fLower === 'status sengketa') {
+                                    const statusStr = displayVal.toLowerCase();
+                                    if (statusStr.includes('selesai')) displayVal = `<span class="badge bg-success shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                                    else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                                    else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
+                                }
+                                
+                                groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
+                            }
+                        });
+                    }
                     groupHtml += `</div>`;
                     if (hasValidField) htmlCol1 += groupHtml;
                 });

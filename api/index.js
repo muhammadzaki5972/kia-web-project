@@ -30,7 +30,7 @@ const PERKARA_HEADERS = ["No Reg", "Tgl Register", "Pemohon", "Termohon", "Isu S
 const DETAIL_HEADERS = [
   "No Reg", "Tgl Register", "Ketua Majelis", "Anggota 1", "Anggota 2", "Mediator", "Panitera Pengganti", 
   "Status Sengketa", "Isu Sengketa", "Nomor Putusan", "Tgl Diputuskan", "Link Putusan", "Isi Permohonan", 
-  "Tgl Sidang Sebelumnya", "Agenda Sidang Sebelumnya", "Tgl Sidang Selanjutnya", "Agenda Sidang Selanjutnya", "View Count"
+  "Tgl Sidang Sebelumnya", "Agenda Sidang Sebelumnya", "Tgl Sidang Selanjutnya", "Agenda Sidang Selanjutnya", "Kehadiran Para Pihak", "View Count"
 ];
 
 // GET: Ambil semua data (terbuka untuk publik)
@@ -61,6 +61,7 @@ app.get('/api/data', async (req, res) => {
       r.agenda_sidang_sebelumnya || '-',
       r.tgl_sidang_selanjutnya || '-',
       r.agenda_sidang_selanjutnya || '-',
+      r.kehadiran_pihak || '-',
       r.view_count || '-'
     ]);
 
@@ -97,12 +98,12 @@ app.post('/api/data', authMiddleware, async (req, res) => {
       sql: `INSERT INTO detail_perkara (
         id, tgl_register, ketua_majelis, anggota_1, anggota_2, mediator, panitera_pengganti, 
         status_sengketa, isu_sengketa, nomor_putusan, tgl_diputuskan, link_putusan, isi_permohonan, 
-        tgl_sidang_sebelumnya, agenda_sidang_sebelumnya, tgl_sidang_selanjutnya, agenda_sidang_selanjutnya, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        tgl_sidang_sebelumnya, agenda_sidang_sebelumnya, tgl_sidang_selanjutnya, agenda_sidang_selanjutnya, kehadiran_pihak, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id, barisDetail[1], barisDetail[2], barisDetail[3], barisDetail[4], barisDetail[5], barisDetail[6],
         barisDetail[7], barisDetail[8], barisDetail[9], barisDetail[10], barisDetail[11], barisDetail[12],
-        barisDetail[13], barisDetail[14], barisDetail[15], barisDetail[16], tanggalUpdate
+        barisDetail[13], barisDetail[14], barisDetail[15], barisDetail[16], barisDetail[17], tanggalUpdate
       ]
     });
 
@@ -131,12 +132,12 @@ app.put('/api/data', authMiddleware, async (req, res) => {
         sql: `UPDATE detail_perkara SET 
           tgl_register=?, ketua_majelis=?, anggota_1=?, anggota_2=?, mediator=?, panitera_pengganti=?, 
           status_sengketa=?, isu_sengketa=?, nomor_putusan=?, tgl_diputuskan=?, link_putusan=?, isi_permohonan=?, 
-          tgl_sidang_sebelumnya=?, agenda_sidang_sebelumnya=?, tgl_sidang_selanjutnya=?, agenda_sidang_selanjutnya=?, updated_at=?
+          tgl_sidang_sebelumnya=?, agenda_sidang_sebelumnya=?, tgl_sidang_selanjutnya=?, agenda_sidang_selanjutnya=?, kehadiran_pihak=?, updated_at=?
           WHERE id=?`,
         args: [
           barisDetail[1], barisDetail[2], barisDetail[3], barisDetail[4], barisDetail[5], barisDetail[6],
           barisDetail[7], barisDetail[8], barisDetail[9], barisDetail[10], barisDetail[11], barisDetail[12],
-          barisDetail[13], barisDetail[14], barisDetail[15], barisDetail[16], tanggalUpdate, id
+          barisDetail[13], barisDetail[14], barisDetail[15], barisDetail[16], barisDetail[17], tanggalUpdate, id
         ]
       });
 

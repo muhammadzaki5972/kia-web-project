@@ -142,6 +142,24 @@ function renderInput(headerText, idPrefix, index, isFirstDetail) {
     } 
     else if (lower.includes('tgl') || lower.includes('tanggal') || lower === 'sidang terakhir') {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="date" class="form-control shadow-sm" id="${id}">${hint}</div>`;
+    } 
+    else if (lower === 'kehadiran para pihak') {
+        return `
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">${label}</label>
+                <div class="d-flex gap-3 mt-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${id}_pemohon" value="Pemohon">
+                        <label class="form-check-label" for="${id}_pemohon">Pemohon</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${id}_termohon" value="Termohon">
+                        <label class="form-check-label" for="${id}_termohon">Termohon</label>
+                    </div>
+                </div>
+                <input type="hidden" id="${id}" value="-">
+                ${hint}
+            </div>`;
     } else {
         return `<div class="col-md-6 mb-3"><label class="form-label fw-bold">${label}</label><input type="text" class="form-control shadow-sm" id="${id}" placeholder="Isi ${label}">${hint}</div>`;
     }
@@ -359,6 +377,15 @@ if(btnConfirmUpdate) {
             const el = document.getElementById(`inputDetail_${i}`);
             let val = el ? el.value : '-';
             if ((`${h}`).toLowerCase().trim() === 'isu sengketa' && barisPerkara[4]) val = barisPerkara[4];
+            if ((`${h}`).toLowerCase().trim() === 'kehadiran para pihak') {
+                const cbPemohon = document.getElementById(`inputDetail_${i}_pemohon`);
+                const cbTermohon = document.getElementById(`inputDetail_${i}_termohon`);
+                const hadirArr = [];
+                if (cbPemohon && cbPemohon.checked) hadirArr.push(cbPemohon.value);
+                if (cbTermohon && cbTermohon.checked) hadirArr.push(cbTermohon.value);
+                val = hadirArr.length > 0 ? hadirArr.join(', ') : '-';
+            }
+            
             barisDetail.push(val);
         });
         
@@ -425,8 +452,16 @@ function bukaModalEdit(id) {
     sheetHeadersDetail.forEach((h, i) => {
         const el = document.getElementById(`inputDetail_${i}`); const val = rowD[i] || '';
         if (el) {
+            if ((`${h}`).toLowerCase().trim() === 'kehadiran para pihak') {
+                const cbPemohon = document.getElementById(`inputDetail_${i}_pemohon`);
+                const cbTermohon = document.getElementById(`inputDetail_${i}_termohon`);
+                const valStr = val || '';
+                if (cbPemohon) cbPemohon.checked = valStr.includes('Pemohon');
+                if (cbTermohon) cbTermohon.checked = valStr.includes('Termohon');
+                el.value = valStr || '-';
+            }
             // SET VALUE SUMMERNOTE ATAU INPUT BIASA
-            if ($(el).hasClass('summernote-editor')) { 
+            else if ($(el).hasClass('summernote-editor')) { 
                 $(el).summernote('code', val); 
                 $(el).val(val);
             } else if (el.type === 'date') {
