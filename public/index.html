@@ -207,13 +207,13 @@
         .card-rincian { max-height: 480px; overflow-y: auto; }
 
         #detailModalTitle {
-            font-size: clamp(0.95rem, 3.5vw, 1.25rem) !important;
+            font-size: clamp(0.95rem, 3.5vw, 1.25rem);
             line-height: 1.4 !important;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 85%;
             padding-left: 10px;
+            padding-right: 10px;
+            width: 90%;
+        }
             padding-right: 10px;
             width: 90%;
         }
@@ -741,7 +741,20 @@
                 const dataTglReg = getField('tgl register');
                 
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
-                document.getElementById('detailModalTitle').innerHTML = titleText;
+                
+                const titleEl = document.getElementById('detailModalTitle');
+                titleEl.style.fontSize = ''; // reset
+                titleEl.innerHTML = titleText;
+                
+                // Auto shrink text to fit one line
+                setTimeout(() => {
+                    const maxWidth = titleEl.parentElement.clientWidth - 80;
+                    let currentSize = parseFloat(window.getComputedStyle(titleEl).fontSize);
+                    while (titleEl.scrollWidth > maxWidth && currentSize > 8) {
+                        currentSize -= 0.5;
+                        titleEl.style.fontSize = currentSize + 'px';
+                    }
+                }, 20);
                 
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
