@@ -62,7 +62,7 @@ app.get('/api/data', async (req, res) => {
       r.tgl_sidang_selanjutnya || '-',
       r.agenda_sidang_selanjutnya || '-',
       r.kehadiran_pihak || '-',
-      r.view_count || '-'
+      r.view_count ?? '-'
     ]);
 
     const updateData = detailResult.rows.map(r => [r.updated_at || '-']);

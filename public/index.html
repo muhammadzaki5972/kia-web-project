@@ -906,12 +906,12 @@
                 const dRowIndex = detailData.findIndex(r => r[0] === id);
                 let currentViews = 0;
                 
-                if (dRowIndex !== -1 && detailData[dRowIndex][17]) {
-                    currentViews = parseInt(detailData[dRowIndex][17]) || 0;
+                if (dRowIndex !== -1 && detailData[dRowIndex][18] !== undefined) {
+                    currentViews = parseInt(detailData[dRowIndex][18]) || 0;
                 }
                 
                 currentViews += 1;
-                if (dRowIndex !== -1) detailData[dRowIndex][17] = currentViews;
+                if (dRowIndex !== -1) detailData[dRowIndex][18] = currentViews;
                 
                 const viewCountEl = document.getElementById('modalViewCount');
                 if (viewCountEl) viewCountEl.innerText = `Dilihat: ${currentViews} kali`;
