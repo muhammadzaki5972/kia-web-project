@@ -425,6 +425,24 @@
         /* =========================================================
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
            ========================================================= */
+        /* Ukuran standar (Desktop) untuk info footer modal */
+        .footer-info-text {
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-info-icon {
+            font-size: 0.75rem;
+        }
+
+        .vs-separator {
+            color: var(--bs-danger);
+            font-size: 0.8em;
+            vertical-align: middle;
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
         @media (max-width: 991.98px) {
             .hero-section {
                 padding-top: 2rem !important;
@@ -497,15 +515,37 @@
                 padding: 0.8rem 1rem !important;
             }
 
-            #detailModalSubtitle .d-flex {
-                gap: 0.35rem !important;
-                margin-top: 0.5rem !important;
+            #detailModalTitle {
+                font-size: 10px !important;
+                white-space: normal !important;
+                word-break: break-word;
+                line-height: 1.1 !important;
             }
 
+            .vs-separator {
+                display: block !important;
+                margin: 0.2rem 0 !important;
+                font-size: 0.9em !important;
+            }
+
+            #detailModalSubtitle .d-flex {
+                gap: 0.25rem !important;
+                margin-top: 0.4rem !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                justify-content: center !important;
+            }
+
+            #detailModalSubtitle {
+                font-size: 10px !important;
+            }
+
+            /* Ukuran khusus (Mobile) untuk kotak putih di bawah judul */
             #detailModalSubtitle .badge {
-                font-size: 0.6rem !important;
-                padding: 0.35rem 0.6rem !important;
-                letter-spacing: 0.2px;
+                font-size: 0.45rem !important;
+                padding: 0.15rem 0.25rem !important;
+                letter-spacing: 0.1px;
+                white-space: nowrap;
             }
 
             #detailModalSubtitle .badge i {
@@ -518,6 +558,15 @@
 
             .modal-body .row {
                 display: block !important;
+            }
+
+            /* Ukuran khusus (Mobile) untuk info footer modal */
+            .footer-info-text {
+                font-size: 0.50rem !important;
+            }
+
+            .footer-info-icon {
+                font-size: 0.55rem !important;
             }
 
             .modal-body .card.h-100 {
@@ -683,14 +732,12 @@
 
                     <div class="position-absolute w-100 px-3 d-flex justify-content-between bottom-0 pb-2"
                         style="z-index: 1;">
-                        <div class="text-muted fw-bold d-flex align-items-center"
-                            style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-eye-fill text-primary me-1" style="font-size: 0.75rem;"></i>
+                        <div class="text-muted fw-bold d-flex align-items-center footer-info-text">
+                            <i class="bi bi-eye-fill text-primary me-1 footer-info-icon"></i>
                             <span id="modalViewCount">Dilihat: - kali</span>
                         </div>
-                        <div class="text-primary fw-bold d-flex align-items-center me-2"
-                            style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-clock-fill me-1" style="font-size: 0.75rem;"></i>
+                        <div class="text-primary fw-bold d-flex align-items-center me-2 footer-info-text">
+                            <i class="bi bi-clock-fill me-1 footer-info-icon"></i>
                             <span id="modalLastUpdated">DIPERBARUI: -</span>
                         </div>
                     </div>
@@ -1015,7 +1062,7 @@
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
 
-                const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
+                const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="vs-separator poppins-font fw-bold">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
 
                 const titleEl = document.getElementById('detailModalTitle');
                 titleEl.style.fontSize = ''; // reset
@@ -1033,8 +1080,8 @@
 
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
-                        <span class="m-1 badge bg-light text-dark border shadow-sm rounded-pill d-flex align-items-center" style="font-size: 11px;"><i class="bi bi-hash text-muted me-1"></i>No. Register: ${dataNoReg ? dataNoReg.val : '-'}</span>
-                        <span class="m-1 badge bg-light text-dark border shadow-sm rounded-pill d-flex align-items-center" style="font-size: 11px;"><i class="bi bi-calendar3 text-muted me-1"></i>Tgl Register: ${dataTglReg ? dataTglReg.val : '-'}</span>
+                        <span class="badge bg-light text-dark border shadow-sm rounded-pill d-flex align-items-center" style="font-size: 11px; padding: 0.35rem 0.6rem;"><i class="bi bi-hash text-muted me-1"></i>No. Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
+                        <span class="badge bg-light text-dark border shadow-sm rounded-pill d-flex align-items-center" style="font-size: 11px; padding: 0.35rem 0.6rem;"><i class="bi bi-calendar3 text-muted me-1"></i>Tgl Reg: ${dataTglReg ? dataTglReg.val : '-'}</span>
                     </div>`;
 
                 const col1Groups = [
@@ -1057,7 +1104,7 @@
 
                 const col3Groups = [
                     { class: "", fields: [{ key: "isu sengketa" }] },
-                    { class: "bg-transparent border-0 shadow-none px-0 text-start", fields: [{ key: "isi permohonan" }] }
+                    { class: "", fields: [{ key: "isi permohonan" }] }
                 ];
 
                 let htmlContent = '<div class="row">';
@@ -1167,7 +1214,7 @@
                             hasValidField = true;
                             foundCol3 = true;
                             if (index === 1) {
-                                groupHtml += `<div class="mb-1"><div class="info-label text-start" style="border-bottom: 1px dashed #dee2e6; padding-bottom: 6px; margin-bottom: 8px;">${data.label}</div><div class="info-value text-start fw-normal lh-base">${data.val}</div></div>`;
+                                groupHtml += `<div class="mb-1"><div class="info-label text-center" style="border-bottom: 1px dashed #dee2e6; padding-bottom: 6px; margin-bottom: 8px;">${data.label}</div><div class="info-value text-start fw-normal lh-base">${data.val}</div></div>`;
                             } else {
                                 groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${data.val}</div></div>`;
                             }
