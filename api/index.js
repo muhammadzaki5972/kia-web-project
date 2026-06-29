@@ -10,7 +10,7 @@ const authRoutes = require('./routes/auth');
 const app = express();
 
 // Security middlewares
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: process.env.ALLOWED_ORIGIN || '*', // Ganti dengan domain Vercel Anda di production
   credentials: true
