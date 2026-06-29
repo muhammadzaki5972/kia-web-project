@@ -450,7 +450,7 @@
             }
 
             main.main-content-wrapper {
-                margin-top: -110px !important;
+                margin-top: -170px !important;
                 /* Penyesuaian tarikan ke atas khusus layar HP */
             }
 
@@ -461,7 +461,8 @@
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
                 padding: 0 !important;
                 gap: 0 !important;
-                border-radius: 0 !important;
+                border-radius: 15px !important;
+                overflow: hidden !important;
                 width: 100%;
                 display: flex !important;
                 align-items: stretch !important;
@@ -911,6 +912,20 @@
             filterTable();
         }
 
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '-') return dateStr;
+            const str = String(dateStr).trim();
+            if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+                const parts = str.substring(0, 10).split('-');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            if (/^\d{4}\/\d{2}\/\d{2}/.test(str)) {
+                const parts = str.substring(0, 10).split('/');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return str;
+        }
+
         function renderTable() {
             const container = document.getElementById('publicDataContainer');
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
@@ -938,7 +953,7 @@
 
                     for (let i = 0; i < sheetHeadersPerkara.length; i++) {
                         if (i !== skipIdx && i !== skipKetIdx) {
-                            let cellData = row[i] || '-';
+                            let cellData = row[i] ? formatDate(row[i]) : '-';
                             const cellLower = (`${cellData}`).toLowerCase().trim();
 
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
@@ -1032,11 +1047,11 @@
                     let idx = findIdx(detailHeaders);
 
                     if (idx !== -1) {
-                        fieldVal = row ? (row[idx] || '-') : '-';
+                        fieldVal = row ? (row[idx] ? formatDate(row[idx]) : '-') : '-';
                         labelText = detailHeaders[idx];
                     } else if (forceDetailIdx !== -1) {
                         idx = forceDetailIdx;
-                        fieldVal = row ? (row[idx] || '-') : '-';
+                        fieldVal = row ? (row[idx] ? formatDate(row[idx]) : '-') : '-';
                         labelText = detailHeaders[idx] || f;
                     } else {
                         idx = findIdx(sheetHeadersPerkara);
