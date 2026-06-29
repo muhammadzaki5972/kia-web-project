@@ -1,32 +1,59 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Publik - KIACEH</title>
-    
+
     <!-- Google Fonts: Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
-    
+
     <style>
         /* Tipografi & Dasar */
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6 !important; }
-        h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .hero-title, .poppins-font { font-family: 'Poppins', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6 !important;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .navbar-brand,
+        .modal-title,
+        .hero-title,
+        .poppins-font {
+            font-family: 'Poppins', sans-serif;
+        }
 
         /* Animasi Loop Gradient (Dipertahankan Hanya untuk Header Utama) */
         @keyframes gradientLoop {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
+
         .bg-animated-gradient {
             background: linear-gradient(-45deg, #001f42, #002b5e, #007acc, #0059b3);
             background-size: 400% 400%;
@@ -41,9 +68,15 @@
             background-size: 300% 100%;
             animation: borderMove 4s linear infinite;
         }
+
         @keyframes borderMove {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 300% 0%; }
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 300% 0%;
+            }
         }
 
         /* =========================================================
@@ -54,34 +87,74 @@
             height: 400px;
             background-color: #001f42;
         }
+
         .hero-slideshow-container {
             position: absolute;
-            top: 0; left: 0; width: 100%; 
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 400px;
             z-index: 0;
         }
+
         .hero-slide {
             position: absolute;
-            top: 0; left: 0; width: 100%; 
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 400px;
             background-size: cover;
             background-position: center;
             opacity: 0;
             animation: imageSlideshow 25s infinite ease-in-out;
         }
+
         /* 5 Gambar Berlisensi Free License */
-        .hero-slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1400'); animation-delay: 0s; }
-        .hero-slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400'); animation-delay: 5s; }
-        .hero-slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400'); animation-delay: 10s; }
-        .hero-slide:nth-child(4) { background-image: url('https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=1400'); animation-delay: 15s; }
-        .hero-slide:nth-child(5) { background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1400'); animation-delay: 20s; }
+        .hero-slide:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1400');
+            animation-delay: 0s;
+        }
+
+        .hero-slide:nth-child(2) {
+            background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400');
+            animation-delay: 5s;
+        }
+
+        .hero-slide:nth-child(3) {
+            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400');
+            animation-delay: 10s;
+        }
+
+        .hero-slide:nth-child(4) {
+            background-image: url('https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=1400');
+            animation-delay: 15s;
+        }
+
+        .hero-slide:nth-child(5) {
+            background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1400');
+            animation-delay: 20s;
+        }
 
         @keyframes imageSlideshow {
-            0% { opacity: 0; }
-            8% { opacity: 1; }
-            20% { opacity: 1; }
-            28% { opacity: 0; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            8% {
+                opacity: 1;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            28% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
 
         /* =========================================================
@@ -89,7 +162,10 @@
            ========================================================= */
         .hero-transparency-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 1;
             /* Fading dari warna background body (#f4f7f6) ke Opacity 0% di bagian atas */
             background: linear-gradient(to top, #f4f7f6 0%, rgba(244, 247, 246, 0.6) 45%, rgba(244, 247, 246, 0) 100%);
@@ -99,18 +175,22 @@
         }
 
         /* Shadow tebal pada teks Hero agar tetap kontras & terbaca di atas overlay super terang (#F4F7F6) */
-        .hero-title { text-shadow: 0 4px 15px rgba(0,0,0,0.85); }
-        
+        .hero-title {
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.85);
+        }
+
         /* UPDATE: Warna #07b587 dan border teks (outline) putih 4-arah */
-        .hero-subtitle { 
-            color: #07b587 !important; 
-            font-weight: 700 !important; /* Dipertebal agar menonjol */
-            text-shadow: 
-                -1.2px -1.2px 0 #fff,  
-                 1.2px -1.2px 0 #fff,
-                -1.2px  1.2px 0 #fff,
-                 1.2px  1.2px 0 #fff,
-                 0px    4px   10px rgba(0,0,0,0.2); /* Soft shadow luar agar makin kontras */
+        .hero-subtitle {
+            color: #07b587 !important;
+            font-weight: 700 !important;
+            /* Dipertebal agar menonjol */
+            text-shadow:
+                -1.2px -1.2px 0 #fff,
+                1.2px -1.2px 0 #fff,
+                -1.2px 1.2px 0 #fff,
+                1.2px 1.2px 0 #fff,
+                0px 4px 10px rgba(0, 0, 0, 0.2);
+            /* Soft shadow luar agar makin kontras */
         }
 
         /* Animasi Typewriter */
@@ -118,6 +198,7 @@
             display: inline-block;
             margin: 0 auto;
         }
+
         .typewriter-text {
             display: inline-block;
             overflow: hidden;
@@ -127,47 +208,98 @@
             font-size: clamp(1.1rem, 4.2vw, 2.3rem) !important;
             animation: typingEffect 4.5s steps(25, end) infinite alternate, blinkCursor 0.75s step-end infinite;
         }
+
         @keyframes typingEffect {
-            0% { width: 0; }
-            45% { width: 100%; }
-            90% { width: 100%; }
-            100% { width: 100%; }
+            0% {
+                width: 0;
+            }
+
+            45% {
+                width: 100%;
+            }
+
+            90% {
+                width: 100%;
+            }
+
+            100% {
+                width: 100%;
+            }
         }
+
         @keyframes blinkCursor {
-            from, to { border-color: transparent; }
-            50% { border-color: #c2f351; }
+
+            from,
+            to {
+                border-color: transparent;
+            }
+
+            50% {
+                border-color: #c2f351;
+            }
         }
 
         /* Search Box Premium & Filter Select */
-        .search-box-elegant { border-radius: 3rem; overflow: hidden; padding: 0.35rem; }
-        .search-box-elegant input { box-shadow: none !important; font-size: 0.95rem; }
-        
-        .search-box-elegant select { 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            box-shadow: none !important; 
-            color: #495057; 
-            padding-right: 2rem !important; 
+        .search-box-elegant {
+            border-radius: 3rem;
+            overflow: hidden;
+            padding: 0.35rem;
+        }
+
+        .search-box-elegant input {
+            box-shadow: none !important;
+            font-size: 0.95rem;
+        }
+
+        .search-box-elegant select {
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: none !important;
+            color: #495057;
+            padding-right: 2rem !important;
             padding-left: 1rem !important;
-            width: auto !important; 
-            flex: 0 0 auto !important; 
+            width: auto !important;
+            flex: 0 0 auto !important;
             cursor: pointer;
         }
-        
+
         /* Tabel & Hover Effects */
         .table-elegant-wrapper {
             border-radius: 0.75rem;
-            overflow: hidden; 
+            overflow: hidden;
             border: 1px solid #dee2e6;
             background: white;
         }
-        .table-responsive::-webkit-scrollbar { height: 8px; }
-        .table-responsive::-webkit-scrollbar-track { background: #f8f9fa; }
-        .table-responsive::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        .table-responsive::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
-        
-        tbody tr { transition: all 0.25s ease; cursor: default; }
-        tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.06); background-color: #ffffff !important; z-index: 10; position: relative; }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f8f9fa;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        tbody tr {
+            transition: all 0.25s ease;
+            cursor: default;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            background-color: #ffffff !important;
+            z-index: 10;
+            position: relative;
+        }
 
         /* Soft Header Tabel Custom */
         .table-soft-header th {
@@ -178,9 +310,21 @@
         }
 
         /* Kustomisasi Warna Pagination */
-        .pagination .page-link { color: #002b5e; border-color: #dee2e6; }
-        .pagination .page-item.active .page-link { background-color: #0099ff; border-color: #0099ff; color: white; }
-        .pagination .page-item.disabled .page-link { color: #8e9ca9; background-color: #f8f9fa; }
+        .pagination .page-link {
+            color: #002b5e;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #0099ff;
+            border-color: #0099ff;
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #8e9ca9;
+            background-color: #f8f9fa;
+        }
 
         /* TAMPILAN MODAL DETAIL */
         .info-group-wrapper {
@@ -189,29 +333,68 @@
             border-radius: 0.5rem;
             padding: 0.5rem 0.6rem;
             margin-bottom: 0.6rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             width: 100%;
         }
-        
-        .info-box-gray { background-color: #f4f6f8; border-color: #e2e8f0; }
-        .info-box-gray .info-label { color: #6c757d !important; }
-        .info-box-gray .info-value { color: #495057 !important; }
-        
-        .info-box-green { background-color: #f0fdf4; border-color: #dcfce7; }
-        .info-box-green .info-label { color: #198754 !important; }
-        .info-box-green .info-value { color: #146c43 !important; }
 
-        .info-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; color: #8e9ca9; font-weight: 700; margin-bottom: 0.15rem; }
-        .info-value { font-size: 0.82rem; color: #1a1d20; font-weight: 600; line-height: 1.25; }
-        .fs-7 { font-size: 0.75rem !important; }
-        .card-rincian { max-height: 480px; overflow-y: auto; }
+        .info-box-gray {
+            background-color: #f4f6f8;
+            border-color: #e2e8f0;
+        }
+
+        .info-box-gray .info-label {
+            color: #6c757d !important;
+        }
+
+        .info-box-gray .info-value {
+            color: #495057 !important;
+        }
+
+        .info-box-green {
+            background-color: #f0fdf4;
+            border-color: #dcfce7;
+        }
+
+        .info-box-green .info-label {
+            color: #198754 !important;
+        }
+
+        .info-box-green .info-value {
+            color: #146c43 !important;
+        }
+
+        .info-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8e9ca9;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+
+        .info-value {
+            font-size: 0.82rem;
+            color: #1a1d20;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .fs-7 {
+            font-size: 0.75rem !important;
+        }
+
+        .card-rincian {
+            max-height: 480px;
+            overflow-y: auto;
+        }
 
         #detailModalTitle {
             font-size: clamp(0.95rem, 3.5vw, 1.25rem);
             line-height: 1.4 !important;
             white-space: nowrap;
             padding-left: 20px;
-            padding-right: 40px; /* Space for close button */
+            padding-right: 40px;
+            /* Space for close button */
             max-width: calc(100% - 60px);
             margin: 0 auto;
         }
@@ -220,7 +403,8 @@
            POSISI TABEL DIRAPATKAN MENYENTUH KOTAK PENCARIAN
            ========================================================= */
         main.main-content-wrapper {
-            margin-top: -140px !important; /* Tarikan ekstrim ke atas di Desktop untuk menutup celah */
+            margin-top: -140px !important;
+            /* Tarikan ekstrim ke atas di Desktop untuk menutup celah */
             position: relative;
             z-index: 10;
         }
@@ -229,56 +413,66 @@
            TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
            ========================================================= */
         @media (max-width: 991.98px) {
-            .hero-section { padding-top: 2rem !important; height: 400px !important; }
-            
-            main.main-content-wrapper {
-                margin-top: -110px !important; /* Penyesuaian tarikan ke atas khusus layar HP */
+            .hero-section {
+                padding-top: 2rem !important;
+                height: 400px !important;
             }
 
-            .search-box-elegant { 
+            main.main-content-wrapper {
+                margin-top: -110px !important;
+                /* Penyesuaian tarikan ke atas khusus layar HP */
+            }
+
+            .search-box-elegant {
                 flex-direction: row !important;
                 flex-wrap: nowrap !important;
-                background: #ffffff !important; 
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; 
-                padding: 0 !important; 
-                gap: 0 !important; 
-                border-radius: 0 !important; 
+                background: #ffffff !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+                padding: 0 !important;
+                gap: 0 !important;
+                border-radius: 0 !important;
                 width: 100%;
                 display: flex !important;
                 align-items: stretch !important;
             }
-            .search-box-elegant .vr { display: none !important; }
-            
-            .search-box-elegant select { 
-                flex: 0 0 auto !important; 
-                width: auto !important; 
-                border-radius: 0 !important; 
-                background-color: #f8f9fa !important; 
-                padding: 0.5rem 1.8rem 0.5rem 0.5rem !important; 
+
+            .search-box-elegant .vr {
+                display: none !important;
+            }
+
+            .search-box-elegant select {
+                flex: 0 0 auto !important;
+                width: auto !important;
+                border-radius: 0 !important;
+                background-color: #f8f9fa !important;
+                padding: 0.5rem 1.8rem 0.5rem 0.5rem !important;
                 font-size: 0.75rem !important;
                 border: none !important;
                 border-right: 1px solid #dee2e6 !important;
             }
-            .search-box-elegant input { 
+
+            .search-box-elegant input {
                 flex: 1 1 auto !important;
-                width: 10% !important; 
-                border-radius: 0 !important; 
-                background-color: #ffffff !important; 
+                width: 10% !important;
+                border-radius: 0 !important;
+                background-color: #ffffff !important;
                 padding: 0.5rem 0.5rem !important;
                 font-size: 0.75rem !important;
                 border: none !important;
             }
-            .search-box-elegant button.btn-primary { 
-                flex: 0 0 auto !important; 
-                margin: 0 !important; 
-                padding: 0.5rem 0.7rem !important; 
-                border-radius: 0 !important; 
+
+            .search-box-elegant button.btn-primary {
+                flex: 0 0 auto !important;
+                margin: 0 !important;
+                padding: 0.5rem 0.7rem !important;
+                border-radius: 0 !important;
                 box-shadow: none !important;
             }
-            .search-box-elegant button.btn-light { 
-                flex: 0 0 auto !important; 
-                margin: 0 !important; 
-                padding: 0.5rem 0.7rem !important; 
+
+            .search-box-elegant button.btn-light {
+                flex: 0 0 auto !important;
+                margin: 0 !important;
+                padding: 0.5rem 0.7rem !important;
                 border-radius: 0 !important;
                 background-color: #f1f3f5 !important;
                 border: none !important;
@@ -286,46 +480,90 @@
                 box-shadow: none !important;
             }
 
-            .modal-header { padding: 0.8rem 1rem !important; }
-            
-            #detailModalSubtitle .d-flex { gap: 0.35rem !important; margin-top: 0.5rem !important; }
-            #detailModalSubtitle .badge { 
-                font-size: 0.6rem !important; 
-                padding: 0.35rem 0.6rem !important; 
+            .modal-header {
+                padding: 0.8rem 1rem !important;
+            }
+
+            #detailModalSubtitle .d-flex {
+                gap: 0.35rem !important;
+                margin-top: 0.5rem !important;
+            }
+
+            #detailModalSubtitle .badge {
+                font-size: 0.6rem !important;
+                padding: 0.35rem 0.6rem !important;
                 letter-spacing: 0.2px;
             }
-            #detailModalSubtitle .badge i { font-size: 0.65rem !important; }
-            
-            .modal-body { padding: 1rem 0.75rem !important; }
-            .modal-body .row { display: block !important; }
-            .modal-body .card.h-100 { height: auto !important; margin-bottom: 1rem !important; }
-            .card-rincian { max-height: none; overflow-y: visible; }
 
-            .modal-footer { padding-bottom: 1.8rem !important; } 
-            .modal-close-btn { 
-                padding: 0.35rem 1.8rem !important; 
-                font-size: 0.8rem !important; 
-                margin-bottom: 0.6rem !important; 
+            #detailModalSubtitle .badge i {
+                font-size: 0.65rem !important;
             }
 
-            .footer-col-section { text-align: center; }
-            .footer-col-section ul li { justify-content: center; text-align: center; }
+            .modal-body {
+                padding: 1rem 0.75rem !important;
+            }
+
+            .modal-body .row {
+                display: block !important;
+            }
+
+            .modal-body .card.h-100 {
+                height: auto !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .card-rincian {
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .modal-footer {
+                padding-bottom: 1.8rem !important;
+            }
+
+            .modal-close-btn {
+                padding: 0.35rem 1.8rem !important;
+                font-size: 0.8rem !important;
+                margin-bottom: 0.6rem !important;
+            }
+
+            .footer-col-section {
+                text-align: center;
+            }
+
+            .footer-col-section ul li {
+                justify-content: center;
+                text-align: center;
+            }
         }
 
-        .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .fade-in-up {
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
-    
+
     <div class="sticky-top shadow-sm" style="z-index: 1030;">
         <nav class="navbar navbar-dark py-3 bg-animated-gradient">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
                 <a class="navbar-brand d-flex align-items-center text-decoration-none m-0" href="#">
-                    <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" class="brand-logo" style="width: 38px; height: auto; margin-right: 12px;">
+                    <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png"
+                        alt="Logo Garuda" class="brand-logo" style="width: 38px; height: auto; margin-right: 12px;">
                     <div class="d-flex flex-column lh-1">
                         <span class="fs-5 fs-md-4 fw-bold text-white">KIACEH</span>
-                        <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
+                        <span class="fw-normal text-white-50" style="font-size: 0.75rem; letter-spacing: 0.5px;">Komisi
+                            Informasi Aceh</span>
                     </div>
                 </a>
             </div>
@@ -335,7 +573,7 @@
 
     <!-- UPDATE: HERO SECTION TANPA CLASS 'shadow-sm' AGAR MENYATU SEMPURNA DENGAN BACKGROUND -->
     <section class="hero-section text-center py-5 text-white position-relative">
-        
+
         <!-- Wadah Gambar Slideshow Statis -->
         <div class="hero-slideshow-container">
             <div class="hero-slide"></div>
@@ -344,7 +582,7 @@
             <div class="hero-slide"></div>
             <div class="hero-slide"></div>
         </div>
-        
+
         <!-- Lapisan Blur Glassmorphism & Transparansi 0% Menuju Atas (Seamless ke warna #f4f7f6) -->
         <div class="hero-transparency-overlay"></div>
 
@@ -355,27 +593,33 @@
                     <h1 class="fw-bold hero-title typewriter-text mb-0">Sistem Informasi Sengketa</h1>
                 </div>
             </div>
-            
+
             <!-- UPDATE: Class 'text-white-50' dihapus agar CSS Custom warna & border border diaplikasikan -->
-            <p class="hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi Informasi Aceh</p>
-            
+            <p class="hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi
+                Informasi Aceh</p>
+
             <div class="row justify-content-center px-2 px-md-0">
                 <div class="col-12 col-md-10 col-lg-8">
                     <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
-                        <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-4" onchange="filterTable()">
+                        <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-4"
+                            onchange="filterTable()">
                             <option value="">Semua Status</option>
                             <option value="selesai">Selesai</option>
                             <option value="proses">Dalam Proses</option>
                         </select>
-                        
+
                         <div class="vr my-2 bg-secondary opacity-25"></div>
-                        
-                        <input type="text" id="searchInput" class="form-control border-0 px-3 bg-transparent py-2" placeholder="Cari Pemohon/Termohon..." oninput="filterTable()">
-                        
-                        <button class="btn btn-primary rounded-pill px-3 px-md-4 fw-bold mx-0 mx-md-1 shadow-sm d-flex align-items-center justify-content-center" onclick="filterTable()">
+
+                        <input type="text" id="searchInput" class="form-control border-0 px-3 bg-transparent py-2"
+                            placeholder="Cari Pemohon/Termohon..." oninput="filterTable()">
+
+                        <button
+                            class="btn btn-primary rounded-pill px-3 px-md-4 fw-bold mx-0 mx-md-1 shadow-sm d-flex align-items-center justify-content-center"
+                            onclick="filterTable()">
                             <i class="bi bi-search"></i> <span class="d-none d-md-inline ms-2">Cari</span>
                         </button>
-                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary shadow-sm" title="Hapus Pencarian" onclick="clearSearch()">
+                        <button class="btn btn-light border rounded-pill px-3 fw-bold text-secondary shadow-sm"
+                            title="Hapus Pencarian" onclick="clearSearch()">
                             <i class="bi bi-backspace-fill text-danger"></i>
                         </button>
                     </div>
@@ -394,34 +638,45 @@
         </div>
     </main>
 
-    <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed" 
-            style="bottom: 25px; right: 25px; width: 46px; height: 46px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;" 
-            onclick="scrollToTop()" title="Kembali ke Atas">
+    <button id="btnScrollTop" class="btn shadow-lg rounded-circle position-fixed"
+        style="bottom: 25px; right: 25px; width: 46px; height: 46px; z-index: 1040; border: 2px solid white; background: linear-gradient(135deg, #0099ff 0%, #002b5e 100%); display: none; align-items: center; justify-content: center; padding: 0; transition: 0.3s;"
+        onclick="scrollToTop()" title="Kembali ke Atas">
         <i class="bi bi-chevron-up fs-4 text-white"></i>
     </button>
 
     <div class="modal fade" id="detailModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 z-1">
-                    <button type="button" class="btn-close position-absolute end-0 top-0 mt-3 me-3 shadow-none" onclick="closeDetailModal()"></button>
-                    <h5 class="modal-title fw-bold text-center text-dark mx-auto" id="detailModalTitle">Detail Perkara</h5>
+                <div
+                    class="modal-header bg-info position-relative flex-column align-items-center pt-4 pb-3 border-bottom-0 z-1">
+                    <button type="button" class="btn-close position-absolute end-0 top-0 mt-3 me-3 shadow-none"
+                        onclick="closeDetailModal()"></button>
+                    <h5 class="modal-title fw-bold text-center text-dark mx-auto" id="detailModalTitle">Detail Perkara
+                    </h5>
                     <div id="detailModalSubtitle" class="w-100"></div>
                 </div>
                 <div class="modal-body position-relative bg-light px-3 px-md-4 py-4">
-                    <div id="detailLoading" style="display: none;" class="text-center py-5"><div class="spinner-border text-info" role="status"></div></div>
+                    <div id="detailLoading" style="display: none;" class="text-center py-5">
+                        <div class="spinner-border text-info" role="status"></div>
+                    </div>
                     <div id="detailContent"></div>
                 </div>
-                
-                <div class="modal-footer position-relative d-flex flex-column justify-content-center align-items-center bg-white py-3 border-top" style="min-height: 65px;">
-                    <button type="button" class="btn btn-secondary btn-sm px-5 rounded-pill fw-bold shadow-sm modal-close-btn mb-1 mb-md-0" style="z-index: 2;" onclick="closeDetailModal()">Tutup</button>
-                    
-                    <div class="position-absolute w-100 px-3 d-flex justify-content-between bottom-0 pb-2" style="z-index: 1;">
-                        <div class="text-muted fw-bold d-flex align-items-center" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-bar-chart-line-fill text-primary me-1" style="font-size: 0.75rem;"></i> 
+
+                <div class="modal-footer position-relative d-flex flex-column justify-content-center align-items-center bg-white py-3 border-top"
+                    style="min-height: 65px;">
+                    <button type="button"
+                        class="btn btn-secondary btn-sm px-5 rounded-pill fw-bold shadow-sm modal-close-btn mb-1 mb-md-0"
+                        style="z-index: 2;" onclick="closeDetailModal()">Tutup</button>
+
+                    <div class="position-absolute w-100 px-3 d-flex justify-content-between bottom-0 pb-2"
+                        style="z-index: 1;">
+                        <div class="text-muted fw-bold d-flex align-items-center"
+                            style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                            <i class="bi bi-bar-chart-line-fill text-primary me-1" style="font-size: 0.75rem;"></i>
                             <span id="modalViewCount">Dilihat: - kali</span>
                         </div>
-                        <div class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;" id="modalLastUpdated">
+                        <div class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;"
+                            id="modalLastUpdated">
                             DIPERBARUI: -
                         </div>
                     </div>
@@ -435,26 +690,34 @@
             <div class="row gy-3 footer-col-section">
                 <div class="col-lg-5 col-md-12">
                     <div class="d-flex align-items-center mb-2 justify-content-center justify-content-lg-start">
-                        <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" style="width: 30px; margin-right: 12px;">
+                        <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png"
+                            alt="Logo Garuda" style="width: 30px; margin-right: 12px;">
                         <div>
                             <h6 class="mb-0 fw-bold poppins-font text-white" style="font-size: 0.95rem;">KIACEH</h6>
-                            <span class="text-white-50 fw-semibold d-block" style="font-size: 0.68rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
+                            <span class="text-white-50 fw-semibold d-block"
+                                style="font-size: 0.68rem; letter-spacing: 0.5px;">Komisi Informasi Aceh</span>
                         </div>
                     </div>
-                    <p class="text-white-50 mb-2 lh-base px-1 px-lg-0">Portal Transparansi Penyelesaian Sengketa Informasi Publik di Provinsi Aceh demi tata kelola pemerintahan yang bersih.</p>
+                    <p class="text-white-50 mb-2 lh-base px-1 px-lg-0">Portal Transparansi Penyelesaian Sengketa
+                        Informasi Publik di Provinsi Aceh demi tata kelola pemerintahan yang bersih.</p>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info" style="letter-spacing: 0.5px; font-size: 0.85rem;">Kontak Layanan</h6>
+                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info"
+                        style="letter-spacing: 0.5px; font-size: 0.85rem;">Kontak Layanan</h6>
                     <ul class="list-unstyled text-white-50 lh-base mb-0">
-                        <li class="mb-1"><i class="bi bi-clock text-info me-2"></i>Senin - Jumat | 08.00 - 16.30 WIB</li>
+                        <li class="mb-1"><i class="bi bi-clock text-info me-2"></i>Senin - Jumat | 08.00 - 16.30 WIB
+                        </li>
                         <li class="mb-1"><i class="bi bi-telephone text-info me-2"></i>(0651) 123456</li>
                         <li><i class="bi bi-envelope text-info me-2"></i>sekretariat@kia.acehprov.go.id</li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info" style="letter-spacing: 0.5px; font-size: 0.85rem;">Tautan Resmi</h6>
+                    <h6 class="fw-bold text-uppercase mb-2 poppins-font text-info"
+                        style="letter-spacing: 0.5px; font-size: 0.85rem;">Tautan Resmi</h6>
                     <div class="d-flex flex-column gap-1 mb-2">
-                        <a href="https://kia.acehprov.go.id" target="_blank" class="text-white-50 text-decoration-none transition-hover"><i class="bi bi-link-45deg text-info me-1"></i>Website Utama KI Aceh</a>
+                        <a href="https://kia.acehprov.go.id" target="_blank"
+                            class="text-white-50 text-decoration-none transition-hover"><i
+                                class="bi bi-link-45deg text-info me-1"></i>Website Utama KI Aceh</a>
                     </div>
                     <div class="d-flex gap-2 justify-content-center justify-content-lg-start mt-2">
                         <a href="#" class="social-icon-btn"><i class="bi bi-instagram"></i></a>
@@ -473,21 +736,21 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        window.onerror = function(msg, url, line, col, error) {
+        window.onerror = function (msg, url, line, col, error) {
             const container = document.getElementById('publicDataContainer');
             if (container) {
                 container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-4 bg-white shadow-sm fade-in-up"><h5 class="text-danger fw-bold poppins-font">Global Error</h5><p class="text-muted">${msg}</p><p class="text-muted" style="font-size:12px;">Line: ${line} | Col: ${col}</p></div>`;
             }
         };
-        window.addEventListener("unhandledrejection", function(e) {
+        window.addEventListener("unhandledrejection", function (e) {
             const container = document.getElementById('publicDataContainer');
             if (container) {
                 container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-4 bg-white shadow-sm fade-in-up"><h5 class="text-danger fw-bold poppins-font">Unhandled Promise</h5><p class="text-muted">${e.reason}</p></div>`;
             }
         });
-        
+
         // Timeout detector to detect fetch hanging
-        setTimeout(function() {
+        setTimeout(function () {
             const container = document.getElementById('publicDataContainer');
             if (container && container.innerHTML.includes('Memuat Data Sengketa...')) {
                 container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-4 bg-white shadow-sm fade-in-up"><h5 class="text-danger fw-bold poppins-font">Timeout Error</h5><p class="text-muted">Proses loading memakan waktu terlalu lama (> 10 detik). Sepertinya koneksi terputus atau API tidak merespons di browser ini.</p></div>`;
@@ -496,7 +759,7 @@
     </script>
     <script>
         let sheetHeadersPerkara = [], perkaraData = [], detailHeaders = [], detailData = [], updateData = [];
-        
+
         let filteredData = [];
         let currentPage = 1;
         const rowsPerPage = 15;
@@ -511,19 +774,19 @@
                 const textData = await response.text();
                 let data;
                 try { data = JSON.parse(textData); } catch (e) { throw new Error("Format respons dari server tidak valid."); }
-                
-                if (!data || !data.perkara || data.perkara.length <= 1) { 
-                    container.innerHTML = '<div class="text-center py-5 bg-white rounded-4 shadow-sm fade-in-up border"><p class="text-muted fw-bold mb-0 poppins-font fs-5"><i class="bi bi-inbox me-2"></i> Belum ada data sengketa yang tersedia.</p></div>'; return; 
+
+                if (!data || !data.perkara || data.perkara.length <= 1) {
+                    container.innerHTML = '<div class="text-center py-5 bg-white rounded-4 shadow-sm fade-in-up border"><p class="text-muted fw-bold mb-0 poppins-font fs-5"><i class="bi bi-inbox me-2"></i> Belum ada data sengketa yang tersedia.</p></div>'; return;
                 }
 
-                sheetHeadersPerkara = data.perkara[0] || []; perkaraData = data.perkara.slice(1) || []; 
+                sheetHeadersPerkara = data.perkara[0] || []; perkaraData = data.perkara.slice(1) || [];
                 detailHeaders = (data.detail && data.detail[0]) ? data.detail[0] : []; detailData = (data.detail && data.detail.length > 1) ? data.detail.slice(1) : [];
                 updateData = (data.update && data.update.length > 1) ? data.update.slice(1) : [];
-                
+
                 filteredData = [...perkaraData];
                 renderTable();
 
-            } catch (error) { 
+            } catch (error) {
                 container.innerHTML = `<div class="text-center py-5 my-4 border border-danger rounded-4 bg-white shadow-sm fade-in-up">
                     <h5 class="text-danger fw-bold poppins-font"><i class="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i> Gagal Memuat Data</h5>
                     <p class="text-muted mb-4">${error.message}</p>
@@ -533,23 +796,23 @@
                         Stack: ${error.stack}<br/>
                     </div>
                     <button class="btn btn-outline-danger px-4 fw-bold rounded-pill shadow-sm" onclick="loadPublicData()">Coba Muat Ulang</button>
-                </div>`; 
+                </div>`;
             }
         }
 
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const statusVal = document.getElementById('statusFilter').value.toLowerCase().trim();
-            
+
             const idxPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
             const idxTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
-            
+
             const idxStatusDetail = detailHeaders.findIndex(h => (`${h}`).toLowerCase().includes('status sengketa'));
-            const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7; 
+            const statusColIndex = idxStatusDetail !== -1 ? idxStatusDetail : 7;
 
             filteredData = perkaraData.filter(row => {
-                const id = row[0]; 
-                
+                const id = row[0];
+
                 let matchText = false;
                 if (query === '') {
                     matchText = true;
@@ -573,7 +836,7 @@
                         matchStatus = detailRow.some(cell => cell && (`${cell}`).toLowerCase().includes(statusVal));
                     }
                 }
-                
+
                 return matchText && matchStatus;
             });
 
@@ -581,21 +844,21 @@
             renderTable();
         }
 
-        function clearSearch() { 
-            document.getElementById('searchInput').value = ''; 
-            document.getElementById('statusFilter').value = ''; 
-            filterTable(); 
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            filterTable();
         }
 
         function renderTable() {
             const container = document.getElementById('publicDataContainer');
             const skipIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'detail');
             const skipKetIdx = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().trim() === 'keterangan tambahan');
-            
+
             let tableHtml = `<div class="shadow-sm table-elegant-wrapper fade-in-up"><div class="table-responsive"><table class="table table-bordered table-hover mb-0 align-middle"><thead class="table-soft-header poppins-font"><tr>`;
-            
+
             tableHtml += `<th class="py-3 px-3 text-center align-middle" style="width: 50px;">No.</th>`;
-            sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
+            sheetHeadersPerkara.forEach((h, i) => { if (i !== skipIdx && i !== skipKetIdx) tableHtml += `<th class="py-3 px-3 align-middle">${h || '-'}</th>`; });
             tableHtml += `<th class="py-3 px-3 text-center align-middle">Tindakan</th></tr></thead><tbody id="dataTable">`;
 
             const startIndex = (currentPage - 1) * rowsPerPage;
@@ -607,28 +870,28 @@
                 const pageData = filteredData.slice(startIndex, endIndex);
 
                 pageData.forEach((row, index) => {
-                    if (!row || row.length === 0) return; 
-                    const absoluteIndex = startIndex + index + 1; 
+                    if (!row || row.length === 0) return;
+                    const absoluteIndex = startIndex + index + 1;
                     tableHtml += `<tr>`;
                     tableHtml += `<td class="text-center py-3 fw-bold text-secondary">${absoluteIndex}</td>`;
-                    
-                    for (let i = 0; i < sheetHeadersPerkara.length; i++) { 
-                        if(i !== skipIdx && i !== skipKetIdx) {
+
+                    for (let i = 0; i < sheetHeadersPerkara.length; i++) {
+                        if (i !== skipIdx && i !== skipKetIdx) {
                             let cellData = row[i] || '-';
                             const cellLower = (`${cellData}`).toLowerCase().trim();
-                            
+
                             const isStatusColumn = (sheetHeadersPerkara[i] && sheetHeadersPerkara[i].toLowerCase().includes('status'));
                             if (isStatusColumn || cellLower === 'selesai' || cellLower === 'dalam proses' || cellLower === 'proses') {
                                 if (cellLower.includes('selesai')) cellData = `<span class="badge bg-success shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
                                 else if (cellLower.includes('proses')) cellData = `<span class="badge bg-warning text-dark shadow-sm rounded-pill px-3 py-2 fw-semibold">${cellData}</span>`;
                             }
-                            tableHtml += `<td class="px-3 py-3 text-nowrap">${cellData}</td>`; 
+                            tableHtml += `<td class="px-3 py-3 text-nowrap">${cellData}</td>`;
                         }
                     }
                     tableHtml += `<td class="px-3 py-3 text-center"><button class="btn btn-info btn-sm text-dark fw-bold shadow-sm py-1 px-3 rounded-pill d-flex align-items-center justify-content-center mx-auto hover-lift" onclick="lihatDetail('${row[0] || ''}')"><i class="bi bi-eye-fill me-1"></i> Lihat</button></td></tr>`;
                 });
             }
-            
+
             tableHtml += `</tbody></table></div></div>`;
 
             const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -670,11 +933,11 @@
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             renderTable();
-            
+
             const searchBox = document.getElementById('publicDataContainer');
             if (searchBox) {
                 const y = searchBox.getBoundingClientRect().top + window.pageYOffset - 120;
-                window.scrollTo({top: y, behavior: 'smooth'});
+                window.scrollTo({ top: y, behavior: 'smooth' });
             }
         }
 
@@ -684,52 +947,52 @@
             document.getElementById('detailModalSubtitle').innerHTML = '';
 
             const pRow = perkaraData.find(r => r[0] === id);
-            const getIndexPem = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('pemohon'));
-            const getIndexTerm = sheetHeadersPerkara.findIndex(h=>(`${h}`).toLowerCase().includes('termohon'));
-            
+            const getIndexPem = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('pemohon'));
+            const getIndexTerm = sheetHeadersPerkara.findIndex(h => (`${h}`).toLowerCase().includes('termohon'));
+
             setTimeout(() => {
                 const row = detailData.find(r => r[0] === id);
-                
+
                 const headerO = detailHeaders[13] ? detailHeaders[13].toLowerCase().trim() : 'tgl sidang sebelumnya';
                 const headerP = detailHeaders[14] ? detailHeaders[14].toLowerCase().trim() : 'agenda sidang sebelumnya';
 
                 const getField = (f, forceDetailIdx = -1) => {
                     let fieldVal = '-', labelText = f;
-                    const findIdx = (headers) => headers.findIndex(h => { 
-                        if(!h) return false;
-                        const val = (`${h}`).toLowerCase().trim(); 
-                        return val === f || 
-                               (f === 'status sengketa' && val.includes('status')) || 
-                               (f === 'no reg' && val === 'rincian informasi') || 
-                               (f === 'isi permohonan' && val === 'rincian permohonan') ||
-                               (f === 'tgl register' && val === 'tanggal register'); 
+                    const findIdx = (headers) => headers.findIndex(h => {
+                        if (!h) return false;
+                        const val = (`${h}`).toLowerCase().trim();
+                        return val === f ||
+                            (f === 'status sengketa' && val.includes('status')) ||
+                            (f === 'no reg' && val === 'rincian informasi') ||
+                            (f === 'isi permohonan' && val === 'rincian permohonan') ||
+                            (f === 'tgl register' && val === 'tanggal register');
                     });
 
                     let idx = findIdx(detailHeaders);
-                    
-                    if(idx !== -1) { 
-                        fieldVal = row ? (row[idx] || '-') : '-'; 
-                        labelText = detailHeaders[idx]; 
+
+                    if (idx !== -1) {
+                        fieldVal = row ? (row[idx] || '-') : '-';
+                        labelText = detailHeaders[idx];
                     } else if (forceDetailIdx !== -1) {
                         idx = forceDetailIdx;
                         fieldVal = row ? (row[idx] || '-') : '-';
                         labelText = detailHeaders[idx] || f;
-                    } else { 
-                        idx = findIdx(sheetHeadersPerkara); 
-                        if(idx !== -1) { 
-                            fieldVal = pRow ? (pRow[idx] || '-') : '-'; 
-                            labelText = sheetHeadersPerkara[idx]; 
-                        } 
+                    } else {
+                        idx = findIdx(sheetHeadersPerkara);
+                        if (idx !== -1) {
+                            fieldVal = pRow ? (pRow[idx] || '-') : '-';
+                            labelText = sheetHeadersPerkara[idx];
+                        }
                     }
 
-                    if(idx !== -1 || forceDetailIdx !== -1) {
-                        if(f === 'no reg') labelText = 'No Register'; 
-                        if(f === 'tgl register') labelText = 'Tgl Register';
-                        
-                        if(f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
+                    if (idx !== -1 || forceDetailIdx !== -1) {
+                        if (f === 'no reg') labelText = 'No Register';
+                        if (f === 'tgl register') labelText = 'Tgl Register';
+
+                        if (f.includes('tgl') || f.includes('tanggal') || f.includes('sidang') || f === headerO) {
                             if (/^\d{4}-\d{2}-\d{2}$/.test(fieldVal)) { const p = fieldVal.split('-'); fieldVal = `${p[2]}/${p[1]}/${p[0]}`; }
                         }
-                        if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http')?'https://'+fieldVal:fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan <i class="bi bi-box-arrow-up-right"></i></a>`;
+                        if (f === 'link putusan' && fieldVal !== '-' && fieldVal !== '') fieldVal = `<a href="${!fieldVal.startsWith('http') ? 'https://' + fieldVal : fieldVal}" target="_blank" class="text-primary fw-bold text-decoration-none">Buka Putusan <i class="bi bi-box-arrow-up-right"></i></a>`;
                         return { label: labelText, val: fieldVal };
                     }
                     return null;
@@ -737,13 +1000,13 @@
 
                 const dataNoReg = getField('no reg');
                 const dataTglReg = getField('tgl register');
-                
+
                 const titleText = pRow ? `<span class="text-dark poppins-font">${pRow[getIndexPem] || 'Pemohon'}</span> <span class="text-danger mx-1 poppins-font">vs</span> <span class="text-dark poppins-font">${pRow[getIndexTerm] || 'Termohon'}</span>` : 'Detail Perkara';
-                
+
                 const titleEl = document.getElementById('detailModalTitle');
                 titleEl.style.fontSize = ''; // reset
                 titleEl.innerHTML = titleText;
-                
+
                 // Auto shrink text to fit one line
                 setTimeout(() => {
                     const maxWidth = titleEl.parentElement.clientWidth - 100; // Extra safe margin for X button
@@ -753,7 +1016,7 @@
                         titleEl.style.fontSize = currentSize + 'px';
                     }
                 }, 20);
-                
+
                 document.getElementById('detailModalSubtitle').innerHTML = `
                     <div class="d-flex flex-wrap justify-content-center px-2">
                         <span class="badge bg-white text-dark border shadow-sm rounded-pill d-flex align-items-center"><i class="bi bi-hash text-muted me-1"></i> Reg: ${dataNoReg ? dataNoReg.val : '-'}</span>
@@ -762,14 +1025,16 @@
 
                 const col1Groups = [
                     { class: "", fields: [{ key: "status sengketa" }] },
-                    { class: "info-box-gray", isCarousel: true, slides: [
-                        { fields: [{ key: headerO, idx: 13 }, { key: headerP, idx: 14 }] },
-                        { fields: [{ key: "kehadiran para pihak", idx: 18 }] }
-                    ] }, 
+                    {
+                        class: "info-box-gray", isCarousel: true, slides: [
+                            { fields: [{ key: headerO, idx: 13 }, { key: headerP, idx: 14 }] },
+                            { fields: [{ key: "kehadiran para pihak", idx: 18 }] }
+                        ]
+                    },
                     { class: "info-box-green", fields: [{ key: "tgl sidang selanjutnya" }, { key: "agenda sidang selanjutnya" }] },
                     { class: "", fields: [{ key: "nomor putusan" }, { key: "tgl diputuskan" }, { key: "link putusan" }] }
                 ];
-                
+
                 const col2Groups = [
                     { class: "", fields: [{ key: "ketua majelis" }, { key: "anggota 1" }, { key: "anggota 2" }] },
                     { class: "", fields: [{ key: "mediator" }] },
@@ -787,30 +1052,30 @@
                 col1Groups.forEach(grp => {
                     let groupHtml = `<div class="info-group-wrapper ${grp.class}">`;
                     let hasValidField = false;
-                    
+
                     if (grp.isCarousel) {
                         hasValidField = true;
                         const carouselId = 'carouselInfoBox' + Math.random().toString(36).substr(2, 9);
                         groupHtml += `<div id="${carouselId}" class="carousel slide" data-bs-ride="false">
                             <div class="carousel-inner">`;
-                        
+
                         grp.slides.forEach((slide, sIdx) => {
                             const activeClass = sIdx === 0 ? 'active' : '';
                             groupHtml += `<div class="carousel-item ${activeClass}"><div class="px-4">`;
-                            
+
                             slide.fields.forEach(fObj => {
                                 const data = getField(fObj.key, fObj.idx);
                                 if (data) {
                                     let displayVal = data.val;
                                     const fLower = fObj.key.toLowerCase().trim();
-                                    
+
                                     if (fLower === 'kehadiran para pihak') {
                                         const safeVal = String(displayVal || '');
                                         const isPemohonHadir = safeVal.includes('Pemohon');
                                         const isTermohonHadir = safeVal.includes('Termohon');
                                         const pemohonIcon = isPemohonHadir ? '<i class="bi bi-check-square-fill text-success fs-6"></i>' : '<i class="bi bi-square text-muted fs-6"></i>';
                                         const termohonIcon = isTermohonHadir ? '<i class="bi bi-check-square-fill text-success fs-6"></i>' : '<i class="bi bi-square text-muted fs-6"></i>';
-                                        
+
                                         displayVal = `
                                         <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
                                             <div class="d-flex gap-2 align-items-center">${pemohonIcon} <span style="font-size: 0.85rem;">Pemohon</span></div>
@@ -818,14 +1083,14 @@
                                             <div class="d-flex gap-2 align-items-center">${termohonIcon} <span style="font-size: 0.85rem;">Termohon</span></div>
                                         </div>`;
                                     }
-                                    
+
                                     groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
                                 }
                             });
-                            
+
                             groupHtml += `</div></div>`;
                         });
-                        
+
                         groupHtml += `
                             </div>
                             <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev" style="width: 25px;">
@@ -851,7 +1116,7 @@
                                     else if (statusStr.includes('dalam proses')) displayVal = `<span class="badge bg-warning text-dark shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                     else if (displayVal !== '-') displayVal = `<span class="badge bg-secondary shadow-sm px-3 py-2 mt-1 fs-7 rounded-pill">${displayVal}</span>`;
                                 }
-                                
+
                                 groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${displayVal}</div></div>`;
                             }
                         });
@@ -867,13 +1132,13 @@
                     let hasValidField = false;
                     grp.fields.forEach(fObj => {
                         const data = getField(fObj.key);
-                        if(data) {
+                        if (data) {
                             hasValidField = true;
                             groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${data.val}</div></div>`;
                         }
                     });
                     groupHtml += `</div>`;
-                    if(hasValidField) htmlCol2 += groupHtml;
+                    if (hasValidField) htmlCol2 += groupHtml;
                 });
                 htmlCol2 += `</div></div></div>`;
 
@@ -884,10 +1149,10 @@
                     let hasValidField = false;
                     grp.fields.forEach(fObj => {
                         const data = getField(fObj.key);
-                        if(data && data.val !== '-') {
+                        if (data && data.val !== '-') {
                             hasValidField = true;
                             foundCol3 = true;
-                            if (index === 1) { 
+                            if (index === 1) {
                                 groupHtml += `<div class="mb-1"><div class="info-label text-start" style="border-bottom: 1px dashed #dee2e6; padding-bottom: 6px; margin-bottom: 8px;">${data.label}</div><div class="info-value text-start fw-normal lh-base">${data.val}</div></div>`;
                             } else {
                                 groupHtml += `<div class="mb-2"><div class="info-label">${data.label}</div><div class="info-value">${data.val}</div></div>`;
@@ -895,24 +1160,24 @@
                         }
                     });
                     groupHtml += `</div>`;
-                    if(hasValidField) htmlCol3 += groupHtml;
+                    if (hasValidField) htmlCol3 += groupHtml;
                 });
-                
-                if(!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
+
+                if (!foundCol3) htmlCol3 += `<div class="text-center text-muted mt-4"><i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i><span style="font-size: 0.9rem;">Belum ada rincian data</span></div>`;
                 htmlCol3 += `</div></div></div>`;
 
                 htmlContent += htmlCol1 + htmlCol2 + htmlCol3 + '</div>';
 
                 const dRowIndex = detailData.findIndex(r => r[0] === id);
                 let currentViews = 0;
-                
+
                 if (dRowIndex !== -1 && detailData[dRowIndex][18] !== undefined) {
                     currentViews = parseInt(detailData[dRowIndex][18]) || 0;
                 }
-                
+
                 currentViews += 1;
                 if (dRowIndex !== -1) detailData[dRowIndex][18] = currentViews;
-                
+
                 const viewCountEl = document.getElementById('modalViewCount');
                 if (viewCountEl) viewCountEl.innerText = `Dilihat: ${currentViews} kali`;
 
@@ -923,10 +1188,10 @@
                 let latestUpdatedDate = '-';
                 if (pRowIndex !== -1 && updateData[pRowIndex] && updateData[pRowIndex][0]) latestUpdatedDate = updateData[pRowIndex][0];
                 if (document.getElementById('modalLastUpdated')) document.getElementById('modalLastUpdated').innerText = "DIPERBARUI: " + latestUpdatedDate.toUpperCase();
-                
-                document.getElementById('detailContent').innerHTML = htmlContent; 
+
+                document.getElementById('detailContent').innerHTML = htmlContent;
                 document.getElementById('detailLoading').style.display = 'none';
-            }, 500); 
+            }, 500);
         }
 
         function closeDetailModal() { bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); }
@@ -944,4 +1209,5 @@
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
     </script>
 </body>
+
 </html>
