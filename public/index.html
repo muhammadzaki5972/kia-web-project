@@ -64,7 +64,7 @@
         .animated-header-border {
             height: 3px;
             width: 100%;
-            background: linear-gradient(90deg, #c2f351, #ffc9c9, #d3b614, #97d1f8);
+            background: linear-gradient(90deg, #c2f351, #f21313, #d3b614, #97d1f8);
             background-size: 300% 100%;
             animation: borderMove 4s linear infinite;
         }
@@ -181,15 +181,15 @@
 
         /* UPDATE: Warna #07b587 dan border teks (outline) putih 4-arah */
         .hero-subtitle {
-            color: #07b587 !important;
-            font-weight: 700 !important;
+            color: #022b20 !important;
+            font-weight: 500 !important;
             /* Dipertebal agar menonjol */
             text-shadow:
-                -1.2px -1.2px 0 #fff,
-                1.2px -1.2px 0 #fff,
-                -1.2px 1.2px 0 #fff,
-                1.2px 1.2px 0 #fff,
-                0px 4px 10px rgba(0, 0, 0, 0.2);
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff,
+                0px 2px 10px rgba(0, 0, 0, 0.2);
             /* Soft shadow luar agar makin kontras */
         }
 
@@ -251,6 +251,11 @@
             font-size: 0.95rem;
         }
 
+        .search-box-elegant input::placeholder {
+            color: #495057 !important;
+            opacity: 20% !important;
+        }
+
         .search-box-elegant select {
             font-size: 0.85rem;
             font-weight: 600;
@@ -301,13 +306,32 @@
             position: relative;
         }
 
-        /* Soft Header Tabel Custom */
+        /* =========================================================
+           PENGATURAN WARNA TABEL (Silakan ubah kode warna di sini) 
+           ========================================================= */
+
+        /* 1. Pengaturan Judul Tabel (Header) */
         .table-soft-header th {
-            background-color: #f0f7ff !important;
-            color: #002b5e !important;
+            background-color: #10529d !important;
+            /* Warna Background Judul Tabel */
+            color: #b4d1f5 !important;
+            /* Warna Tulisan Judul Tabel */
+            border-color: #b8daff !important;
+            /* Warna Garis Samping Judul */
+            border-bottom: 2px solid #c0c30b !important;
+            /* Warna Garis Bawah Judul */
             font-weight: 600;
-            border-bottom: 2px solid #b8daff !important;
         }
+
+        /* 2. Pengaturan Isi Tabel & Garis-garisnya */
+        .table-responsive .table td {
+            color: #334155 !important;
+            /* Warna Tulisan Isi Tabel */
+            border-color: #e2e8f0 !important;
+            /* Warna Garis-garis Pembatas Data */
+        }
+
+        /* ========================================================= */
 
         /* Kustomisasi Warna Pagination */
         .pagination .page-link {
@@ -364,8 +388,8 @@
         }
 
         .info-box-blue {
-            background-color: #fffee2;
-            border-color: #8b8706;
+            background-color: #fffeee;
+            border-color: #aaa51e;
         }
 
         .info-box-blue .info-label {
