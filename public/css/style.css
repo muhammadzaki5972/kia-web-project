@@ -98,3 +98,621 @@ main.container {
 .note-editor .dropdown-toggle::after {
     display: none !important;
 }
+
+/* ==== CSS DARI INDEX.HTML ==== */
+/* Tipografi & Dasar */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f6 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand,
+.modal-title,
+.hero-title,
+.poppins-font {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Animasi Loop Gradient (Dipertahankan Hanya untuk Header Utama) */
+@keyframes gradientLoop {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.bg-animated-gradient {
+    background: linear-gradient(-45deg, #001f42, #002b5e, #007acc, #0059b3);
+    background-size: 400% 400%;
+    animation: gradientLoop 12s ease infinite;
+}
+
+/* Garis Pembatas Animasi di Header */
+.animated-header-border {
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, #c2f351, #f21313, #d3b614, #97d1f8);
+    background-size: 300% 100%;
+    animation: borderMove 4s linear infinite;
+}
+
+@keyframes borderMove {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 300% 0%;
+    }
+}
+
+/* =========================================================
+           TINGGI STATIS 400px UNTUK SLIDESHOW & HERO SECTION
+           ========================================================= */
+.hero-section {
+    position: relative;
+    height: 400px;
+    background-color: #001f42;
+}
+
+.hero-slideshow-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    z-index: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    animation: imageSlideshow 25s infinite ease-in-out;
+}
+
+/* 5 Gambar Berlisensi Free License */
+.hero-slide:nth-child(1) {
+    background-image: url('https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1400');
+    animation-delay: 0s;
+}
+
+.hero-slide:nth-child(2) {
+    background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400');
+    animation-delay: 5s;
+}
+
+.hero-slide:nth-child(3) {
+    background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400');
+    animation-delay: 10s;
+}
+
+.hero-slide:nth-child(4) {
+    background-image: url('https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=1400');
+    animation-delay: 15s;
+}
+
+.hero-slide:nth-child(5) {
+    background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1400');
+    animation-delay: 20s;
+}
+
+@keyframes imageSlideshow {
+    0% {
+        opacity: 0;
+    }
+
+    8% {
+        opacity: 1;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    28% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* =========================================================
+           LINEAR GRADIENT BLUR #F4F7F6 (TO TOP) OPACITY 0%
+           ========================================================= */
+.hero-transparency-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* Fading dari warna background body (#f4f7f6) ke Opacity 0% di bagian atas */
+    background: linear-gradient(to top, #f4f7f6 0%, rgba(244, 247, 246, 0.6) 45%, rgba(244, 247, 246, 0) 100%);
+    /* Efek Blur Glassmorphism transparan */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Shadow tebal pada teks Hero agar tetap kontras & terbaca di atas overlay super terang (#F4F7F6) */
+.hero-title {
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.85);
+}
+
+/* UPDATE: Warna #07b587 dan border teks (outline) putih 4-arah */
+.hero-subtitle {
+    color: #022b20 !important;
+    font-weight: 500 !important;
+    /* Dipertebal agar menonjol */
+    text-shadow:
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff,
+        1px 1px 0 #fff,
+        0px 2px 10px rgba(0, 0, 0, 0.2);
+    /* Soft shadow luar agar makin kontras */
+}
+
+/* Animasi Typewriter */
+.typewriter-container {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.typewriter-text {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid #c2f351;
+    width: 0;
+    font-size: clamp(1.1rem, 4.2vw, 2.3rem) !important;
+    animation: typingEffect 4.5s steps(25, end) infinite alternate, blinkCursor 0.75s step-end infinite;
+}
+
+@keyframes typingEffect {
+    0% {
+        width: 0;
+    }
+
+    45% {
+        width: 100%;
+    }
+
+    90% {
+        width: 100%;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes blinkCursor {
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #c2f351;
+    }
+}
+
+/* Search Box Premium & Filter Select */
+.search-box-elegant {
+    border-radius: 3rem;
+    overflow: hidden;
+    padding: 0.35rem;
+}
+
+.search-box-elegant input {
+    box-shadow: none !important;
+    font-size: 0.95rem;
+}
+
+.search-box-elegant input::placeholder {
+    color: #495057 !important;
+    opacity: 20% !important;
+}
+
+.search-box-elegant select {
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: none !important;
+    color: #495057;
+    padding-right: 2rem !important;
+    padding-left: 1rem !important;
+    width: auto !important;
+    flex: 0 0 auto !important;
+    cursor: pointer;
+}
+
+/* Tabel & Hover Effects */
+.table-elegant-wrapper {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    background: white;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+tbody tr {
+    transition: all 0.25s ease;
+    cursor: default;
+}
+
+tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    background-color: #ffffff !important;
+    z-index: 10;
+    position: relative;
+}
+
+/* =========================================================
+           PENGATURAN WARNA TABEL (Silakan ubah kode warna di sini) 
+           ========================================================= */
+
+/* 1. Pengaturan Judul Tabel (Header) */
+.table-soft-header th {
+    background-color: #10529d !important;
+    /* Warna Background Judul Tabel */
+    color: #b4d1f5 !important;
+    /* Warna Tulisan Judul Tabel */
+    border-color: #b8daff !important;
+    /* Warna Garis Samping Judul */
+    border-bottom: 2px solid #c0c30b !important;
+    /* Warna Garis Bawah Judul */
+    font-weight: 600;
+}
+
+/* 2. Pengaturan Isi Tabel & Garis-garisnya */
+.table-responsive .table td {
+    color: #334155 !important;
+    /* Warna Tulisan Isi Tabel */
+    border-color: #e2e8f0 !important;
+    /* Warna Garis-garis Pembatas Data */
+}
+
+/* ========================================================= */
+
+/* Kustomisasi Warna Pagination */
+.pagination .page-link {
+    color: #002b5e;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0099ff;
+    border-color: #0099ff;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #8e9ca9;
+    background-color: #f8f9fa;
+}
+
+/* TAMPILAN MODAL DETAIL */
+.info-group-wrapper {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    width: 100%;
+}
+
+.info-box-gray {
+    background-color: #f4f6f8;
+    border-color: #e2e8f0;
+}
+
+.info-box-gray .info-label {
+    color: #6c757d !important;
+}
+
+.info-box-gray .info-value {
+    color: #495057 !important;
+}
+
+.info-box-green {
+    background-color: #f0fdf4;
+    border-color: #dcfce7;
+}
+
+.info-box-green .info-label {
+    color: #198754 !important;
+}
+
+.info-box-green .info-value {
+    color: #146c43 !important;
+}
+
+.info-box-blue {
+    background-color: #fffeee;
+    border-color: #aaa51e;
+}
+
+.info-box-blue .info-label {
+    color: #ab8103 !important;
+}
+
+.info-box-blue .info-value {
+    color: #4f3c03 !important;
+}
+
+.info-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8e9ca9;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+}
+
+.info-value {
+    font-size: 0.82rem;
+    color: #1a1d20;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.fs-7 {
+    font-size: 0.75rem !important;
+}
+
+.card-rincian {
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+#detailModalTitle {
+    font-size: clamp(0.95rem, 3.5vw, 1.25rem);
+    line-height: 1.4 !important;
+    white-space: nowrap;
+    padding-left: 20px;
+    padding-right: 40px;
+    /* Space for close button */
+    max-width: calc(100% - 60px);
+    margin: 0 auto;
+}
+
+/* =========================================================
+           POSISI TABEL DIRAPATKAN MENYENTUH KOTAK PENCARIAN
+           ========================================================= */
+main.main-content-wrapper {
+    margin-top: -140px !important;
+    /* Tarikan ekstrim ke atas di Desktop untuk menutup celah */
+    position: relative;
+    z-index: 10;
+}
+
+/* =========================================================
+           TAMPILAN HP / MOBILE (MAX-WIDTH: 991.98px)
+           ========================================================= */
+/* Ukuran standar (Desktop) untuk info footer modal */
+.footer-info-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+}
+
+.footer-info-icon {
+    font-size: 0.75rem;
+}
+
+.vs-separator {
+    color: var(--bs-danger);
+    font-size: 0.8em;
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 0.5rem;
+}
+
+@media (max-width: 991.98px) {
+    .hero-section {
+        padding-top: 2rem !important;
+        height: 400px !important;
+    }
+
+    main.main-content-wrapper {
+        margin-top: -170px !important;
+        /* Penyesuaian tarikan ke atas khusus layar HP */
+    }
+
+    .search-box-elegant {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        border-radius: 15px !important;
+        overflow: hidden !important;
+        width: 100%;
+        display: flex !important;
+        align-items: stretch !important;
+    }
+
+    .search-box-elegant .vr {
+        display: none !important;
+    }
+
+    .search-box-elegant select {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        border-radius: 0 !important;
+        background-color: #f8f9fa !important;
+        padding: 0.5rem 1.8rem 0.5rem 0.5rem !important;
+        font-size: 0.75rem !important;
+        border: none !important;
+        border-right: 1px solid #dee2e6 !important;
+    }
+
+    .search-box-elegant input {
+        flex: 1 1 auto !important;
+        width: 10% !important;
+        border-radius: 0 !important;
+        background-color: #ffffff !important;
+        padding: 0.5rem 0.5rem !important;
+        font-size: 0.75rem !important;
+        border: none !important;
+    }
+
+    .search-box-elegant button.btn-primary {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0.5rem 0.7rem !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .search-box-elegant button.btn-light {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0.5rem 0.7rem !important;
+        border-radius: 0 !important;
+        background-color: #f1f3f5 !important;
+        border: none !important;
+        border-left: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+
+    .modal-header {
+        padding: 0.8rem 1rem !important;
+    }
+
+    #detailModalTitle {
+        font-size: 10px !important;
+        white-space: normal !important;
+        word-break: break-word;
+        line-height: 1.1 !important;
+    }
+
+    .vs-separator {
+        display: block !important;
+        margin: 0.2rem 0 !important;
+        font-size: 0.9em !important;
+    }
+
+    #detailModalSubtitle .d-flex {
+        gap: 0.25rem !important;
+        margin-top: 0.4rem !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: center !important;
+    }
+
+    #detailModalSubtitle {
+        font-size: 10px !important;
+    }
+
+    /* Ukuran khusus (Mobile) untuk kotak putih di bawah judul */
+    #detailModalSubtitle .badge {
+        font-size: 0.45rem !important;
+        padding: 0.15rem 0.25rem !important;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+    }
+
+    #detailModalSubtitle .badge i {
+        font-size: 0.65rem !important;
+    }
+
+    .modal-body {
+        padding: 1rem 0.75rem !important;
+    }
+
+    .modal-body .row {
+        display: block !important;
+    }
+
+    /* Ukuran khusus (Mobile) untuk info footer modal */
+    .footer-info-text {
+        font-size: 0.50rem !important;
+    }
+
+    .footer-info-icon {
+        font-size: 0.55rem !important;
+    }
+
+    .modal-body .card.h-100 {
+        height: auto !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .card-rincian {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .modal-footer {
+        padding-bottom: 1.8rem !important;
+    }
+
+    .modal-close-btn {
+        padding: 0.35rem 1.8rem !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 0.6rem !important;
+    }
+
+    .footer-col-section {
+        text-align: center;
+    }
+
+    .footer-col-section ul li {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
