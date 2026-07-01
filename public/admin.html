@@ -10,31 +10,38 @@
     <link rel="stylesheet" href="css/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-light">
+<body class="admin-body">
 
 <div class="wrapper">
     <!-- Sidebar -->
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h4 class="fw-bold m-0 poppins-font">KIACEH</h4>
-            <small class="text-white-50">Panel Admin</small>
+        <div class="sidebar-header d-flex flex-column align-items-center text-center">
+            <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" height="40" class="mb-2">
+            <div class="sidebar-text">
+                <h4 class="fw-bold m-0 poppins-font">KIACEH</h4>
+                <small class="text-white-50">Panel Admin</small>
+            </div>
         </div>
         <ul class="list-unstyled components">
             <li class="active" id="nav-beranda">
-                <a onclick="switchTab('beranda')">📊 Beranda</a>
+                <a onclick="switchTab('beranda')"><i class="bi bi-clipboard-data-fill me-2"></i><span class="sidebar-text">Beranda</span></a>
             </li>
             <li id="nav-manajemen">
-                <a onclick="switchTab('manajemen')">📁 Manajemen Data</a>
+                <a onclick="switchTab('manajemen')"><i class="bi bi-database-fill-add me-2"></i><span class="sidebar-text">Manajemen Data</span></a>
+            </li>
+            <li id="nav-pengaturan">
+                <a onclick="switchTab('pengaturan')"><i class="bi bi-sliders me-2"></i><span class="sidebar-text">Pengaturan Akun</span></a>
             </li>
             <li>
-                <a onclick="bukaModalPassword()">⚙️ Pengaturan Akun</a>
+                <a href="index.html"><i class="bi bi-browser-safari me-2"></i><span class="sidebar-text">Web Publik</span></a>
             </li>
-            <li>
-                <a href="index.html">🌐 Web Publik</a>
-            </li>
+
         </ul>
-        <div class="p-3 mt-auto">
+        <div class="p-3 mt-auto sidebar-text">
             <button class="btn btn-danger w-100 fw-bold" onclick="logout()">Logout</button>
+        </div>
+        <div class="p-3 mt-auto d-none text-center" id="logoutIconOnly">
+            <a onclick="logout()" class="text-danger fs-4 cursor-pointer" title="Logout"><i class="bi bi-power"></i></a>
         </div>
     </nav>
 
@@ -47,7 +54,7 @@
                 <button type="button" id="sidebarCollapse" class="btn btn-primary" onclick="toggleSidebar()">
                     <span class="fw-bold">☰ Menu</span>
                 </button>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 ms-auto">
                     <img src="https://www.freepnglogos.com/uploads/logo-garuda-png/garuda-buku-pembangunan-desa-kementrian-desa-pdtt-2.png" alt="Logo Garuda" height="35">
                 </div>
             </div>
@@ -56,7 +63,7 @@
 
     
         <!-- Tab Beranda -->
-        <div id="section-beranda" class="container mt-4 mb-5">
+        <div id="section-beranda" class="container mt-4 mb-5 main-section">
             <h3 class="fw-bold mb-4">Dashboard Statistik</h3>
             
             <div class="row g-3 mb-4">
@@ -107,7 +114,7 @@
         </div>
 
         <!-- Tab Manajemen Data -->
-        <main id="section-manajemen" class="container mt-4 mb-5" style="display:none;">
+        <main id="section-manajemen" class="container mt-4 mb-5 main-section" style="display:none;">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
             <h3 class="fw-bold m-0 fs-4">Manajemen Data</h3>
             <button class="btn btn-success fw-bold" onclick="bukaModalTambah()">+ Tambah Data</button>
@@ -134,6 +141,64 @@
             </div>
         </div>
     </main>
+
+    <!-- Tab Pengaturan -->
+    <main id="section-pengaturan" class="container mt-4 mb-5 main-section" style="display:none;">
+        <h3 class="fw-bold m-0 fs-4 mb-4"><i class="bi bi-sliders me-2"></i>Pengaturan Akun & Sistem</h3>
+        
+        <div class="row g-4">
+            <!-- Kolom Maintenance -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-tools text-warning fs-3 me-3"></i>
+                            <h5 class="fw-bold m-0">Mode Maintenance</h5>
+                        </div>
+                        <p class="text-muted mb-4">Tutup akses publik sementara waktu. Pengunjung umum akan dialihkan ke layar perbaikan dan tidak dapat melihat data sengketa.</p>
+                        
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light">
+                            <span class="fw-bold">Status Maintenance</span>
+                            <div class="form-check form-switch p-0 m-0">
+                                <input class="form-check-input m-0" type="checkbox" id="maintenanceSwitch" style="width: 3em; height: 1.5em; cursor: pointer;" onclick="toggleMaintenance(event)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Ubah Password -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-key-fill text-secondary fs-3 me-3"></i>
+                            <h5 class="fw-bold m-0">Ubah Password Admin</h5>
+                        </div>
+                        <p class="text-muted mb-4">Perbarui kata sandi Anda secara berkala untuk menjaga keamanan akun panel admin.</p>
+                        
+                        <form id="formUbahPassword" onsubmit="submitUbahPassword(event)">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Password Lama</label>
+                                <input type="password" id="inputPasswordLama" class="form-control" placeholder="Masukkan password saat ini..." required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Password Baru</label>
+                                <input type="password" id="inputPasswordBaru" class="form-control" placeholder="Minimal 6 karakter" required minlength="6">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Konfirmasi Password Baru</label>
+                                <input type="password" id="inputKonfirmasiPassword" class="form-control" placeholder="Ulangi password baru" required minlength="6">
+                            </div>
+                            <div id="passwordAlert" class="alert d-none" role="alert"></div>
+                            <button type="submit" class="btn btn-warning w-100 fw-bold mt-2 shadow-sm" id="btnSubmitPassword">Simpan Password Baru</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="text-center py-3 bg-white mt-auto text-muted" style="border-top: 1px solid #dee2e6;">&copy; 2026 Komisi Informasi Aceh (KIACEH).</footer>
     </div><!-- End of Content -->
 </div><!-- End of Wrapper -->
 
@@ -194,37 +259,28 @@
         </div>
     </div>
 
-    <!-- Modal Ubah Password -->
-    <div class="modal fade" id="ubahPasswordModal" tabindex="-1" data-bs-backdrop="static">
+    <!-- Modal Maintenance Confirm -->
+    <div class="modal fade" id="maintenanceModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title fw-bold">Pengaturan Akun (Ubah Password)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold poppins-font text-primary"><i class="bi bi-info-circle-fill me-2"></i>Konfirmasi Maintenance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="cancelMaintenanceToggle()"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="formUbahPassword" onsubmit="submitUbahPassword(event)">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Password Lama</label>
-                            <input type="password" id="inputPasswordLama" class="form-control" placeholder="Masukkan password saat ini..." required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Password Baru</label>
-                            <input type="password" id="inputPasswordBaru" class="form-control" placeholder="Minimal 6 karakter" required minlength="6">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Konfirmasi Password Baru</label>
-                            <input type="password" id="inputKonfirmasiPassword" class="form-control" placeholder="Ulangi password baru" required minlength="6">
-                        </div>
-                        <div id="passwordAlert" class="alert d-none" role="alert"></div>
-                        <button type="submit" class="btn btn-warning w-100 fw-bold mt-2 shadow-sm" id="btnSubmitPassword">Simpan Password Baru</button>
-                    </form>
+                <div class="modal-body fs-6" id="maintenanceModalBody">
+                    Apakah Anda yakin ingin mengubah status Maintenance?
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-dismiss="modal" onclick="cancelMaintenanceToggle()">Batal</button>
+                    <button type="button" class="btn btn-success rounded-pill px-4 fw-bold text-white" id="btnConfirmMaintenance" onclick="executeMaintenanceToggle()">Ya, Lanjutkan</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="text-center py-3 bg-white mt-auto text-muted">&copy; 2026 Komisi Informasi Aceh (KIACEH).</footer>
+
+
+
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -235,6 +291,6 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
     
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script src="js/main.js?v=14"></script>
+    <script src="js/main.js?v=23"></script>
 </body>
 </html>

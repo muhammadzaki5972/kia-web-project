@@ -614,10 +614,12 @@ function switchTab(tabName) {
     // Hide all sections
     document.getElementById('section-beranda').style.display = 'none';
     document.getElementById('section-manajemen').style.display = 'none';
+    document.getElementById('section-pengaturan').style.display = 'none';
     
     // Remove active class from navs
     document.getElementById('nav-beranda').classList.remove('active');
     document.getElementById('nav-manajemen').classList.remove('active');
+    document.getElementById('nav-pengaturan').classList.remove('active');
     
     // Show selected section
     document.getElementById('section-' + tabName).style.display = 'block';
@@ -686,3 +688,77 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCharts();
     }
 });
+
+
+
+// ==== MAINTENANCE LOGIC ====
+async function fetchMaintenanceStatus() {
+    try {
+        const res = await fetch('/api/settings/maintenance');
+        const data = await res.json();
+        const sw = document.getElementById('maintenanceSwitch');
+        if(sw) {
+            sw.checked = data.maintenance_mode;
+        }
+    } catch(e) {
+        console.error('Failed to fetch maintenance status', e);
+    }
+}
+
+let pendingMaintenanceStatus = null;
+
+function toggleMaintenance(event) {
+    const sw = document.getElementById('maintenanceSwitch');
+    pendingMaintenanceStatus = sw.checked; // State already changed natively
+    
+    const confirmMsg = pendingMaintenanceStatus 
+        ? 'Apakah Anda yakin ingin <b>MENYALAKAN</b> Mode Maintenance?<br><br>Pengunjung umum tidak akan bisa melihat data perkara dan akan dialihkan ke layar pemeliharaan.'
+        : 'Apakah Anda yakin ingin <b>MEMATIKAN</b> Mode Maintenance?<br><br>Website akan kembali bisa diakses oleh publik secara normal.';
+
+    document.getElementById('maintenanceModalBody').innerHTML = confirmMsg;
+    new bootstrap.Modal(document.getElementById('maintenanceModal')).show();
+}
+
+function cancelMaintenanceToggle() {
+    const sw = document.getElementById('maintenanceSwitch');
+    if(pendingMaintenanceStatus !== null) {
+        sw.checked = !pendingMaintenanceStatus; // Revert visually
+        pendingMaintenanceStatus = null;
+    }
+}
+
+async function executeMaintenanceToggle() {
+    const sw = document.getElementById('maintenanceSwitch');
+    if(pendingMaintenanceStatus === null) return;
+    
+    sw.disabled = true;
+    const targetStatus = pendingMaintenanceStatus;
+    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('maintenanceModal'));
+    
+    try {
+        const response = await fetch('/api/settings/maintenance', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ status: targetStatus })
+        });
+        const data = await response.json();
+        if(response.ok) {
+            sw.checked = data.maintenance_mode;
+            if(modalInstance) modalInstance.hide();
+        } else {
+            alert('Gagal mengubah status: ' + data.error);
+            sw.checked = !targetStatus; // Revert visually
+            if(modalInstance) modalInstance.hide();
+        }
+    } catch(e) {
+        alert('Terjadi kesalahan jaringan.');
+        sw.checked = !targetStatus; // Revert visually
+        if(modalInstance) modalInstance.hide();
+    } finally {
+        sw.disabled = false;
+        pendingMaintenanceStatus = null;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', fetchMaintenanceStatus);

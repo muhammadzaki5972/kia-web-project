@@ -38,9 +38,51 @@ const DETAIL_HEADERS = [
   "Tgl Sidang Sebelumnya", "Agenda Sidang Sebelumnya", "Tgl Sidang Selanjutnya", "Agenda Sidang Selanjutnya", "Kehadiran Para Pihak", "View Count"
 ];
 
-// GET: Ambil semua data (terbuka untuk publik)
+// GET: Ambil status maintenance
+app.get('/api/settings/maintenance', async (req, res) => {
+  try {
+    const result = await db.execute('SELECT value FROM settings WHERE key = ?', ['maintenance_mode']);
+    const isMaintenance = result.rows.length > 0 && result.rows[0].value === 'true';
+    res.json({ maintenance_mode: isMaintenance });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch settings" });
+  }
+});
+
+// PUT: Ubah status maintenance (Protected)
+app.put('/api/settings/maintenance', authMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+    await db.execute('UPDATE settings SET value = ? WHERE key = ?', [status ? 'true' : 'false', 'maintenance_mode']);
+    res.json({ success: true, maintenance_mode: status });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update settings" });
+  }
+});
+
+// GET: Ambil semua data (terbuka untuk publik, kecuali saat maintenance)
 app.get('/api/data', async (req, res) => {
   try {
+    // Cek mode maintenance
+    const maintenanceRes = await db.execute('SELECT value FROM settings WHERE key = ?', ['maintenance_mode']);
+    const isMaintenance = maintenanceRes.rows.length > 0 && maintenanceRes.rows[0].value === 'true';
+    
+    // Jika maintenance nyala, dan user tidak punya token admin, tolak akses
+    if (isMaintenance) {
+      const token = req.cookies.token;
+      let isAdmin = false;
+      if (token) {
+        const jwt = require('jsonwebtoken');
+        try {
+          jwt.verify(token, process.env.JWT_SECRET || 'rahasia_negara');
+          isAdmin = true;
+        } catch(e) {}
+      }
+      
+      if (!isAdmin) {
+        return res.status(503).json({ error: "Maintenance Mode", message: "Sistem sedang dalam pemeliharaan." });
+      }
+    }
     const perkaraResult = await db.execute('SELECT * FROM data_perkara');
     const detailResult = await db.execute('SELECT * FROM detail_perkara');
 

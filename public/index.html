@@ -67,7 +67,7 @@
             <p class="hero-subtitle mb-4 fs-6 px-2">Portal Transparansi Penyelesaian Sengketa Informasi Publik - Komisi
                 Informasi Aceh</p>
 
-            <div class="row justify-content-center px-2 px-md-0">
+            <div class="row justify-content-center px-2 px-md-0" id="searchFormContainer">
                 <div class="col-12 col-md-10 col-lg-8">
                     <div class="input-group search-box-elegant shadow-lg bg-white d-flex align-items-center">
                         <select id="statusFilter" class="form-select border-0 bg-transparent py-2 ps-3 pe-4"
@@ -98,7 +98,17 @@
     </section>
 
     <!-- MAIN CONTENT WRAPPER -->
-    <main class="container main-content-wrapper flex-grow-1 mb-5 pb-3">
+    <main class="container main-content-wrapper flex-grow-1 mb-5 pb-3" id="mainContainer">
+        
+        <!-- Maintenance Overlay (Hidden by Default) -->
+        <div id="maintenanceOverlay" class="d-none text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-tools text-warning" style="font-size: 5rem;"></i>
+            </div>
+            <h2 class="fw-bold poppins-font">Sistem Sedang Dalam Pemeliharaan</h2>
+            <p class="text-muted fs-5">Kami sedang melakukan pembaruan sistem untuk memberikan layanan yang lebih baik. Silakan kembali beberapa saat lagi.</p>
+        </div>
+
         <div id="publicDataContainer" class="px-2 px-md-0">
             <div class="text-center py-5" id="loadingStatus">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -238,6 +248,14 @@
             try {
                 container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-3 text-muted fw-bold poppins-font">Memuat Data Sengketa...</p></div>';
                 const response = await fetch(`/api/data?t=${new Date().getTime()}`, { cache: 'no-store' });
+                
+                if (response.status === 503) {
+                    document.getElementById('publicDataContainer').classList.add('d-none');
+                    document.getElementById('searchFormContainer')?.classList.add('d-none');
+                    document.getElementById('maintenanceOverlay').classList.remove('d-none');
+                    return;
+                }
+                
                 if (!response.ok) throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
                 const textData = await response.text();
                 let data;

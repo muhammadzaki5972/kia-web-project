@@ -10,6 +10,14 @@
             try {
                 container.innerHTML = '<div class="text-center py-5" id="loadingStatus"><div class="spinner-border text-primary" role="status"></div><p class="mt-3 text-muted fw-bold poppins-font">Memuat Data Sengketa...</p></div>';
                 const response = await fetch('/api/data');
+                
+                if (response.status === 503) {
+                    document.getElementById('publicDataContainer').classList.add('d-none');
+                    document.getElementById('searchFormContainer')?.classList.add('d-none'); // Hide search if exists
+                    document.getElementById('maintenanceOverlay').classList.remove('d-none');
+                    return;
+                }
+                
                 if (!response.ok) throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
                 const textData = await response.text();
                 let data;
