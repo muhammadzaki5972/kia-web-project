@@ -716,3 +716,99 @@ main.main-content-wrapper {
         transform: translateY(0);
     }
 }
+
+/* ==== ADMIN SIDEBAR DASHBOARD CSS ==== */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #001f42; /* Dark theme */
+    color: #fff;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #00152c;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    flex-grow: 1;
+}
+
+#sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+#sidebar ul li a:hover, #sidebar ul li.active > a {
+    color: #fff;
+    background: #00366d;
+    border-left: 4px solid #f2c94c;
+}
+
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card {
+    border-radius: 8px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card.bg-primary { background: linear-gradient(45deg, #0d6efd, #0dcaf0) !important; }
+.stat-card.bg-success { background: linear-gradient(45deg, #198754, #20c997) !important; }
+.stat-card.bg-warning { background: linear-gradient(45deg, #ffc107, #fd7e14) !important; }
+.stat-card.bg-danger { background: linear-gradient(45deg, #dc3545, #f87171) !important; }
+
+.stat-card h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0; }
+.stat-card p { margin-bottom: 0; font-size: 1rem; opacity: 0.9; }
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+        position: fixed;
+        height: 100vh;
+        z-index: 9999;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+}

@@ -290,7 +290,7 @@ async function loadData() {
         
         let theadHtml = '';
         sheetHeadersPerkara.forEach((h, i) => { if(i !== skipIdx && i !== skipKetIdx) theadHtml += `<th>${h}</th>`; });
-        theadHtml += `<th>Detail</th><th>Aksi</th>`;
+        theadHtml += `<th>Aksi</th>`;
         thead.innerHTML = theadHtml;
 
         let formHtml = `<div class="card shadow-sm mb-4"><div class="card-header bg-secondary text-white fw-bold">Data Utama</div><div class="card-body row">`;
@@ -313,8 +313,11 @@ async function loadData() {
         perkaraData.forEach(row => {
             let rowHtml = `<tr>`;
             for (let i = 0; i < sheetHeadersPerkara.length; i++) { if(i !== skipIdx && i !== skipKetIdx) rowHtml += `<td>${row[i] || '-'}</td>`; }
-            rowHtml += `<td><button type="button" class="btn btn-warning btn-sm text-dark fw-bold py-0 shadow-sm" onclick="lihatDetail('${row[0]}')">Lihat</button></td>`;
-            rowHtml += `<td><button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')">Edit</button> <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm mt-1 mt-md-0" onclick="hapusData('${row[0]}')">Hapus</button></td></tr>`;
+            rowHtml += `<td><div class="d-flex gap-1 justify-content-center">
+                <button type="button" class="btn btn-warning btn-sm text-dark py-0 shadow-sm" onclick="lihatDetail('${row[0]}')" title="Lihat Detail"><i class="bi bi-eye-fill"></i></button>
+                <button type="button" class="btn btn-primary btn-sm py-0 shadow-sm" onclick="bukaModalEdit('${row[0]}')" title="Edit"><i class="bi bi-pencil-square"></i></button>
+                <button type="button" class="btn btn-danger btn-sm py-0 shadow-sm" onclick="hapusData('${row[0]}')" title="Hapus"><i class="bi bi-trash3-fill"></i></button>
+            </div></td></tr>`;
             allRowsHtml += rowHtml;
         });
         tbody.innerHTML = allRowsHtml;
@@ -539,3 +542,147 @@ function lihatDetail(id) {
 }
 function closeDetailModal() { const m = bootstrap.Modal.getInstance(document.getElementById('detailModal')); if(m) m.hide(); }
 window.onload = loadData;
+
+function bukaModalPassword() {
+    const modal = new bootstrap.Modal(document.getElementById('ubahPasswordModal'));
+    document.getElementById('formUbahPassword').reset();
+    document.getElementById('passwordAlert').classList.add('d-none');
+    modal.show();
+}
+
+async function submitUbahPassword(event) {
+    event.preventDefault();
+    const btn = document.getElementById('btnSubmitPassword');
+    const alertBox = document.getElementById('passwordAlert');
+    
+    const currentPassword = document.getElementById('inputPasswordLama').value;
+    const newPassword = document.getElementById('inputPasswordBaru').value;
+    const confirmPassword = document.getElementById('inputKonfirmasiPassword').value;
+
+    if (newPassword !== confirmPassword) {
+        alertBox.className = 'alert alert-danger mt-3';
+        alertBox.innerText = 'Password baru dan konfirmasi tidak cocok!';
+        alertBox.classList.remove('d-none');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Menyimpan...';
+    alertBox.classList.add('d-none');
+
+    try {
+        const response = await fetch('/api/auth/change-password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alertBox.className = 'alert alert-success mt-3';
+            alertBox.innerText = 'Password berhasil diubah! Silakan login kembali...';
+            alertBox.classList.remove('d-none');
+            
+            setTimeout(() => {
+                logout(); // Paksa user login ulang
+            }, 2000);
+        } else {
+            alertBox.className = 'alert alert-danger mt-3';
+            alertBox.innerText = data.error || 'Gagal mengubah password.';
+            alertBox.classList.remove('d-none');
+            btn.disabled = false;
+            btn.innerText = 'Simpan Password Baru';
+        }
+    } catch (error) {
+        alertBox.className = 'alert alert-danger mt-3';
+        alertBox.innerText = 'Terjadi kesalahan jaringan.';
+        alertBox.classList.remove('d-none');
+        btn.disabled = false;
+        btn.innerText = 'Simpan Password Baru';
+    }
+}
+
+
+
+// ==== DASHBOARD LOGIC ====
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+}
+
+function switchTab(tabName) {
+    // Hide all sections
+    document.getElementById('section-beranda').style.display = 'none';
+    document.getElementById('section-manajemen').style.display = 'none';
+    
+    // Remove active class from navs
+    document.getElementById('nav-beranda').classList.remove('active');
+    document.getElementById('nav-manajemen').classList.remove('active');
+    
+    // Show selected section
+    document.getElementById('section-' + tabName).style.display = 'block';
+    document.getElementById('nav-' + tabName).classList.add('active');
+    
+    if(tabName === 'beranda') {
+        renderCharts();
+    }
+    
+    // On mobile, close sidebar after clicking
+    if(window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('active');
+    }
+}
+
+let chartsRendered = false;
+function renderCharts() {
+    if(chartsRendered) return;
+    
+    // Dummy Data for Bar Chart
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'],
+            datasets: [{
+                label: 'Jumlah Sengketa Masuk',
+                data: [12, 19, 15, 25, 22, 30, 28, 15, 10, 18, 20, 31],
+                backgroundColor: '#0d6efd',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Dummy Data for Pie Chart
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Selesai', 'Diproses', 'Ditolak'],
+            datasets: [{
+                data: [180, 42, 23],
+                backgroundColor: ['#198754', '#ffc107', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+    
+    chartsRendered = true;
+}
+
+// Initial render
+document.addEventListener('DOMContentLoaded', () => {
+    if(document.getElementById('barChart')) {
+        renderCharts();
+    }
+});
