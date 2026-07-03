@@ -4,6 +4,14 @@ async function checkAuth() {
             const res = await fetch('/api/auth/me');
             if (!res.ok) {
                 window.location.href = 'login.html';
+            } else {
+                const data = await res.json();
+                if (data.user && data.user.username) {
+                    const userElement = document.getElementById('loggedUsername');
+                    if (userElement) {
+                        userElement.textContent = data.user.username;
+                    }
+                }
             }
         } catch (e) {
             window.location.href = 'login.html';
@@ -12,7 +20,11 @@ async function checkAuth() {
 }
 checkAuth();
 
-async function logout() { 
+function logout() {
+    new bootstrap.Modal(document.getElementById('logoutModal')).show();
+}
+
+async function confirmLogout() { 
     try {
         await fetch('/api/auth/logout', { method: 'POST' });
     } catch(e) {}
